@@ -199,29 +199,29 @@ package object meta {
         case MetaAnyType => AnyType
         case MetaAnyRefType => AnyRefType
         case MetaAnyValueType => AnyValueType
-        case MetaIntType => IntType(valueData.get("Min"), valueData.get("Max"))
+        case MetaIntType => IntType(valueData.getAs[Int]("Min"), valueData.getAs[Int]("Max"))
         case MetaDoubleType => DoubleType
         case MetaBoolType => BoolType
         case MetaStringType => StringType
-        case MetaFileType => FileType(valueData("Category"), valueData[List[String]]("Extensions"): _*)
-        case MetaListType => ListType(valueData[ValueData]("ElementType").asResourceType)
-        case MetaMapType => MapType(valueData[ValueData]("KeyType").asResourceType, 
-                                  valueData[ValueData]("ValueType").asResourceType)
+        case MetaFileType => FileType(valueData("Category").toString, valueData("Extensions").asInstanceOf[List[String]]: _*)
+        case MetaListType => ListType(valueData("ElementType").asInstanceOf[ValueData].asResourceType)
+        case MetaMapType => MapType(valueData("KeyType").asInstanceOf[ValueData].asResourceType, 
+                                    valueData("ValueType").asInstanceOf[ValueData].asResourceType)
                                   
-        case MetaRefType => schema.findRefType(valueData[ResourceRef]("RefType").id).get
-        case MetaValueType => schema.findValueType(valueData[ResourceRef]("ValueType").id).get
-        case MetaSelectOneType => schema.findSelectOneType(valueData[ResourceRef]("SelectOneType").id).get
+        case MetaRefType => schema.findRefType(valueData("RefType").asInstanceOf[ResourceRef].id).get
+        case MetaValueType => schema.findValueType(valueData("ValueType").asInstanceOf[ResourceRef].id).get
+        case MetaSelectOneType => schema.findSelectOneType(valueData("SelectOneType").asInstanceOf[ResourceRef].id).get
       
         case x => error("Unknown meta-type: " + x) 
       }
     
       def asField: Field = {
-        val name: String = valueData("Name")
-        val fieldType = valueData[ValueData]("FieldType").asResourceType
-        val category: String = valueData.getOrElse("Category", "")
-        val description: String = valueData.getOrElse("Description", "")
-        val required: Boolean = valueData("Required")
-        val isId: Boolean = valueData("IsId")
+        val name = valueData("Name").asInstanceOf[String]
+        val fieldType = valueData("FieldType").asInstanceOf[ValueData].asResourceType
+        val category = valueData.getOrElse("Category", "")
+        val description = valueData.getOrElse("Description", "")
+        val required = valueData("Required").asInstanceOf[Boolean]
+        val isId = valueData("IsId").asInstanceOf[Boolean]
         val default: Option[fieldType.Value] = valueData.get("Default") map fieldType.asValue
         Field[fieldType.Value](name, fieldType, category, required, isId, default, description)
       }
@@ -229,28 +229,28 @@ package object meta {
     
     class RichRefData(refData: RefData) {
       def asRefType: RefType = {
-        val name: String = refData("Name")
-        val parentName = refData[ResourceRef]("Parent").id
+        val name = refData("Name").asInstanceOf[String]
+        val parentName = refData("Parent").asInstanceOf[ResourceRef].id
         def parent: RefType = schema.findRefType(parentName) getOrElse error("No RefType found called \"" + parentName + "\"") 
-        val isAbstract: Boolean = refData("Abstract")
-        val fields: List[Field] = refData[List[ValueData]]("Fields").map(_.asField)
+        val isAbstract = refData("Abstract").asInstanceOf[Boolean]
+        val fields: List[Field] = refData("Fields").asInstanceOf[List[ValueData]].map(_.asField)
         RefType(name, parent, isAbstract, fields: _*)
       }
         
       def asValueType: ValueType = {
-        val name: String = refData("Name")
-        val parentName = refData[ResourceRef]("Parent").id
+        val name = refData("Name").asInstanceOf[String]
+        val parentName = refData("Parent").asInstanceOf[ResourceRef].id
         def parent: ValueType = schema.findValueType(parentName) getOrElse error("No ValueType found called \"" + parentName + "\"")
-        val isAbstract: Boolean = refData("Abstract")
-        val fields: List[Field] = refData[List[ValueData]]("Fields").map(_.asField)
+        val isAbstract = refData("Abstract").asInstanceOf[Boolean]
+        val fields: List[Field] = refData("Fields").asInstanceOf[List[ValueData]].map(_.asField)
         ValueType(name, parent, isAbstract, fields: _*)
       }
         
         
       def asSelectOneType: SelectOneType = {
-        val name: String = refData("Name")
-        val valueType: ResourceType = refData[ValueData]("ValueType").asResourceType
-        val values: List[valueType.Value] = refData[List[Any]]("Values") map valueType.asValue
+        val name = refData("Name").asInstanceOf[String]
+        val valueType: ResourceType = refData("ValueType").asInstanceOf[ValueData]asResourceType
+        val values: List[valueType.Value] = refData("Values").asInstanceOf[List[ValueData]] map valueType.asValue
         SelectOneType[valueType.Value](name, valueType, values: _*)
       }
     }

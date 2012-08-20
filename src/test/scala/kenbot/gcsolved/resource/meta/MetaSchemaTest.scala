@@ -33,22 +33,22 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
     
     def checkSameFields(data: ValueData, f: Field) {
       it("should have the same name") {
-        data[Any]("Name") should equal (f.name)
+        data("Name") should equal (f.name)
       }
       it("should have the same field type") {
-        data[Any]("FieldType") should equal (f.fieldType.typeDescriptor)
+        data("FieldType") should equal (f.fieldType.typeDescriptor)
       }
       it("should have the same default") {
         data.get("Default") should equal (f.default)
       }
       it("should have the same required status") {
-        data[Any]("Required") should equal (f.required)
+        data("Required") should equal (f.required)
       }
       it("should have the same description") {
-        data[Any]("Description") should equal (f.description)
+        data("Description") should equal (f.description)
       }
       it("should have the same category") {
-        data[Any]("Category") should equal (f.category)
+        data("Category") should equal (f.category)
       }
     }
     
@@ -110,19 +110,19 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
     
     def checkSameFields(data: RefData, rt: RefType) {
       it("should have the same name") {
-        data[Any]("Name") should equal (rt.name)
+        data("Name") should equal (rt.name)
       }
       
       it("should have the same parent") {
-        data[Any]("Parent") should equal (rt.parent.metaRef)
+        data("Parent") should equal (rt.parent.metaRef)
       }
       
       it("should have the same abstractness") {
-        data[Any]("Abstract") should equal (rt.isAbstract)
+        data("Abstract") should equal (rt.isAbstract)
       }
       
       it("should have the same fields") {
-        data[Any]("Fields") should equal (rt.localFields.values.toList.map(_.asData))
+        data("Fields") should equal (rt.localFields.values.toList.map(_.asData))
       }
     }
     
@@ -171,16 +171,16 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
     
     def checkSameFields(data: RefData, vt: ValueType) {
       it("should have the same name") {
-        data[Any]("Name") should equal (vt.name)
+        data("Name") should equal (vt.name)
       }
       it("should have the same parent") {
-        data[Any]("Parent") should equal (vt.parent.metaRef)
+        data("Parent") should equal (vt.parent.metaRef)
       }
       it("should have the same abstractness") {
-        data[Any]("Abstract") should equal (vt.isAbstract)
+        data("Abstract") should equal (vt.isAbstract)
       }
       it("should have the same fields") {
-        data[Any]("Fields") should equal (vt.localFields.values.toList.map(_.asData))
+        data("Fields") should equal (vt.localFields.values.toList.map(_.asData))
       }
     }
     
@@ -228,13 +228,13 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
     
     def checkSameFields(data: RefData, s1t: SelectOneType) {
       it("should have the same name") {
-        data[Any]("Name") should equal (s1t.name)
+        data("Name") should equal (s1t.name)
       }
       it("should have the same value type") {
-        data[Any]("ValueType") should equal (s1t.valueType.typeDescriptor)
+        data("ValueType") should equal (s1t.valueType.typeDescriptor)
       }
       it("should have the same values") {
-        data[Any]("Values") should equal (s1t.values)
+        data("Values") should equal (s1t.values)
       }
     }
     

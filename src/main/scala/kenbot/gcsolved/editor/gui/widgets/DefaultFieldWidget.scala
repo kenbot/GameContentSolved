@@ -29,16 +29,23 @@ abstract class DefaultFieldWidget(val field: Field, parentWidgetParam: => Option
   top =>   
     
   override lazy val parentWidget = parentWidgetParam
-    
+  private var acceptableValue = true
+  private var editableVar = true
+  
+  override def editable = editableVar
+  override def editable_=(b: Boolean) {
+    this.editableVar = b
+    editor.enabled = b
+  }
+  
   /**
    * Mix this in to editors to mark it as belonging to us 
    */
-  protected trait MyEditorMixin extends WidgetEditor {
+  protected trait MyEditorMixin extends WidgetEditor { 
     this: Component => 
+    
     def widget: FieldWidget = top
   }  
-    
-  private var acceptableValue = true
   
   final def valid: Boolean = !parentAllowsValidation || acceptableValue
 

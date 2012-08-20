@@ -13,7 +13,14 @@ object ResourceLibrary {
       new ResourceLibrary(id, name, "", 0, Map(), Set(), schema, Seq())
 }
 
-case class ResourceRef(id: String, refType: RefType)
+case class ResourceRef(id: String, refType: RefType) {
+  private def equality = (id, refType.name)
+  override def hashCode() = equality.hashCode
+  override def equals(a: Any) = a match {
+    case rr: ResourceRef => equality == rr.equality
+    case _ => false
+  }
+}
 
 
 final class ResourceLibrary private (
@@ -45,7 +52,12 @@ final class ResourceLibrary private (
   
   def findResourcesThatReferTo(resourceRef: ResourceRef): Seq[RefData] = 
       allResources.filter(_ refersTo resourceRef).toSeq
-  def allResources: Iterator[RefData] = (localResources /: linkedLibraries)(_ ++ _.allResources)
+      
+  def allResources: Iterator[RefData] = (localResources.toSet /: linkedLibraries) { (rs, lib) =>
+    def alreadyDefined(r: RefData) = rs.exists(_.ref == r.ref)
+    rs ++ (lib.allResources filterNot alreadyDefined)
+  }.iterator
+  
   def allResourcesByType(refType: RefType): Iterator[RefData] = allResources filter (_.resourceType <:< refType)
   def localResources: Iterator[RefData] = resourceMap.valuesIterator
   def localResourcesByType(refType: RefType): Iterator[RefData] = localResources filter (_.resourceType <:< refType)

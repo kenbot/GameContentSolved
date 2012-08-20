@@ -14,7 +14,7 @@ class RefData private (
   val definedIn: Option[ResourceLibraryRef],
   val fields: Map[Field.Name, Any]) extends ObjectData {
 
-  override lazy val id: String = get[Any](resourceType.idField).map(_.toString) getOrElse ""
+  override lazy val id: String = get(resourceType.idField).map(_.toString) getOrElse ""
   
   private def copy(resourceType: RefType = this.resourceType,
     version: Int = this.version,
@@ -30,6 +30,17 @@ class RefData private (
     fields.valuesIterator.exists(_.toString.toLowerCase contains s)
   }
 
+  private def definesField(field: Field): Boolean = fields contains field.name
+  
+  def addDefaults: RefData = {
+    val fieldsWithDefaults = resourceType.fields.values.filter(_.default.isDefined)
+    val notDefinedYet = fieldsWithDefaults filterNot definesField
+    val namedDefaults = notDefinedYet.map(f => f.name -> f.default.get)
+    (this /: namedDefaults) {
+      case (data, (name, dflt)) => data.updateField(name, dflt) 
+    }
+  }
+  
   override def valid: Boolean = fields.contains(resourceType.idField) && id.toString != "" && super.valid
   
   def incrementVersion(): RefData = copy(version = version+1)
@@ -45,7 +56,7 @@ class RefData private (
   protected def updateFields(newFields: Map[Field.Name, Any]) = copy(fields = newFields)
   def updateField(field: Field.Name, value: Any): RefData = copy(fields = fields + (field -> value))
   
-  private def equality = (id, resourceType, version, fields)
+  private def equality = (id, resourceType, fields)
   
   override def hashCode() = equality.hashCode
   

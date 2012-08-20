@@ -15,9 +15,11 @@ trait ObjectData {
   
   def matches(searchString: String): Boolean
   def updateField(field: Field.Name, value: Any): ObjectData  
-  def apply[A](field: Field.Name): A = fields(field).asInstanceOf[A]
+  def apply(field: Field.Name): Any = fields(field)
   def getOrElse[A](field: Field.Name, orElse: A): A = fields.getOrElse(field, orElse).asInstanceOf[A]
-  def get[A](field: Field.Name): Option[A] = fields.get(field).map(_.asInstanceOf[A])
+  def get(field: Field.Name): Option[Any] = fields.get(field)
+  def getAs[A](field: Field.Name): Option[A] = get(field).map(_.asInstanceOf[A])
+  
   def refersTo(resourceRef: ResourceRef): Boolean = externalRefs contains resourceRef
   
   def updateResourceRefs(resourceRef: ResourceRef, newId: String): ObjectData

@@ -1,18 +1,20 @@
 package kenbot.gcsolved.editor.gui
+import scala.sys.error
+
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
+
+import kenbot.gcsolved.editor.gui.widgets.TextFieldWidget
 import kenbot.gcsolved.resource.types.IntType
 import kenbot.gcsolved.resource.types.RefType
 import kenbot.gcsolved.resource.types.StringType
 import kenbot.gcsolved.resource.Field
 import kenbot.gcsolved.resource.RefData
+import kenbot.gcsolved.resource.ResourceLibrary
 import kenbot.gcsolved.resource.ResourceRef
 import kenbot.gcsolved.resource.ResourceSchema
-import kenbot.gcsolved.resource.ResourceLibrary
-import kenbot.gcsolved.editor.gui.widgets.TextFieldWidget
-import scala.sys.error
 
 @RunWith(classOf[JUnitRunner])  
 class ListAndEditScreenSpec extends Spec with ShouldMatchers {
@@ -27,16 +29,21 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
       
   val legoTruckType = RefType("LegoTruck", 'id -> IntType ^ (isId = true), 'legoMan -> legoManType)
       
-  val legoMan = RefData(legoManType, 
-      'id -> 1, 'head -> "pirate", 'body -> "fireman", 'pants -> "green")
-      
-  val truckContainingMan = RefData(legoTruckType, 
-      'id -> 9, 'legoMan -> legoMan.ref)
+
       
   val schema = ResourceSchema().addRefTypes(legoManType, legoTruckType)
-  val library = ResourceLibrary("foo", schema).addResources(legoMan)
+  val library = {
+    val legoMan = RefData(legoManType, 
+      'id -> 1, 'head -> "pirate", 'body -> "fireman", 'pants -> "green")
       
-  private def newScreen(lib: ResourceLibrary = library) = new ListAndEditScreen(legoManType, Seq(legoMan), lib, new TextFieldWidget(_))
+
+    
+    ResourceLibrary("foo", schema).addResources(legoMan)
+  }
+  
+  val legoMan = library.findResource(ResourceRef("1", legoManType)).get
+  val truckContainingMan = RefData(legoTruckType, 'id -> 9, 'legoMan -> legoMan.ref)
+  
   
   describe("Modifying resources") {
     
@@ -109,7 +116,7 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
     
     it("should revert the selected resource/s to the original state in the list view") {
       val legoManItem = screen.allResources.find(_.currentId == legoMan.id).get
-      legoManItem.current[String]("head") should equal ("pirate")
+      legoManItem.current("head") should equal ("pirate")
     }
     
     describe("if reverting an ID change") {
@@ -146,33 +153,32 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
     val linkedLib = ResourceLibrary("blah", schema).addLinkedLibraries(library)
     val screen = newScreen(linkedLib)
     
-    it("should not have editable widgets") {
-      pending
-    }
-    
-    it("should show the Import button") {
-      pending
+    it("should not be editable") {
+      screen.editScreen should not be ('editable)
     }
     
     describe("Importing") {
-      it("should make the widgets editable") {
-        pending
+      it("should make the screen editable") {
+        screen.importSelected()
+        screen.editScreen should be ('editable)
       }
       
       it("should add the resource locally to the library") {
-        pending
+        screen.importSelected()
+        val screenItemRef = screen.selectedResources.head.current.ref
+        screen.updatedLibrary containsLocally screenItemRef should be (true)
       }
     }
   }
   
   describe("Creating a new resource") {
-    /*
+    
     it("should add the resource to the list view") {
       val screen = newScreen()
       val numStartingResources = screen.allResources.size
       screen.addNew()
       screen.allResources.size should equal (numStartingResources + 1)
-    }*/
+    }
     
     it("shouldn't add anything to the library yet") {
       val screen = newScreen()
@@ -210,18 +216,25 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
     }
   }
     
+  private def newScreen(lib: ResourceLibrary = library) = new ListAndEditScreen(legoManType, Seq(legoMan), lib, new TextFieldWidget(_))
+  
+  
+  //////////////////////
+  // TODO Just awful!!  ListAndEditScreen shouldn't know anything about widgets.  Kill ASAP
   private def updateWidget(screen: ListAndEditScreen, name: String, value: Option[Any]) {
     val w = findWidget(screen, name).get
     w.fieldValue = value
     w.hasFocus = true
     w.hasFocus = false
   }
+  private def findWidget(screen: ListAndEditScreen, name: String) = screen.editScreen.asInstanceOf[WidgetEditScreen].fieldWidgets.find(_.field.name == name)
+  //////////////////////
   
-  private def findWidget(screen: ListAndEditScreen, name: String) = screen.editScreen.fieldWidgets.find(_.field.name == name)
+  
   
   private def findUpdatedResourceValue(screen: ListAndEditScreen, ref: ResourceRef, property: String): Any = {
     val resource = screen.updatedLibrary.findResource(ref)
-    val prop = resource.map(_.get[Any](property)) getOrElse error("Couldn't find resource " + ref)
+    val prop = resource.map(_ get property) getOrElse error("Couldn't find resource " + ref)
     prop getOrElse error("No value for " + property + " on " + ref)
   }
 }

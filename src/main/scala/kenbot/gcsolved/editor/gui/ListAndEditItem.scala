@@ -3,13 +3,25 @@ import kenbot.gcsolved.resource.RefData
 import kenbot.gcsolved.resource.ResourceLibrary
 import scala.sys.error
 
-case class ListAndEditItem(var current: RefData, original: Option[RefData], localLibraryRef: ResourceLibrary.ResourceLibraryRef) {
+
+object ListAndEditItem {
+  def apply(current: RefData, original: Option[RefData], localLibraryRef: ResourceLibrary.ResourceLibraryRef) = {
+    new ListAndEditItem(current, original, localLibraryRef)
+  }
+}
+
+class ListAndEditItem(private var currentVar: RefData, val original: Option[RefData], val localLibraryRef: ResourceLibrary.ResourceLibraryRef) {
   
-  
+  private var previousRef = original.map(_.ref)
+  def current = currentVar
+  def current_=(c: RefData) {
+    previousRef = Some(currentVar.ref)
+    currentVar = c.addDefaults
+  }
   
   def isNew = original.isEmpty
-  def isModified = original.map(current !=) getOrElse false
-  def isIdModified = !isNew && original.map(_.id != current.id).getOrElse(false)
+  def isModified = original.map(current !=) getOrElse false 
+  def isIdModified = !isNew && previousRef.map(_.id != current.id).getOrElse(false)
   def isExternal = current.definedIn.map(localLibraryRef !=) getOrElse false
   def canImport = isExternal
   def isValid = current.valid
@@ -24,8 +36,8 @@ case class ListAndEditItem(var current: RefData, original: Option[RefData], loca
   
   def updateLibraryFromCurrent(lib: ResourceLibrary): ResourceLibrary = {
     original match {
-      case Some(orig) if isIdModified => 
-        lib.updateResourceId(orig.ref, current.id).addResource(current)
+      case Some(orig) if isIdModified && previousRef.isDefined => 
+        lib.updateResourceId(previousRef.get, current.id).addResource(current)
         
       case _ => lib.addResource(current)
     }
@@ -33,6 +45,15 @@ case class ListAndEditItem(var current: RefData, original: Option[RefData], loca
   
   def currentId = if (current.id.nonEmpty) current.id else "(new)"
   
+  private def equality = (currentVar, original, localLibraryRef)
+  
+  override def hashCode() = equality.hashCode
+  
+  override def equals(a: Any) = a match {
+    case other: ListAndEditItem => equality == other.equality
+    case _ => false
+  }
+    
   override def toString() = {
     def modifiedStr = if (isModified) "*" else ""
     def externalStr = if (isExternal) " - " + current.definedIn.get else ""

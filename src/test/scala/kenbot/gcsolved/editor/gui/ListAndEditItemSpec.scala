@@ -101,5 +101,7 @@ class ListAndEditItemSpec extends Spec with ShouldMatchers {
       updatedLib.findResource(currentData.ref) should not equal (Some(dataInLibrary))
       updatedLib.findResource(currentData.ref) should equal (Some(currentData))
     }
+    
+    
   }
 }

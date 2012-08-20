@@ -26,9 +26,9 @@ class RefDataSpec extends Spec with ShouldMatchers {
     it("should have the given id") {data.id should equal ("Roger")}
     it("should have the given resource type") {data.resourceType should equal (rabbit)}
     it("should have the given fields") {
-      data[Any]("weight") should equal (44)
-      data[Any]("toes") should equal (3)
-      data[Any]("colour") should equal ("white")
+      data("weight") should equal (44)
+      data("toes") should equal (3)
+      data("colour") should equal ("white")
     }
     it("should throw an exception if the resource type is abstract") {
      val abstractType = RefType("AbstractType", AnyRefType, true)
@@ -39,7 +39,7 @@ class RefDataSpec extends Spec with ShouldMatchers {
   describe("Updating field values") {
     it("should result in the new value being set") {
       val newData = data.updateField("colour", "red")
-      newData[Any]("colour") should equal ("red")
+      newData("colour") should equal ("red")
     }
   }
   

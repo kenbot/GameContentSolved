@@ -100,21 +100,40 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
       it ("should be iterable through allResources") {
         libWithLinked.allResources.toSet should equal (Set(fooRes, linkedRes))
       }
+      
       it ("should be findable") {
         libWithLinked contains linkedRes.ref should be (true)
       }
+      
       it ("should be findable by reference") {
         libWithLinked findResource linkedRes.ref should equal (Some(linkedRes))
       }
+      
       it ("should should not be findable locally by reference") {
         libWithLinked findLocalResource linkedRes.ref should equal (None)
       }
-      it ("should should not be findable if shadowed by a locally stored resource") {
+      
+      describe("if shadowed by a locally stored resource") {
         val res2 = fooRes.updateField("a", 4)
         val linkedLibrary2 = linkedLibrary addResource res2
-        val foundRes = (libWithLinked findResource res2.ref).get
-        foundRes[Any]("a") should equal (1)
+        val libWithLinked = libWithAddedResource addLinkedLibraries linkedLibrary2
+        
+        it ("should should not be findable if shadowed by a locally stored resource") {
+          val foundRes = (libWithLinked findResource res2.ref).get
+          foundRes("a") should equal (1)
+        }
+        
+        it ("should not appear in 'allResources' if shadowed by a locally stored resource") {
+          println(libWithLinked.allResources.toList.map(_.debugString))
+          
+          println("****" + libWithLinked.allResources.toList)
+          println("****" + libWithLinked.allResources.map(_.ref).toList)
+          libWithLinked.allResources.exists(_("a") == 4) should be (false)
+        }
       }
+
+      
+      
       it ("should not be removable from the linking library") {
         evaluating {
           libWithLinked removeResource linkedRes.ref
@@ -253,11 +272,11 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
     }
     it ("should result in a library with all direct references to the resource having been updated") {
       val res = updatedLib.findResource(b.ref).get
-      res[Any]("other") should equal (newRef)
+      res("other") should equal (newRef)
     }
     it ("should result in a library with all list references to the resource having been updated") {
       val res = updatedLib.findResource(fooList.ref).get
-      res[Any]("foos") should equal (List(newRef, b.ref))
+      res("foos") should equal (List(newRef, b.ref))
     }
     it ("should result in a library with all map references to the resource having been updated") {
       val res = updatedLib.findResource(fooMap.ref).get

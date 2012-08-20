@@ -49,7 +49,7 @@ class LibraryPage(val refTypes: Seq[RefType], val library: ResourceLibrary) exte
   }
   
   def filterBy(searchString: String) {
-    def matches(t: RefType): Boolean = (t.name.toLowerCase contains searchString) ||
+    def matches(t: RefType): Boolean = (t.name.toLowerCase contains searchString.toLowerCase) ||
                                        (getChildren(t) exists matches)
     
     treeView.model = makeTreeModel filter matches

@@ -40,16 +40,10 @@ object DynamicSideListPanel {
 
 
 class DynamicSideListPanel[C <: Component : ItemDescription](initialPanels: Seq[C]) 
-    extends NestedBorderPanel with Publisher {
+    extends NestedBorderPanel with Publisher with SuppressableEvents {
   
   private[this] val itemDesc = implicitly[ItemDescription[C]]
   import itemDesc._
-  
-  private[this] val areEventsSuppressed = new DynamicVariable(false)
-  private def suppressEvents(thunk: => Unit) {
-    areEventsSuppressed.withValue(true)(thunk)
-  }
-  
   
   val listView = new ListView(initialPanels) {
     preferredSize = (150, 100)
@@ -157,7 +151,7 @@ class DynamicSideListPanel[C <: Component : ItemDescription](initialPanels: Seq[
     }
     
     editorPanel.center = panel
-    if (!areEventsSuppressed.value)
+    if (!shouldSuppressEvents)
       publish(ComponentSelected(this, panel))
     revalidate()
     repaint()

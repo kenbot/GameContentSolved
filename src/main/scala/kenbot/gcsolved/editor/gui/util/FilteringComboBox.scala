@@ -36,7 +36,7 @@ class FilteringComboBox[A](originalItems: Seq[A], useBlankItem: Boolean = true)(
   
   private val originalStrings: Seq[String] = originalItems map a2s
   
-  require(originalStrings.distinct == originalStrings, "All combo box items must be unique")
+  require(originalStrings.distinct == originalStrings, "All combo box items must be unique: " + originalStrings)
   
   private val itemMap: Map[String, A] = originalItems.map(i => i.toString -> i).toMap
   

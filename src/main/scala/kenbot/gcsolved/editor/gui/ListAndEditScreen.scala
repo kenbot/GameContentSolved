@@ -27,18 +27,19 @@ import scala.swing.Publisher
 import kenbot.gcsolved.editor.gui.widgets.FieldWidget
 import kenbot.gcsolved.resource.Field
 import kenbot.gcsolved.resource.ResourceRef
+import kenbot.gcsolved.editor.gui.util.SuppressableEvents
 
 
 class ListAndEditScreen(val refType: RefType, 
             initialValues: Seq[RefData], 
             val originalLibrary: ResourceLibrary, 
-            makeWidget: Field => FieldWidget) extends Reactor {
+            makeWidget: Field => FieldWidget) extends Reactor with SuppressableEvents {
   
   
-  val editScreen = EditScreen(refType, Seq.empty, makeWidget)
+  val editScreen: EditScreen = new WidgetEditScreen(refType, Seq.empty, makeWidget) // TODO: replace with factory function
   lazy val panel = new ListAndEditScreenPanel(initialValuesOrDefault.toList, editScreen.panel)
-  
   private[this] var updatedLibraryVar = originalLibrary
+  
   def updatedLibrary = updatedLibraryVar
   private def updatedLibrary_=(lib: ResourceLibrary) { 
     updatedLibraryVar = lib 
@@ -51,24 +52,25 @@ class ListAndEditScreen(val refType: RefType,
   }
   
   def allResources: Seq[ListAndEditItem] = panel.allResources
-  
+
   def addNew() {
+    
     val newValue = refType.emptyData
     val newItem = ListAndEditItem(newValue, None, originalLibrary.id)
-    panel.allResources :+= newItem
-    selectedResources = Seq(newItem)
-    println("Raargj!")
+    
+    suppressEvents {
+      panel.allResources :+= newItem
+      selectedResources = Seq(newItem)
+    }
   }
   
   def importSelected() {
-    println("importSelected")
     updatedLibrary = updatedLibrary.addResources(editScreen.values: _*)
-    panel.repaint()
+    selectedResources.foreach(_ updateCurrentFromLibrary updatedLibrary)
+    onResourcesSelected(selectedResources)
   }
   
   def undoChanges() {
-    println("undo changes")
-    
     selectedResources.foreach(_.resetToOriginal())
     updatedLibrary = originalLibrary
     onResourcesSelected(selectedResources)
@@ -85,29 +87,33 @@ class ListAndEditScreen(val refType: RefType,
   private def initialValuesOrDefault = {
     val data = if (initialValues.nonEmpty) initialValues
                else List(refType.emptyData)
+              
     data map newListItem
   }
     
-  private def newListItem(refData: RefData) = 
-    ListAndEditItem(refData, Some(refData), originalLibrary.id)
+  private def newListItem(refData: RefData) = ListAndEditItem(refData, Some(refData), originalLibrary.id)
 
 
   private def updateLibraryAndViewWithEdits() {
     val edited = editScreen.values
     val selected = selectedResources
     
-    // Awful!  refactor!  
-    // This is so that if the ID is changed, then the ID will be updated throughout the library.
-    // This can only be done when 1 resource is selected.  It doesn't make sense to change the ID
-    // in bulk edit mode.
-    if (selected.size == 1) { 
-      selected.head.current = edited.head
-      updatedLibrary = selected.head.updateLibraryFromCurrent(updatedLibrary)
+    if (!selected.exists(_.isExternal)) {
+      // TODO Awful!  refactor!  
+      // This is so that if the ID is changed, then the ID will be updated throughout the library.
+      // This can only be done when 1 resource is selected.  It doesn't make sense to change the ID
+      // in bulk edit mode.
+      if (selected.size == 1) { 
+        selected.head.current = edited.head
+        updatedLibrary = selected.head.updateLibraryFromCurrent(updatedLibrary)
+      }
+      else {
+        updatedLibrary = updatedLibrary.addResources(edited: _*)
+      }
+      panel updateResourcesFromLibrary updatedLibrary
+      panel.revertButton.enabled = shouldBeAbleToUndo(selectedResources);
+      panel.repaint()
     }
-    else {
-      updatedLibrary = updatedLibrary.addResources(edited: _*)
-    }
-    panel updateResourcesFromLibrary updatedLibrary
   }
   
   private def getTitleForSelectedResources(resources: Seq[ListAndEditItem]): String = {
@@ -123,23 +129,34 @@ class ListAndEditScreen(val refType: RefType,
   }
   
   private def onResourcesSelected(selected: Seq[ListAndEditItem]) {
+    var hasExternalResources = selected.exists(_.isExternal)
+    
     editScreen.values = selected.map(_.current)
-    editScreen.fieldWidgets.foreach(_.hasFocus = false)
-    editScreen.fieldWidgets.headOption.map(_.hasFocus = true)
+    editScreen.editable = !hasExternalResources
+    
+    panel.importButton.visible = hasExternalResources
     panel.title = getTitleForSelectedResources(selected)
+    panel.enableButtons(selected.nonEmpty)
+    panel.deleteButton.enabled &&= !selected.exists(_.isExternal)
+    panel.revertButton.enabled &&= shouldBeAbleToUndo(selected)
     panel.repaint()
   }
+  
+  private def shouldBeAbleToUndo(items: Seq[ListAndEditItem]) = items.exists(_.isModified)
   
   listenTo(panel.newButton, panel.revertButton, 
       panel.importButton, panel.deleteButton, panel.listView.selection, editScreen)
   
   reactions += {
+    case e if shouldSuppressEvents => println("Event suppressed: " + e.getClass.getName)
+    
     case ButtonClicked(panel.newButton) => addNew()
     case ButtonClicked(panel.revertButton) => undoChanges()
     case ButtonClicked(panel.importButton) => importSelected()
     case ButtonClicked(panel.deleteButton) => delete()
     case ListSelectionChanged(_, _, true) => onResourcesSelected(selectedResources)
     
+    // TODO ListAndEditScreen shouldn't know about widgets.  Refactor.
     case WidgetFocusEvent(w, true, _) => 
       println("ListAndEditScreen GAIN focus: " + w.field.name)
       panel centerScrollBarOn w.editor

@@ -1,8 +1,8 @@
 package kenbot.gcsolved.resource.types
 
-import scalaz.Scalaz.ValidationNEL
-import scalaz._
-import Scalaz._
+//import scalaz.Scalaz.ValidationNEL
+//import scalaz._
+//import Scalaz._
 import kenbot.gcsolved.resource.meta.MetaAnyType
 
 
@@ -16,7 +16,7 @@ abstract class ResourceType protected[resource] (val name: String, parentType: =
       (parent != this && (parent <:< other)))
       
       
-  type ValidationResult = ValidationNEL[String, Any]
+  //type ValidationResult = ValidationNEL[String, Any]
   type Value    
   def isAbstract = false
   
@@ -47,11 +47,11 @@ abstract class ResourceType protected[resource] (val name: String, parentType: =
   
   /**
    * Validates the given value, returning a Scalaz Validation.
-   */
+   *
   final def validate(value: Any): ValidationResult = getFailures(value) match {
     case Nil => Success(value)
     case first :: rest => Failure(NonEmptyList(first, rest: _*))
-  }
+  }*/
   
   /**
    * Returns true if the given value is valid, false otherwise
