@@ -66,15 +66,15 @@ class ListAndEditItemSpec extends Spec with ShouldMatchers {
   
   describe("Displayed text") {
     it("should start with a * if modified") {
-      itemWithDifferent.toString should startWith ("*")
+      itemWithDifferent.toString should include ("*")
     }
     
     it("should not start with a * if not modified") {
-      itemWithSame.toString should not startWith ("*")
+      itemWithSame.toString should not include ("*")
     }
     
     it("should end in \"(new)\" if there is no original data") {
-      itemWithMissing.toString should endWith ("(new)")
+      itemWithMissing.toString should include ("(new)")
     }
   }
   
