@@ -11,9 +11,16 @@ object AnyRefType extends RefType("AnyRef", isAbstract=true) {
   override protected def initFields(theLocalFields: Seq[Field]): Seq[Field] = theLocalFields
   override def fields: Map[Field.Name, Field] = Map.empty
   
+  override lazy val defaultValueMap: Map[Field.Name, Any] = Map.empty 
+  
   override def getFailures(value: Any): List[String] = {
     if (value.isInstanceOf[ResourceRef]) Nil
     else List("Expecting a ResourceRef: " + value)
+  }
+
+  override def equals(a: Any) = a match {
+    case x: AnyRef if x eq this => true
+    case _ => false
   }
 }
 
@@ -42,7 +49,7 @@ class RefType(
     theFields: => Seq[Field] = Seq()) 
     
   extends ObjectType(name, parentType, true, false, theFields) {
-  
+	  
   def metaType: MetaAnyType = MetaRefType
   type Value = ResourceRef
   
@@ -55,23 +62,23 @@ class RefType(
     def idCount = {
       val allFields = if (parent eq this) theLocalFields 
                       else theLocalFields ++ parent.fields.values
+                      
       allFields.count(_.isId)
     }
-                    
     require(isAbstract || idCount == 1, "RefType " + name + " must have exactly one ID field: " + idCount)
     theLocalFields
   }
   
   override lazy val parent: RefType = parentType
   
-  override def emptyData = {
-    val defaultValues = fields.values.map(f => (f.name, f.default))
-    val definedDefaultsOnly = defaultValues.collect { 
-      case (name, Some(default)) => (name, default) 
-    }
-    RefData(this, definedDefaultsOnly.toMap)
-  }
-   
+  override def emptyData = RefData(this)
+  
+  lazy val defaultValueMap: Map[Field.Name, Any] = (for {
+    field <- fields.values
+    default <- field.default
+  } 
+  yield field.name -> default).toMap
+  
   override def asValue(a: Any): Value = a.asInstanceOf[ResourceRef]
   
   override def getFailures(a: Any): List[String] = a match {

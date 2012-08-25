@@ -35,8 +35,8 @@ class ResourceSchema private (
   def selectOneTypes: Seq[SelectOneType] = userSelectOneTypes
     
   def objectTypes: List[ObjectType] = userRefTypes ++ userValueTypes
-  lazy val userRefTypes: List[RefType] = theRefTypes.filterNot(_.name == "AnyRefType").toList
-  lazy val userValueTypes: List[ValueType] = theValueTypes.filterNot(_.name == "AnyValueType").toList
+  lazy val userRefTypes: List[RefType] = theRefTypes.filterNot(_.name == AnyRefType.name).toList
+  lazy val userValueTypes: List[ValueType] = theValueTypes.filterNot(_.name == AnyValueType.name).toList
   lazy val userSelectOneTypes: List[SelectOneType] = theSelectOneTypes.toList
   
   private lazy val refTypeMap: Map[String, RefType] = refTypes.map(t => t.name -> t).toMap

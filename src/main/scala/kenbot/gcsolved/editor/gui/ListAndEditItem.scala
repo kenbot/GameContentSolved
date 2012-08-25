@@ -16,7 +16,12 @@ class ListAndEditItem(private var currentVar: RefData, val original: Option[RefD
   def current = currentVar
   def current_=(c: RefData) {
     previousRef = Some(currentVar.ref)
-    currentVar = c.addDefaults
+    currentVar = c
+  }
+  
+  def printState() {
+    println("Current: " + current.debugString)
+    println("Original: " + original.map(_.debugString))
   }
   
   def isNew = original.isEmpty

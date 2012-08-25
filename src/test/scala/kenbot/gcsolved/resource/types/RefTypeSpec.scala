@@ -17,7 +17,7 @@ class RefTypeSpec extends Spec with ShouldMatchers {
   describe("Reference types") {
     val fruit = RefType("fruit", idField, 'healthy -> BoolType)
     val hammer = RefType("hammer", idField)
-    val banana = RefType("banana", fruit, false, 'peeled -> BoolType)
+    val banana = RefType("banana", fruit, false, 'peeled -> BoolType, 'latinName -> StringType ^ (default=Some("defaultus")))
     
     describe("construction") {
       it ("should set the right values") {
@@ -32,9 +32,17 @@ class RefTypeSpec extends Spec with ShouldMatchers {
       }
     }
     
+    describe("empty data") {
+      it("should contain default values") {
+        val empty = banana.emptyData
+        empty("latinName") should equal ("defaultus")
+        
+      }
+    }
+    
     describe("equality") {
       it("should equal a type with the same properties") {
-         banana should equal (RefType("banana", fruit, false, 'peeled -> BoolType))
+         banana should equal (RefType("banana", fruit, false, 'peeled -> BoolType, 'latinName -> StringType ^ (default=Some("defaultus"))))
       }
       it("shouldn't equal a type with different fields") {
          banana should not equal (RefType("banana", fruit, false, 'peeled -> IntType))

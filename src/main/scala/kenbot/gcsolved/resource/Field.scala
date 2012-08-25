@@ -11,7 +11,7 @@ sealed trait Field {self =>
   type Value
   type ValidationResult = ValidationNEL[String, Option[Value]]
   
-  val name: Name
+  def name: Name
   
   lazy val humanReadableName: Name = {
     val str = new StringBuilder
@@ -22,12 +22,12 @@ sealed trait Field {self =>
     str.capitalize
   }
   
-  val category: Name
+  def category: Name
   val fieldType: ResourceType {type Value = self.Value}
-  val required: Boolean
-  val isId: Boolean
-  val default: Option[fieldType.Value]
-  val description: String
+  def required: Boolean
+  def isId: Boolean
+  def default: Option[fieldType.Value]
+  def description: String
   
   def ^(required: Boolean = false, 
         isId: Boolean = false, 
@@ -93,14 +93,21 @@ object Field {
       val category: Name,
       requiredParam: Boolean, 
       val isId: Boolean,
-      val default: Option[T], 
+      givenDefault: Option[T], 
       val description: String) extends Field { self => 
     
     require(name.trim.length > 0, "Name must not be empty")
-        
-    val required: Boolean = requiredParam || isId
-        
+    require(!isId || givenDefault.isEmpty, "ID field cannot have a default value")
+    
     type Value = T
+    
+    lazy val default: Option[T] = if (isId) None 
+                                  else givenDefault orElse fType.default
+    
+    
+    val required: Boolean = requiredParam || isId
+    
+    
     lazy val fieldType: ResourceType {type Value = T} = { 
       fType ensuring (_ != null, "Field had null type: " + name) 
     }

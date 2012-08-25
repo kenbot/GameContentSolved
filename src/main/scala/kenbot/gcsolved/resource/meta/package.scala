@@ -86,7 +86,7 @@ package object meta {
     def asLibrary: ResourceLibrary = ResourceLibrary("Schema", MetaSchema).
       addResources(AnyRefType.asData +: schema.userRefTypes.map(_.asData): _*).
       addResources(AnyValueType.asData +: schema.userValueTypes.map(_.asData): _*).
-      addResources(schema.selectOneTypes.map(_.asData): _*).
+      addResources(schema.userSelectOneTypes.map(_.asData): _*).
       addLinkedLibraries(schema.linkedSchemas.map(_.asLibrary): _*)
   }
   
@@ -162,8 +162,8 @@ package object meta {
       case AnyType | AnyValueType | AnyRefType | DoubleType | BoolType | StringType => ValueData(resourceType.metaType)
       
       case IntType(minOpt, maxOpt) => 
-        val minMapping = minOpt.map("Min" -> _)
-        val maxMapping = minOpt.map("Min" -> _)
+        val minMapping = minOpt.map("Min" ->)
+        val maxMapping = minOpt.map("Min" ->)
         val fields = Map() ++ minMapping ++ maxMapping
         ValueData(MetaIntType, fields)
         
@@ -172,7 +172,7 @@ package object meta {
           'Extensions -> extensions.toList)
           
       case ListType(elementType, maxLengthOpt) => 
-          val lengthMapping = maxLengthOpt.map("Length" -> _)
+          val lengthMapping = maxLengthOpt.map("Length" ->)
           val fields = Map("ElementType" -> elementType.typeDescriptor) ++ lengthMapping
           ValueData(MetaListType, fields)
         

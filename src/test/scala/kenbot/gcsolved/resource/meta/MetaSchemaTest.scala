@@ -19,6 +19,7 @@ import kenbot.gcsolved.resource.RefData
 import kenbot.gcsolved.resource.Field
 import kenbot.gcsolved.resource.ResourceSchema
 import kenbot.gcsolved.resource.ResourceLibrary
+import kenbot.gcsolved.resource.ResourceRef
 
 
 @RunWith(classOf[JUnitRunner]) 
@@ -28,7 +29,7 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
   
   describe("Fields") {
     val field = 'Boo -> IntType ^ (category="details", required=true, default=Some(5), description="hello!")
-    implicit val context = new SchemaContext(ResourceSchema.Empty)
+    val context = new SchemaContext(ResourceSchema.Empty)
     import context._
     
     def checkSameFields(data: ValueData, f: Field) {
@@ -105,7 +106,7 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
     val parent = RefType("parent", AnyRefType, true, 'Blah -> StringType)
     val refType = RefType("foo", parent, false, idField, 'Flum -> IntType, 'Grum -> ListType(BoolType))
     val schema = ResourceSchema().addRefTypes(parent, refType)
-    implicit val context = new SchemaContext(schema)
+    val context = new SchemaContext(schema)
     import context._   
     
     def checkSameFields(data: RefData, rt: RefType) {
@@ -166,7 +167,7 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
     val parent = ValueType("parent", AnyValueType, true, 'Blah -> StringType)
     val valueType = ValueType("foo", parent, false, 'Flum -> IntType, 'Grum -> ListType(BoolType))
     val schema = ResourceSchema().addValueTypes(parent, valueType)
-    implicit val context = new SchemaContext(schema)
+    val context = new SchemaContext(schema)
     import context._   
     
     def checkSameFields(data: RefData, vt: ValueType) {
@@ -223,7 +224,7 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
   describe("SelectOneTypes") {
     val selectOneType = SelectOneType("foo", StringType, "a", "b", "c")
     val schema = ResourceSchema().addSelectOneTypes(selectOneType)
-    implicit val context = new SchemaContext(schema)
+    val context = new SchemaContext(schema)
     import context._   
     
     def checkSameFields(data: RefData, s1t: SelectOneType) {
@@ -284,11 +285,10 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
         addValueTypes(seedType).
         addSelectOneTypes(fruitCompanyType)
         
-    implicit val context = new SchemaContext(schema)
+    val context = new SchemaContext(schema)
     import context._   
         
-    def checkSameFields(library: ResourceLibrary, resourceSchema: ResourceSchema) {
-      implicit val schema = resourceSchema
+    def checkSameFields(library: ResourceLibrary, schema: ResourceSchema) {
       
       it ("should have the same RefTypes") {
         val refTypes = library.allResourcesByType(RefTypeDefinition).map(_.asRefType).toSet

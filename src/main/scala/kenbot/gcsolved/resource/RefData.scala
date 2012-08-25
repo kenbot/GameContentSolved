@@ -12,9 +12,11 @@ class RefData private (
   val resourceType: RefType,
   val version: Int,
   val definedIn: Option[ResourceLibraryRef],
-  val fields: Map[Field.Name, Any]) extends ObjectData {
+  givenFields: Map[Field.Name, Any]) extends ObjectData {
 
   override lazy val id: String = get(resourceType.idField).map(_.toString) getOrElse ""
+  
+  val fields: Map[Field.Name, Any] = resourceType.defaultValueMap ++ givenFields
   
   private def copy(resourceType: RefType = this.resourceType,
     version: Int = this.version,
@@ -30,16 +32,7 @@ class RefData private (
     fields.valuesIterator.exists(_.toString.toLowerCase contains s)
   }
 
-  private def definesField(field: Field): Boolean = fields contains field.name
-  
-  def addDefaults: RefData = {
-    val fieldsWithDefaults = resourceType.fields.values.filter(_.default.isDefined)
-    val notDefinedYet = fieldsWithDefaults filterNot definesField
-    val namedDefaults = notDefinedYet.map(f => f.name -> f.default.get)
-    (this /: namedDefaults) {
-      case (data, (name, dflt)) => data.updateField(name, dflt) 
-    }
-  }
+  private def isFieldDefined(field: Field): Boolean = fields contains field.name
   
   override def valid: Boolean = fields.contains(resourceType.idField) && id.toString != "" && super.valid
   

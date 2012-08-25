@@ -22,6 +22,8 @@ abstract class ResourceType protected[resource] (val name: String, parentType: =
   
   def metaType: MetaAnyType
   
+  def default: Option[Value] = None
+  
   /**
    * Convert or coerce the given value to the type expected by this ResourceType. 
    * While correctly typed, the returned value may or may not pass validation.

@@ -5,13 +5,17 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers._
 import org.scalatest._
 import Field._
-import kenbot.gcsolved.resource.types.RefType
 import kenbot.gcsolved.resource.types.AnyRefType
-import kenbot.gcsolved.resource.types.StringType
+import kenbot.gcsolved.resource.types.RefType
+import kenbot.gcsolved.resource.types.{StringType, IntType}
 
 @RunWith(classOf[JUnitRunner])
 class RefDataSpec extends Spec with ShouldMatchers {
-  val rabbit = RefType("Rabbit", 'name -> StringType ^ (isId = true))
+  
+  val rabbit = RefType("Rabbit", 
+      'name -> StringType ^ (isId = true), 
+      'age -> IntType ^ (default = Some(4)))
+  
   def makeData = RefData(rabbit, 
     'name -> "Roger",
     'weight -> 44, 
@@ -34,8 +38,17 @@ class RefDataSpec extends Spec with ShouldMatchers {
      val abstractType = RefType("AbstractType", AnyRefType, true)
      evaluating { RefData(abstractType) } should produce [IllegalArgumentException]
     }
+    it("should have all of the default fields defined in the RefType") {
+      data("age") should equal (4)
+    }
+    it("shouldn't use the RefType's default values if a value is already provided") {
+      val data = RefData(rabbit, 'name -> "Bugs", 'age -> 22)
+      data("age") should equal (22)
+    }
   }
 
+  
+  
   describe("Updating field values") {
     it("should result in the new value being set") {
       val newData = data.updateField("colour", "red")
@@ -46,9 +59,6 @@ class RefDataSpec extends Spec with ShouldMatchers {
   describe("Equality") {
     it("should be equal to a resource with identical fields") {
       data should equal (makeData)
-    }
-    it("should not be equal to a resource with a different version") {
-      data should not equal (data.incrementVersion)
     }
     it("should not be equal to a resource with a different id") {
       data should not equal (data updateId "baz")

@@ -99,13 +99,6 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     listView.repaint()
   }
   
-    
-  def enableButtons(enabled: Boolean) {
-    deleteButton.enabled = enabled
-    cloneButton.enabled = enabled
-    revertButton.enabled = enabled
-  }
-  
   
   def updateResourcesFromLibrary(lib: ResourceLibrary) {
     allResourcesVar = allResourcesVar filter { r => lib.contains(r.current.ref)}

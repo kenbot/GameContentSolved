@@ -157,7 +157,7 @@ package object types {
     'Magic -> RangeType,
     'MagicRegen -> RangeType,
     'CanBeMale -> BoolType,
-    'CanBeFemale -> BoolType,
+    'CanBeFemale -> BoolType ^ (default=Some(true)),
     'BloodColor -> ColorType,
     'Images -> MapType(ActorState, MapType(Direction, ListType(ImageType))),
     'CorpseImages -> ListType(StillImageType) ^ (default=Some(List(someImage)), description="This is what it looks like dead")))

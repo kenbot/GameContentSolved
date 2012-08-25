@@ -111,8 +111,7 @@ class ListAndEditScreen(val refType: RefType,
         updatedLibrary = updatedLibrary.addResources(edited: _*)
       }
       panel updateResourcesFromLibrary updatedLibrary
-      panel.revertButton.enabled = shouldBeAbleToUndo(selectedResources);
-      panel.repaint()
+      updateButtonStates()
     }
   }
   
@@ -136,13 +135,18 @@ class ListAndEditScreen(val refType: RefType,
     
     panel.importButton.visible = hasExternalResources
     panel.title = getTitleForSelectedResources(selected)
-    panel.enableButtons(selected.nonEmpty)
-    panel.deleteButton.enabled &&= !selected.exists(_.isExternal)
-    panel.revertButton.enabled &&= shouldBeAbleToUndo(selected)
+    updateButtonStates()
+  }
+  
+  private def updateButtonStates() {
+    val nonEmpty = selectedResources.nonEmpty
+    val noExternal = selectedResources.forall(!_.isExternal)
+    val anyModified = selectedResources.exists(_.isModified)
+    panel.deleteButton.enabled = nonEmpty && noExternal
+    panel.revertButton.enabled = nonEmpty && noExternal && anyModified
     panel.repaint()
   }
   
-  private def shouldBeAbleToUndo(items: Seq[ListAndEditItem]) = items.exists(_.isModified)
   
   listenTo(panel.newButton, panel.revertButton, 
       panel.importButton, panel.deleteButton, panel.listView.selection, editScreen)

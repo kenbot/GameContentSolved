@@ -5,6 +5,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import kenbot.gcsolved.resource.types.IntType
 import kenbot.gcsolved.resource.types.StringType
+import kenbot.gcsolved.resource.types.BoolType
 
 @RunWith(classOf[JUnitRunner])  
 class FieldSpec extends Spec with ShouldMatchers {
@@ -31,6 +32,20 @@ class FieldSpec extends Spec with ShouldMatchers {
   describe("ID fields") {
     it("should be automatically required") {
       field ^ (isId = true) should be ('required)
+    }
+  }
+  
+  describe("default value") {
+    it("cannot be provided if this field is an ID") {
+      BoolType.default should be ('defined)
+      val f = Field("bar", BoolType, isId=true)
+      f.default should equal (None)
+    }
+    
+    it("should be automatically provided if the resource type provides one") {
+      BoolType.default should be ('defined)
+      val f = Field("bar", BoolType)
+      f.default should equal (BoolType.default)
     }
   }
   
