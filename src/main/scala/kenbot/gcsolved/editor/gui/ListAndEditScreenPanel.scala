@@ -84,6 +84,14 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
   def selectedResources_=(selected: Seq[ListAndEditItem]) {
     val indices = selected map { s => allResources indexWhere s.eq }
     listView.selectIndices(indices: _*)
+    onSelectionChanged()
+  }
+  
+  private def onSelectionChanged() {
+    if (selectedResources.nonEmpty) mainScrollPane.contents = mainPanel
+    else mainScrollPane.contents = pleaseSelectPanel
+    revalidate()
+    repaint()
   }
   
   def allResources: Seq[ListAndEditItem] = allResourcesVar
@@ -102,7 +110,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
   
   def updateResourcesFromLibrary(lib: ResourceLibrary) {
     allResourcesVar = allResourcesVar filter { r => lib.contains(r.current.ref)}
-    allResources foreach { _.updateCurrentFromLibrary(lib) }
+    allResourcesVar foreach { _.updateCurrentFromLibrary(lib) }
   }
   
   def centerScrollBarOn(c: Component) {
@@ -115,11 +123,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
   listenTo(listView.selection)
   
   reactions += {
-    case ListSelectionChanged(_, _, true) => 
-      if (selectedResources.nonEmpty) mainScrollPane.contents = mainPanel
-      else mainScrollPane.contents = pleaseSelectPanel
-      revalidate()
-      repaint()
+    case ListSelectionChanged(_, _, true) => onSelectionChanged()
   }
 
   west = new NestedBorderPanel {

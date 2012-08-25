@@ -81,6 +81,13 @@ class ListAndEditScreen(val refType: RefType,
     println("deleting " + selectedRefs.toList)
     updatedLibrary = updatedLibrary.removeResources(selectedRefs)
     panel updateResourcesFromLibrary updatedLibrary
+    
+    suppressEvents {
+      def shouldRemove(item: ListAndEditItem) = selectedResources.contains(item) && !item.isExternal
+      panel.allResources = panel.allResources filterNot shouldRemove
+      selectedResources = Nil
+    }
+    updateButtonStates()
     panel.repaint()
   }
   
@@ -140,10 +147,10 @@ class ListAndEditScreen(val refType: RefType,
   
   private def updateButtonStates() {
     val nonEmpty = selectedResources.nonEmpty
-    val noExternal = selectedResources.forall(!_.isExternal)
+    val noneExternal = selectedResources.forall(!_.isExternal)
     val anyModified = selectedResources.exists(_.isModified)
-    panel.deleteButton.enabled = nonEmpty && noExternal
-    panel.revertButton.enabled = nonEmpty && noExternal && anyModified
+    panel.deleteButton.enabled = nonEmpty && noneExternal
+    panel.revertButton.enabled = nonEmpty && noneExternal && anyModified
     panel.repaint()
   }
   

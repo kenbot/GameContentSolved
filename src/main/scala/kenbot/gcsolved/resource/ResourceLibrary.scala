@@ -38,16 +38,21 @@ final class ResourceLibrary private (
 
   def ref: ResourceLibraryRef = id
   def unsaved: Boolean = version == 0
+  
   def containsLocally(resourceRef: ResourceRef): Boolean = resourceMap contains resourceRef
+  
   def contains(resourceRef: ResourceRef): Boolean = 
       containsLocally(resourceRef) || linkedLibraries.exists(_ containsLocally resourceRef)
+      
   def findLocalResource(resourceRef: ResourceRef): Option[RefData] = resourceMap get resourceRef
+  
   def findResource(resourceRef: ResourceRef): Option[RefData] = {
     val res = findLocalResource(resourceRef)
     (res /: linkedLibraries)(_ orElse _.findResource(resourceRef))
   }
 
   def files: Set[File] = fileSet
+  
   def addFiles(filesToAdd: File*): ResourceLibrary = copy(fileSet = fileSet ++ filesToAdd)
   
   def findResourcesThatReferTo(resourceRef: ResourceRef): Seq[RefData] = 

@@ -63,6 +63,6 @@ class ListAndEditItem(private var currentVar: RefData, val original: Option[RefD
     def modifiedStr = if (isModified) "*" else ""
     def externalStr = if (isExternal) " - " + current.definedIn.get else ""
     def newStr = if (isNew) " (new)" else ""
-    modifiedStr + current.id + newStr + externalStr
+    <html>{modifiedStr + current.id}<span color="blue">{newStr}</span> <span color="gray">{externalStr}</span></html>.toString
   }
 }
