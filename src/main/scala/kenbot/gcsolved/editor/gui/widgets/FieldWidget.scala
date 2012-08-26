@@ -23,4 +23,6 @@ trait FieldWidget extends Publisher {
   
   def fieldValue: Option[Any]
   def fieldValue_=(v: Option[Any]): Unit
+  
+  override def toString() = getClass.getSimpleName + "(" + field.name + ")"
 }

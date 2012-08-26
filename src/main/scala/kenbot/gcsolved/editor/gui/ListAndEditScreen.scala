@@ -54,7 +54,6 @@ class ListAndEditScreen(val refType: RefType,
   def allResources: Seq[ListAndEditItem] = panel.allResources
 
   def addNew() {
-    
     val newValue = refType.emptyData
     val newItem = ListAndEditItem(newValue, None, originalLibrary.id)
     
@@ -78,7 +77,6 @@ class ListAndEditScreen(val refType: RefType,
   
   def delete() {
     val selectedRefs = selectedResources.filter(!_.isNew).map(_.current.ref)
-    println("deleting " + selectedRefs.toList)
     updatedLibrary = updatedLibrary.removeResources(selectedRefs)
     panel updateResourcesFromLibrary updatedLibrary
     
@@ -159,7 +157,7 @@ class ListAndEditScreen(val refType: RefType,
       panel.importButton, panel.deleteButton, panel.listView.selection, editScreen)
   
   reactions += {
-    case e if shouldSuppressEvents => println("Event suppressed: " + e.getClass.getName)
+    case _ if shouldSuppressEvents => 
     
     case ButtonClicked(panel.newButton) => addNew()
     case ButtonClicked(panel.revertButton) => undoChanges()
@@ -168,12 +166,7 @@ class ListAndEditScreen(val refType: RefType,
     case ListSelectionChanged(_, _, true) => onResourcesSelected(selectedResources)
     
     // TODO ListAndEditScreen shouldn't know about widgets.  Refactor.
-    case WidgetFocusEvent(w, true, _) => 
-      println("ListAndEditScreen GAIN focus: " + w.field.name)
-      panel centerScrollBarOn w.editor
-      
     case WidgetFocusEvent(w, false, _) => 
-      println("ListAndEditScreen LOST focus: " + w.field.name)
       updateLibraryAndViewWithEdits()
       
     case LibraryChangedEvent(source, newLib, _) => 

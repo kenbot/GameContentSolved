@@ -58,12 +58,6 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     if (initialValues.nonEmpty)
       selectIndices(0)
   }
-
-  val mainScrollPane = new ScrollPane(mainPanel) {
-    verticalScrollBar.unitIncrement = 16
-    verticalScrollBarPolicy = BarPolicy.AsNeeded
-    horizontalScrollBarPolicy = BarPolicy.Never
-  }
   
   private val pleaseSelectPanel = new FlowPanel {
     contents += new Label("Select entries from the left to edit them") 
@@ -88,8 +82,8 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
   }
   
   private def onSelectionChanged() {
-    if (selectedResources.nonEmpty) mainScrollPane.contents = mainPanel
-    else mainScrollPane.contents = pleaseSelectPanel
+    //if (selectedResources.nonEmpty) mainScrollPane.contents = mainPanel
+    //else mainScrollPane.contents = pleaseSelectPanel
     revalidate()
     repaint()
   }
@@ -113,11 +107,6 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     allResourcesVar foreach { _.updateCurrentFromLibrary(lib) }
   }
   
-  def centerScrollBarOn(c: Component) {
-    val scrollTo = c.location.y - mainScrollPane.size.height/2
-    mainScrollPane.verticalScrollBar.value = scrollTo
-    mainScrollPane.repaint()
-  }
   
     
   listenTo(listView.selection)
@@ -147,6 +136,6 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
       }
       south = importButton
     }
-    center = mainScrollPane
+    center = mainPanel
   }
 }

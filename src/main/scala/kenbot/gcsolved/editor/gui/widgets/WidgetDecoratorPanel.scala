@@ -11,7 +11,7 @@ import scala.annotation.target.field
 import scala.swing.event.MousePressed
 
 
-class WidgetDecoratorPanel(widget: FieldWidget) extends NestedBorderPanel {
+class WidgetDecoratorPanel(val widget: FieldWidget) extends NestedBorderPanel {
   
   top => 
   
