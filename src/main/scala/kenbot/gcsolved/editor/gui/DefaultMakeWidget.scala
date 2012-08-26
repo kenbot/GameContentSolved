@@ -19,6 +19,7 @@ import kenbot.gcsolved.resource.types.FileType
 import kenbot.gcsolved.editor.gui.widgets.FileSelectorWidget
 import kenbot.gcsolved.editor.Settings
 import kenbot.gcsolved.resource.types.IntType
+import kenbot.gcsolved.resource.ResourceRef
 
 object DefaultMakeWidget {
   def apply(settings: Settings, parentWidget: => Option[FieldWidget] = None, level: Int = 0) = {
@@ -36,9 +37,9 @@ class DefaultMakeWidget(settings: Settings, parentWidget: => Option[FieldWidget]
     case FileType(_,_*) => new FileSelectorWidget(field, settings.environment, parentWidget, level)
     case rt: RefType => 
       val resourcesOfType = settings.currentLibrary.allResourcesByType(rt).map(_.ref).toSeq
-      new ComboBoxWidget(field, resourcesOfType, parentWidget, level)
+      new ComboBoxWidget[ResourceRef](field, resourcesOfType, _.id, parentWidget, level)
       
-    case s1t: SelectOneType => new ComboBoxWidget(field, s1t.values, parentWidget, level)
+    case s1t: SelectOneType => new ComboBoxWidget[s1t.Value](field, s1t.values, _.toString, parentWidget, level)
     
     case ListType(_, _) => 
       lazy val w: FieldWidget = new DynamicListWidget(field, makeNextWidget(w), parentWidget, level); w

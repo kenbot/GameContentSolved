@@ -2,7 +2,7 @@ package kenbot.gcsolved.editor.gui.util
 
 import scala.annotation.implicitNotFound
 import scala.collection.mutable.ListBuffer
-import scala.swing.Swing.onEDT
+import scala.swing.Swing.{onEDT, pair2Dimension}
 import scala.swing.event.FocusGained
 import scala.swing.event.KeyTyped
 import scala.swing.event.SelectionChanged
@@ -38,11 +38,10 @@ class FilteringComboBox[A](originalItems: Seq[A], useBlankItem: Boolean = true)(
   
   require(originalStrings.distinct == originalStrings, "All combo box items must be unique: " + originalStrings)
   
-  private val itemMap: Map[String, A] = originalItems.map(i => i.toString -> i).toMap
+  private val itemMap: Map[String, A] = originalItems.map(i => a2s(i) -> i).toMap
   
   def selectedItem: Option[A] = {
     val selectedString = selection.item
-    
     if (selectedString == BlankItem) None
     else Some(itemMap(selectedString))
   }
@@ -66,6 +65,8 @@ class FilteringComboBox[A](originalItems: Seq[A], useBlankItem: Boolean = true)(
   override def hasFocus: Boolean = peer.getEditor.getEditorComponent.hasFocus
   
   private def editorTextField = peer.getEditor.getEditorComponent.asInstanceOf[JTextField]
+  editorTextField.setPreferredSize(200, 21) // We don't want the size jumping around
+  
   private def currentText: String = editorTextField.getText
   
   def items: Seq[String] = peer.getModel.toList
@@ -90,7 +91,7 @@ class FilteringComboBox[A](originalItems: Seq[A], useBlankItem: Boolean = true)(
     case FocusLost(src, other, temp) if src ne this  => 
       publish(FocusLost(this, other, temp))
 
-    case kt: KeyTyped => onEDT {
+    case KeyTyped(src, ch, _, _) if ch.toLower >= 'a' && ch.toLower <= 'z' => onEDT {
       val text = currentText
       val filtered = originalStrings.filter(_.toLowerCase contains text.toLowerCase)
       items = if (text == "" && useBlankItem) (BlankItem +: filtered) 
