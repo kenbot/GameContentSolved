@@ -22,11 +22,9 @@ trait WidgetFocusBehaviour extends FieldWidget {
         if (noChildrenHaveFocus) {
           subWidgets(0).hasFocus = true
         }
-        //println("GAIN focus:  " + field.name)
       }
       else {
         subWidgets.foreach(_.hasFocus = false)
-        //println("LOST focus:  " + field.name)
       }
       publish(WidgetFocusEvent(this, focusGained, level))
     }

@@ -7,8 +7,9 @@ import kenbot.gcsolved.editor.gui.util.TextFields
 import java.awt.Dimension
 import scala.swing.Swing.pair2Dimension
 
-class TextFieldWidget(theField: Field, val columns: Int = 20,
-    parentWidget:  => Option[FieldWidget] = None, 
+class TextFieldWidget(theField: Field, 
+    val columns: Int = 20,
+    parentWidget: => Option[FieldWidget] = None, 
     level: Int = 0) extends DefaultFieldWidget(theField, parentWidget, level) {
   
   top => 

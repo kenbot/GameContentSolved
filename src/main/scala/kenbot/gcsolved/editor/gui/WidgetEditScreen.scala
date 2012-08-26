@@ -41,10 +41,8 @@ class WidgetEditScreen(theRefType: RefType,
   
     
   private def centerScrollBarOn(w: FieldWidget) {
-    
     val loc = Components.getLocationUnderParent(w.editor, editScreenPanel)
-    val scrollTo = loc.y - scroller.size.height/2
-    println("scrollTo: " + scrollTo)
+    val scrollTo = loc.y + w.editor.size.height/2 - scroller.size.height/2
 
     scroller.verticalScrollBar.value = scrollTo
     scroller.repaint()
@@ -76,14 +74,12 @@ class WidgetEditScreen(theRefType: RefType,
   deafTo(self)
   
   reactions += {
-    case w @ WidgetFocusEvent(widget, true, level) => 
+    case w @ WidgetFocusEvent(widget, true, 0) => 
       fieldWidgets.filter(widget ne).foreach(_.hasFocus = false)
-      println("GAIN FOCUS: " + widget.field.name)
       centerScrollBarOn(widget)
       publish(w)
       
     case w @ WidgetFocusEvent(widget, false, level) => 
-      println("LOST FOCUS: " + widget.field.name)
       publish(w) 
       
     case w: WidgetFocusEvent => 
@@ -91,7 +87,6 @@ class WidgetEditScreen(theRefType: RefType,
   }
   
   require(values.forall(_.resourceType <:< objectType))
-  
   
   values = initialValues
 
