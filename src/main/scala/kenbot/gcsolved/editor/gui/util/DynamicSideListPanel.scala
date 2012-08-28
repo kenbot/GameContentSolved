@@ -77,6 +77,17 @@ class DynamicSideListPanel[C <: Component : ItemDescription](initialPanels: Seq[
     selectIndex(lastIndex+1, true)
   }
   
+  private val editorPanel = new NestedBorderPanel {
+    south = enterButton
+  }
+
+  override def enabled: Boolean = listView.enabled
+  override def enabled_=(b: Boolean) {
+    listView.enabled = b
+    enterButton.enabled = b
+  }
+  
+  
   def currentPanel: C = editorPanel.center.asInstanceOf[C]
   def selectedIndices = listView.selection.indices
   def selectedItems = listView.selection.items
@@ -84,10 +95,6 @@ class DynamicSideListPanel[C <: Component : ItemDescription](initialPanels: Seq[
                                else 0
   def numPanels = userPanels.size
   
-  
-  private val editorPanel = new NestedBorderPanel {
-    south = enterButton
-  }
   
   def userPanels: Seq[C] = listView.listData
   

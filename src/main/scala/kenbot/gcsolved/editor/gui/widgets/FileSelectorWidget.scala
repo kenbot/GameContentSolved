@@ -21,12 +21,7 @@ class FileSelectorWidget(theField: Field,
   top => 
     
   require(theField.fieldType.isInstanceOf[FileType])
-  
-  def fileType: FileType = theField.fieldType.asInstanceOf[FileType]
-  
-  def currentText: String = editor.textField.text
-  
-  
+
   
   lazy val editor = new NestedBorderPanel with MyEditorMixin {
     val textField = new TextField { // Make it a auto-complete combobox, with existing files from the environment
@@ -51,6 +46,16 @@ class FileSelectorWidget(theField: Field,
     west = loadButton
     center = textField
   } 
+  
+    
+  def fileType: FileType = theField.fieldType.asInstanceOf[FileType]
+  
+  def currentText: String = editor.textField.text
+  
+  protected def enforceEditorEditable(b: Boolean) { 
+    editor.textField.enabled = b
+    editor.loadButton.enabled = b
+  }
   
   def fileTypeDescription = fileType.extensions.map(e => "*." + e.toUpperCase).mkString(", ")
   

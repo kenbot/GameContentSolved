@@ -27,6 +27,8 @@ class EditScreenWidget(theField: Field,
     }
     border = BorderFactory.createLineBorder(new Color(0xDD, 0xDD, 0xDD), 1)
   }
+  
+  protected def enforceEditorEditable(b: Boolean) { }
 
   listenTo(subWidgets: _*)
   deafTo(this)

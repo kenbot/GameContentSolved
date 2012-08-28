@@ -35,8 +35,11 @@ abstract class DefaultFieldWidget(val field: Field, parentWidgetParam: => Option
   override def editable = editableVar
   override def editable_=(b: Boolean) {
     this.editableVar = b
-    editor.enabled = b
+    subWidgets.foreach(_.editable = b)
+    enforceEditorEditable(b)
   }
+  
+  protected def enforceEditorEditable(b: Boolean)
   
   /**
    * Mix this in to editors to mark it as belonging to us 

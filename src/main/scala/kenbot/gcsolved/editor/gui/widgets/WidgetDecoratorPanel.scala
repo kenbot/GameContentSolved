@@ -76,7 +76,7 @@ class WidgetDecoratorPanel(val widget: FieldWidget) extends NestedBorderPanel {
   }
   
   reactions += {
-    case MousePressed(`label`, _, _, _, _) => widget.hasFocus = true
+    case MousePressed(`label`, _, _, _, _) if widget.editable => widget.hasFocus = true
     case ValidationEvent(`widget`, _)  => updateAll()
     case WidgetFocusEvent(`widget`, _, _) => updateAll()
   }

@@ -36,6 +36,8 @@ class DynamicListWidget(theField: Field,
     top listenTo this
   }
   
+  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
+  
   reactions += {
     case ValidationEvent(widget, success) if widget ne this => validateAndUpdate()
     case DynamicSideListPanel.ComponentAdded(`editor`, added: WidgetEditor) => top listenTo added.widget

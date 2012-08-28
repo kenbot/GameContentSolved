@@ -12,6 +12,8 @@ class CheckBoxWidget(theField: Field, parentWidget:  => Option[FieldWidget] = No
   
   def rawFieldValue: Option[Any] = Some(editor.selected)
   
+  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
+  
   def fieldValue_=(value: Option[Any]) { 
     value foreach { b => editor.selected = (b == true) } 
     validateAndUpdate()

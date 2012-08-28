@@ -26,6 +26,7 @@ class ChooseTypeWidget(theField: Field,
   val editor = new TextField with MyEditorMixin
   def rawFieldValue: Option[Any] = None
   def fieldValue_=(v: Option[Any]) {}
+  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
     /*
  
   lazy val fieldType: ValueType = theField.fieldType.asInstanceOf[ValueType]

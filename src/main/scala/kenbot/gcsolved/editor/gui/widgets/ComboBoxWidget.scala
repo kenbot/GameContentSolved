@@ -17,6 +17,8 @@ class ComboBoxWidget[A](theField: Field,
   
   lazy val editor = new FilteringComboBox(items, !field.required)(textFunc) with MyEditorMixin
   
+  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
+  
   def rawFieldValue: Option[Any] = editor.selectedItem
   
   def fieldValue_=(value: Option[Any]) { 

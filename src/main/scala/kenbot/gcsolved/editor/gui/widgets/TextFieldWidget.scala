@@ -19,6 +19,8 @@ class TextFieldWidget(theField: Field,
     TextFields.autoSelectOnFocus(this)
     top.listenTo(this, keys)
   }
+  
+  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
  
   def rawFieldValue: Option[Any] = {
     val text = editor.text.trim
