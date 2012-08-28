@@ -82,8 +82,8 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
   }
   
   private def onSelectionChanged() {
-    //if (selectedResources.nonEmpty) mainScrollPane.contents = mainPanel
-    //else mainScrollPane.contents = pleaseSelectPanel
+    centerPanel.center = if (selectedResources.nonEmpty) mainPanel
+                         else pleaseSelectPanel
     revalidate()
     repaint()
   }
@@ -128,7 +128,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     }
   }
 
-  center = new NestedBorderPanel {
+  val centerPanel = new NestedBorderPanel {
     north = new NestedBorderPanel {
       center = titleLabel
       east = new FlowPanel { 
@@ -138,4 +138,6 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     }
     center = mainPanel
   }
+  
+  center = centerPanel
 }
