@@ -30,5 +30,7 @@ class EditScreenWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMetho
     checkSettingValues(editScreenWidget, mkData(5,6))
   }
   
+  checkSettingEditableAlsoAppliesToSubWidgets(editScreenWidget)
+  
   checkFocusing(makeWidget('parent -> NestedType))
 }

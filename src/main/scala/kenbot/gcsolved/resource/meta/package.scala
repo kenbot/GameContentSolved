@@ -31,20 +31,19 @@ package object meta {
   lazy val SchemaLibrary = ResourceLibrary("Schema", MetaSchema)
   
   type MetaAnyType = ValueType
-  lazy val MetaAnyType = ValueType("MetaAnyType", AnyValueType, false)
-  lazy val MetaAnyRefType = ValueType("MetaAnyRefType", MetaAnyType, false)
-  lazy val MetaAnyValueType = ValueType("MetaAnyValueType", MetaAnyType, false)
-  lazy val MetaIntType = ValueType("MetaIntType", MetaAnyType, false, 'Min -> IntType, 'Max -> IntType)
-  lazy val MetaStringType = ValueType("MetaStringType", MetaAnyType, false, 'MaxLength -> IntType)
-  lazy val MetaBoolType = ValueType("MetaBooleanType", MetaAnyType, false)
-  lazy val MetaDoubleType = ValueType("MetaDoubleType", MetaAnyType, false)
-  lazy val MetaFileType = ValueType("MetaFileType", MetaAnyType, false, 'Path -> StringType, 'Extensions -> ListType(StringType))
-  lazy val MetaListType = ValueType("MetaListType", MetaAnyType, false, 'ElementType -> MetaAnyType, 'MaxLength -> IntType)
-  lazy val MetaMapType = ValueType("MetaMapType", MetaAnyType, false, 'KeyType -> MetaAnyType, 'ValueType -> MetaAnyType)
-  
-  lazy val MetaRefType = ValueType("MetaRefType", MetaAnyRefType, false, 'RefType -> RefTypeDefinition)
-  lazy val MetaValueType = ValueType("MetaValueType", MetaAnyValueType, false, 'ValueType -> ValueTypeDefinition)
-  lazy val MetaSelectOneType = ValueType("MetaSelectOneType", MetaAnyType, false, 'SelectOneType -> SelectOneTypeDefinition)
+  lazy val MetaAnyType = ValueType("MetaAnyType", AnyValueType)
+  lazy val MetaAnyRefType = ValueType("MetaAnyRefType", MetaAnyType)
+  lazy val MetaAnyValueType = ValueType("MetaAnyValueType", MetaAnyType)
+  lazy val MetaIntType = ValueType("MetaIntType", MetaAnyType, 'Min -> IntType, 'Max -> IntType)
+  lazy val MetaStringType = ValueType("MetaStringType", MetaAnyType, 'MaxLength -> IntType)
+  lazy val MetaBoolType = ValueType("MetaBooleanType", MetaAnyType)
+  lazy val MetaDoubleType = ValueType("MetaDoubleType", MetaAnyType)
+  lazy val MetaFileType = ValueType("MetaFileType", MetaAnyType, 'Path -> StringType, 'Extensions -> ListType(StringType))
+  lazy val MetaListType = ValueType("MetaListType", MetaAnyType, 'ElementType -> MetaAnyType, 'MaxLength -> IntType)
+  lazy val MetaMapType = ValueType("MetaMapType", MetaAnyType, 'KeyType -> MetaAnyType, 'ValueType -> MetaAnyType)
+  lazy val MetaRefType = ValueType("MetaRefType", MetaAnyRefType, 'RefType -> RefTypeDefinition)
+  lazy val MetaValueType = ValueType("MetaValueType", MetaAnyValueType, 'ValueType -> ValueTypeDefinition)
+  lazy val MetaSelectOneType = ValueType("MetaSelectOneType", MetaAnyType, 'SelectOneType -> SelectOneTypeDefinition)
   
   lazy val RefTypeDefinition: RefType = RefType.recursive("RefTypeDefinition", AnyRefType, false, Seq(
       'Name -> StringType ^ (isId=true), 

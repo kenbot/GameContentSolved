@@ -23,6 +23,7 @@ scalacOptions += "-Ydependent-method-types"
 
 initialCommands := """
     import kenbot.gcsolved.resource._;
+    import kenbot.gcsolved.resource.types._;
     import scala.swing._;
     import Swing._;
   """

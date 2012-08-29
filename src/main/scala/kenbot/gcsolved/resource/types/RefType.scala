@@ -32,6 +32,7 @@ object RefType {
   }
     
   def apply(name: String, fields: Field*): RefType = apply(name, AnyRefType, false, fields: _*)
+  def apply(name: String, parent: => RefType, fields: Field*): RefType = new RefType(name, parent, false, fields)
   def apply(name: String, parent: => RefType, isAbstract: Boolean, fields: Field*): RefType = {
     new RefType(name, parent, isAbstract, fields)
   }

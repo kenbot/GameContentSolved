@@ -17,6 +17,8 @@ object AnyValueType extends ValueType("AnyValue", isAbstract=true)  {
   
 object ValueType {
   def apply(name: String, fields: Field*): ValueType = apply(name, AnyValueType, false, fields: _*)
+  def apply(name: String, parent: => ValueType, fields: Field*): ValueType = 
+      new ValueType(name, parent, false, fields)
   def apply(name: String, parent: => ValueType, isAbstract: Boolean, fields: Field*): ValueType = 
       new ValueType(name, parent, isAbstract, fields)
       

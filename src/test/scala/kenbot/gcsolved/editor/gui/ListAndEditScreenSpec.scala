@@ -173,12 +173,21 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
   
   describe("Creating a new resource") {
     
-    it("should add the resource to the list view") {
+    it("should add the resource to the list view, the first time") {
       val screen = newScreen()
       val numStartingResources = screen.allResources.size
       screen.addNew()
       screen.allResources.size should equal (numStartingResources + 1)
     }
+    
+    it("shouldn't add the resource to the list view if there's already a new one with no ID") {
+      val screen = newScreen()
+      val numStartingResources = screen.allResources.size
+      screen.addNew()
+      screen.addNew()
+      screen.allResources.size should equal (numStartingResources + 1)
+    }
+    
     
     it("shouldn't add anything to the library yet") {
       val screen = newScreen()

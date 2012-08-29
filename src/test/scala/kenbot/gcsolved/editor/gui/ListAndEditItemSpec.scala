@@ -36,15 +36,15 @@ class ListAndEditItemSpec extends Spec with ShouldMatchers {
   
   describe("Modified status") {
     it ("should be true if the original item is different from the current") {
-      itemWithDifferent.isModified should be (true)
+      itemWithDifferent should be ('isModified)
     }
     
     it ("should be false if the original item is the same as the current") {
-      itemWithSame.isModified should be (false)
+      itemWithSame should not be ('isModified)
     }
     
     it ("should be false if the original item is missing") {
-      itemWithMissing.isModified should be (false)
+      itemWithMissing should not be ('isModified)
     }
   }
   
@@ -55,12 +55,22 @@ class ListAndEditItemSpec extends Spec with ShouldMatchers {
     
     it ("should be true if defined in a different library") {
       val itemWithExternal = ListAndEditItem(externalData, Some(externalData), "tttt")
-      itemWithExternal.isExternal should be (true)
+      itemWithExternal should be ('isExternal)
     }
     
     it ("should be false if not defined in a library") {
       val itemWithExternal = ListAndEditItem(noLibraryData, Some(noLibraryData), "tttt")
-      itemWithExternal.isExternal should be (false)
+      itemWithExternal should not be ('isExternal)
+    }
+  }
+  
+  describe("New status") {
+    it ("should be false if the original item exists") {
+      itemWithSame should not be ('isNew)
+    }
+    
+    it ("should be true if the original item is missing") {
+      itemWithMissing should be ('isNew)
     }
   }
   

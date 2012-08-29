@@ -54,12 +54,19 @@ class ListAndEditScreen(val refType: RefType,
   def allResources: Seq[ListAndEditItem] = panel.allResources
 
   def addNew() {
-    val newValue = refType.emptyData
-    val newItem = ListAndEditItem(newValue, None, originalLibrary.id)
+    val alreadyExistingNewOne = allResources.find(_.isNewWithNoId)
     
-    suppressEvents {
-      panel.allResources :+= newItem
-      selectedResources = Seq(newItem)
+    if (alreadyExistingNewOne.isDefined) {
+      selectedResources = alreadyExistingNewOne.toList
+    } 
+    else {
+        val newValue = refType.emptyData
+        val newItem = ListAndEditItem(newValue, None, originalLibrary.id)
+    
+        suppressEvents {
+          panel.allResources :+= newItem
+          selectedResources = Seq(newItem)
+        }
     }
   }
   

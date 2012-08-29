@@ -25,6 +25,7 @@ class ListAndEditItem(private var currentVar: RefData, val original: Option[RefD
   }
   
   def isNew = original.isEmpty
+  def isNewWithNoId = isNew && current.id.isEmpty
   def isModified = original.map(current !=) getOrElse false 
   def isIdModified = !isNew && previousRef.map(_.id != current.id).getOrElse(false)
   def isExternal = current.definedIn.map(localLibraryRef !=) getOrElse false

@@ -5,6 +5,8 @@ import kenbot.gcsolved.resource.meta._
 class StringType(val maxLength: Option[Int]) extends ResourceType("String") {
   type Value = String
   
+  require(maxLength.forall(_ > 0), "Max length must be greater than zero")
+  
   def metaType: MetaAnyType = MetaStringType
   
   override def <:<(other: ResourceType): Boolean = other match {

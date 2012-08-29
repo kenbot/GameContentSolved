@@ -16,6 +16,21 @@ trait WidgetSpecMethods {
     describe("For a " + fieldType.name + " field")(thunk)
   }  
     
+  def checkSettingEditableAlsoAppliesToSubWidgets(fieldWidget: FieldWidget) {
+    describe("Setting the editable state") {
+      it("should apply to all the subwidgets") {
+        assume(fieldWidget.subWidgets.nonEmpty, "This test is meaningless if there are no subwidgets")  
+        
+        fieldWidget.editable = false
+        fieldWidget.subWidgets.forall(_.editable) should be (false)
+          
+        fieldWidget.editable = true
+        fieldWidget.subWidgets.forall(_.editable) should be (true)
+      }
+    }
+    
+  }
+  
   def checkValidation(makeWidget: Field => FieldWidget, field: Field, rubbishValue: Any, validValue: Any) {
     describe("Validation") {
       it("should fail when a rubbish value is selected") {
