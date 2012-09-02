@@ -33,17 +33,16 @@ import kenbot.gcsolved.editor.gui.util.SuppressableEvents
 class ListAndEditScreen(val refType: RefType, 
             initialValues: Seq[RefData], 
             val originalLibrary: ResourceLibrary, 
-            makeWidget: Field => FieldWidget) extends Reactor with SuppressableEvents {
+            makeEditScreen: RefType => EditScreen) extends Reactor with SuppressableEvents {
   
-  
-  val editScreen: EditScreen = new WidgetEditScreen(refType, Seq.empty, makeWidget) // TODO: replace with factory function
+  val editScreen: EditScreen = makeEditScreen(refType)
+ 
   lazy val panel = new ListAndEditScreenPanel(initialValuesOrDefault.toList, editScreen.panel)
+
   private[this] var updatedLibraryVar = originalLibrary
   
   def updatedLibrary = updatedLibraryVar
-  private def updatedLibrary_=(lib: ResourceLibrary) { 
-    updatedLibraryVar = lib 
-  }
+  private def updatedLibrary_=(lib: ResourceLibrary) { updatedLibraryVar = lib }
   
   def selectedResources: Seq[ListAndEditItem] = panel.selectedResources
   def selectedResources_=(selected: Seq[ListAndEditItem]) {
@@ -54,7 +53,7 @@ class ListAndEditScreen(val refType: RefType,
   def allResources: Seq[ListAndEditItem] = panel.allResources
 
   def addNew() {
-    val alreadyExistingNewOne = allResources.find(_.isNewWithNoId)
+    val alreadyExistingNewOne = allResources.find(r => r.isNew && r.hasNoIdYet)
     
     if (alreadyExistingNewOne.isDefined) {
       selectedResources = alreadyExistingNewOne.toList
@@ -65,7 +64,7 @@ class ListAndEditScreen(val refType: RefType,
     
         suppressEvents {
           panel.allResources :+= newItem
-          selectedResources = Seq(newItem)
+          selectedResources = List(newItem)
         }
     }
   }
@@ -96,6 +95,24 @@ class ListAndEditScreen(val refType: RefType,
     panel.repaint()
   }
   
+  private def receiveValuesChanged(newValues: Seq[RefData]) {
+     println("Received update newValues: " + newValues)
+     
+     val idChangeRequired = selectedResources.size == 1 && 
+                            newValues(0).id != selectedResources(0).currentId  
+     if (idChangeRequired) {
+       val newData = newValues(0)
+       val origData = selectedResources(0).current
+       updatedLibrary = updatedLibrary.updateResourceId(origData.ref, newData.id) addResource newData
+       panel.updateResourceWithNewId(newData, origData.id)
+     }
+     else {
+       updatedLibrary = updatedLibrary.addResources(newValues: _*)
+     }      
+     panel updateResourcesFromLibrary updatedLibrary
+     updateButtonStates()
+  }
+
   private def initialValuesOrDefault = {
     val data = if (initialValues.nonEmpty) initialValues
                else List(refType.emptyData)
@@ -104,28 +121,6 @@ class ListAndEditScreen(val refType: RefType,
   }
     
   private def newListItem(refData: RefData) = ListAndEditItem(refData, Some(refData), originalLibrary.id)
-
-
-  private def updateLibraryAndViewWithEdits() {
-    val edited = editScreen.values
-    val selected = selectedResources
-    
-    if (!selected.exists(_.isExternal)) {
-      // TODO Awful!  refactor!  
-      // This is so that if the ID is changed, then the ID will be updated throughout the library.
-      // This can only be done when 1 resource is selected.  It doesn't make sense to change the ID
-      // in bulk edit mode.
-      if (selected.size == 1) { 
-        selected.head.current = edited.head
-        updatedLibrary = selected.head.updateLibraryFromCurrent(updatedLibrary)
-      }
-      else {
-        updatedLibrary = updatedLibrary.addResources(edited: _*)
-      }
-      panel updateResourcesFromLibrary updatedLibrary
-      updateButtonStates()
-    }
-  }
   
   private def getTitleForSelectedResources(resources: Seq[ListAndEditItem]): String = {
     val result = resources.size match {
@@ -151,18 +146,18 @@ class ListAndEditScreen(val refType: RefType,
   }
   
   private def updateButtonStates() {
-    val nonEmpty = selectedResources.nonEmpty
+    val anythingSelected = selectedResources.nonEmpty
     val noneExternal = selectedResources.forall(!_.isExternal)
     val anyModified = selectedResources.exists(_.isModified)
-    panel.deleteButton.enabled = nonEmpty && noneExternal
-    panel.revertButton.enabled = nonEmpty && noneExternal && anyModified
+    panel.deleteButton.enabled = anythingSelected && noneExternal
+    panel.revertButton.enabled = anythingSelected && noneExternal && anyModified
     panel.repaint()
   }
   
   
   listenTo(panel.newButton, panel.revertButton, 
       panel.importButton, panel.deleteButton, panel.listView.selection, editScreen)
-  
+ 
   reactions += {
     case _ if shouldSuppressEvents => 
     
@@ -171,13 +166,8 @@ class ListAndEditScreen(val refType: RefType,
     case ButtonClicked(panel.importButton) => importSelected()
     case ButtonClicked(panel.deleteButton) => delete()
     case ListSelectionChanged(_, _, true) => onResourcesSelected(selectedResources)
-    
-    // TODO ListAndEditScreen shouldn't know about widgets.  Refactor.
-    case WidgetFocusEvent(w, false, _) => 
-      updateLibraryAndViewWithEdits()
-      
+    case UpdateValues(_, values) => receiveValuesChanged(values) 
     case LibraryChangedEvent(source, newLib, _) => 
-      println("library changed")
       panel.allResources = newLib.allResourcesByType(refType).toList map newListItem
   }
   

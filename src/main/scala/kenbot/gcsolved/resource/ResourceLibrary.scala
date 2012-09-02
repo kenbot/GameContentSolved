@@ -123,11 +123,8 @@ final class ResourceLibrary private (
     copy(resourceMap = resourceMap - resourceRef)
   }
   
-  def removeResources(resourceRefs: Seq[ResourceRef]): ResourceLibrary = {
-    (this /: resourceRefs) { 
-      (lib, ref) => lib removeResource ref
-    }
-  }
+  def removeResources(resourceRefs: Seq[ResourceRef]): ResourceLibrary = (this /: resourceRefs) { _ removeResource _ }
+  
   
   def allExternalRefs: Iterator[ResourceRef] = localResources.flatMap(_.externalRefs)
   

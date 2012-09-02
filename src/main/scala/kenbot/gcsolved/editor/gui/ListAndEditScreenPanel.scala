@@ -101,6 +101,9 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     listView.repaint()
   }
   
+  def updateResourceWithNewId(newData: RefData, oldId: Any) {
+    allResources.find(_.currentId == oldId).foreach(_.current = newData)
+  }   
   
   def updateResourcesFromLibrary(lib: ResourceLibrary) {
     allResourcesVar = allResourcesVar filter { r => lib.contains(r.current.ref)}

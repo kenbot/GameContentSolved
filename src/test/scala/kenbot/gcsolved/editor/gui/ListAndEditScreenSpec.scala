@@ -1,11 +1,9 @@
 package kenbot.gcsolved.editor.gui
 import scala.sys.error
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
-
 import kenbot.gcsolved.editor.gui.widgets.TextFieldWidget
 import kenbot.gcsolved.resource.types.IntType
 import kenbot.gcsolved.resource.types.RefType
@@ -15,9 +13,10 @@ import kenbot.gcsolved.resource.RefData
 import kenbot.gcsolved.resource.ResourceLibrary
 import kenbot.gcsolved.resource.ResourceRef
 import kenbot.gcsolved.resource.ResourceSchema
+import scala.swing.Publisher
 
 @RunWith(classOf[JUnitRunner])  
-class ListAndEditScreenSpec extends Spec with ShouldMatchers {
+class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
 
   import Field._
   
@@ -29,14 +28,10 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
       
   val legoTruckType = RefType("LegoTruck", 'id -> IntType ^ (isId = true), 'legoMan -> legoManType)
       
-
-      
   val schema = ResourceSchema().addRefTypes(legoManType, legoTruckType)
   val library = {
     val legoMan = RefData(legoManType, 
       'id -> 1, 'head -> "pirate", 'body -> "fireman", 'pants -> "green")
-      
-
     
     ResourceLibrary("foo", schema).addResources(legoMan)
   }
@@ -47,27 +42,29 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
   
   describe("Modifying resources") {
     
-    it("should trigger a library update when the widget loses focus") {
+    it("should trigger a library update when the edit screen fires a value update") {
       val screen = newScreen()
       
       findUpdatedResourceValue(screen, legoMan.ref, "head") should equal ("pirate")
-      
-      updateWidget(screen, "head", Some("spaceman"))
+
+      fireValueUpdate(screen, legoMan.updateField("head", "spaceman"))
       
       findUpdatedResourceValue(screen, legoMan.ref, "head") should equal ("spaceman")
     }
 
     describe("by changing the ID") {
       val screen = newScreen(library addResource truckContainingMan)
+
+      fireValueUpdate(screen, legoMan.updateField("id", 222))
+
       val oldId = legoMan.ref
       val newId = ResourceRef("222", legoManType)
       
-      updateWidget(screen, "id", Some(222))
       
       it("should not leave a resource with the old ID in the library") {
         screen.updatedLibrary findResource oldId should be ('isEmpty)
       } 
-      
+
       it("should leave a resource with the new ID in the library") {
         screen.updatedLibrary findResource newId should not be ('isEmpty)
       }
@@ -81,8 +78,10 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
       }
       
       it("should leave a resource with the new ID in the list view") {
+        println(">> " + screen.allResources)
         screen.allResources.exists(_.currentId == newId.id) should be (true)
       }
+      
     }
   }
 
@@ -102,7 +101,9 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
   
   describe("Undo changes") {
     val screen = newScreen()
-    updateWidget(screen, "head", Some("spaceman"))
+    
+    fireValueUpdate(screen, legoMan.updateField("head", "spaceman"))
+    
     findUpdatedResourceValue(screen, legoMan.ref, "head") should equal ("spaceman")
     screen.undoChanges()
     
@@ -110,8 +111,8 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
       findUpdatedResourceValue(screen, legoMan.ref, "head") should equal ("pirate")
     }
     
-    it("should revert the selected resource/s to the original state in the widgets") {
-      findWidget(screen, "head").flatMap(_.fieldValue) should equal (Some("pirate"))
+    it("should revert the selected resource/s to the original state in the edit screen") {
+      screen.editScreen.values(0)("head") should equal ("pirate")
     }
     
     it("should revert the selected resource/s to the original state in the list view") {
@@ -123,7 +124,9 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
       val screen = newScreen()
       val oldId = legoMan.ref
       val newId = ResourceRef("222", legoManType)
-      updateWidget(screen, "id", Some(222))
+      
+      fireValueUpdate(screen, legoMan.updateField("id", 222))
+      
       findUpdatedResourceValue(screen, newId, "id") should equal (222)
       screen.undoChanges()
       
@@ -143,8 +146,8 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
         screen.allResources.exists(_.current.ref == newId) should be (false)
       }
       
-      it("should have the old ID back in the widget") {
-        findWidget(screen, "id").get.fieldValue.get.toString should equal (oldId.id)
+      it("should have the old ID back in the edit screen") {
+        screen.editScreen.values(0).id should equal (legoMan.id)
       }
     }
   }
@@ -225,20 +228,15 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers {
     }
   }
     
-  private def newScreen(lib: ResourceLibrary = library) = new ListAndEditScreen(legoManType, Seq(legoMan), lib, new TextFieldWidget(_))
-  
-  
-  //////////////////////
-  // TODO Just awful!!  ListAndEditScreen shouldn't know anything about widgets.  Kill ASAP
-  private def updateWidget(screen: ListAndEditScreen, name: String, value: Option[Any]) {
-    val w = findWidget(screen, name).get
-    w.fieldValue = value
-    w.hasFocus = true
-    w.hasFocus = false
+  private def newScreen(lib: ResourceLibrary = library) = {
+    new ListAndEditScreen(legoManType, Seq(legoMan), lib, DummyEditScreen.apply) 
   }
-  private def findWidget(screen: ListAndEditScreen, name: String) = screen.editScreen.asInstanceOf[WidgetEditScreen].fieldWidgets.find(_.field.name == name)
-  //////////////////////
-  
+ 
+  private def fireValueUpdate(screen: ListAndEditScreen, value: RefData) {
+    screen listenTo this
+    publish(UpdateValues(screen.editScreen, Seq(value)))
+    screen deafTo this
+  }
   
   
   private def findUpdatedResourceValue(screen: ListAndEditScreen, ref: ResourceRef, property: String): Any = {

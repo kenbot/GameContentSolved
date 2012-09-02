@@ -24,10 +24,10 @@ class ListAndEditItem(private var currentVar: RefData, val original: Option[RefD
     println("Original: " + original.map(_.debugString))
   }
   
+  def hasNoIdYet = currentId.isEmpty
   def isNew = original.isEmpty
-  def isNewWithNoId = isNew && current.id.isEmpty
   def isModified = original.map(current !=) getOrElse false 
-  def isIdModified = !isNew && previousRef.map(_.id != current.id).getOrElse(false)
+  def isIdModified = !isNew && previousRef.map(_.id != currentId).getOrElse(false)
   def isExternal = current.definedIn.map(localLibraryRef !=) getOrElse false
   def canImport = isExternal
   def isValid = current.valid
@@ -49,7 +49,7 @@ class ListAndEditItem(private var currentVar: RefData, val original: Option[RefD
     }
   }
   
-  def currentId = if (current.id.nonEmpty) current.id else "(new)"
+  def currentId = current.id
   
   private def equality = (currentVar, original, localLibraryRef)
   

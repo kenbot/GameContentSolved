@@ -15,13 +15,24 @@ import kenbot.gcsolved.resource.RefData
 import scala.swing.Publisher
 import kenbot.gcsolved.editor.gui.widgets.WidgetFocusEvent
 import kenbot.gcsolved.editor.gui.widgets.WidgetDecoratorPanel
+import scala.swing.event.Event
 
+
+trait UpdatedValuesEvent extends Event { val src: EditScreen }
+case class UpdateValues(src: EditScreen, values: Seq[RefData]) extends UpdatedValuesEvent
 
 trait EditScreen extends Publisher {
   def objectType: ObjectType
-  var values: Seq[RefData]
+  def isBulkEditSupported: Boolean
   var editable: Boolean
+  var values: Seq[RefData]
   
   def panel: Component 
+
+  //def replaceBadValues(message: String, correctValues: Seq[RefData]): Unit 
+
+  protected final def fireUpdatedValues() {
+    publish(UpdateValues(this, values)) 
+  }
 }
 

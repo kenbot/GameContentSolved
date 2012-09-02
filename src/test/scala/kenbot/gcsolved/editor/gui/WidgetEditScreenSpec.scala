@@ -17,17 +17,13 @@ import kenbot.gcsolved.editor.gui.widgets.TextFieldWidget
 @RunWith(classOf[JUnitRunner])  
 class WidgetEditScreenSpec extends Spec with ShouldMatchers {
   
-  val bananaType = RefType("Banana", 'foo -> StringType ^ (isId = true), 'noo -> IntType)
-  val schema = ResourceSchema().addRefTypes(bananaType)
-  val data = RefData(bananaType, "foo" -> "flib")
-    
+  lazy val bananaType = RefType("Banana", 'name -> StringType ^ (isId = true))
   
-  val editScreen = new WidgetEditScreen(bananaType, Seq(data), new TextFieldWidget(_))
+  def editScreen = new WidgetEditScreen(bananaType, Seq(bananaType.emptyData), new TextFieldWidget(_))
   
   describe("Creating") {
     it("should create widgets for all the fields") {
-      editScreen.fieldWidgets.size should equal(bananaType.fields.size)
+      editScreen.fieldWidgets.size should equal (bananaType.fields.size)
     }
   }
-
 }

@@ -21,8 +21,7 @@ class WidgetEditScreen(theRefType: RefType,
   
   
   self => 
-  
-    
+
   val objectType: RefType = theRefType
   
   lazy val fieldWidgets: Seq[FieldWidget] = objectType.fields.values.toList map makeWidget
@@ -39,7 +38,9 @@ class WidgetEditScreen(theRefType: RefType,
   
   def panel: Component = scroller
   
-    
+  def isBulkEditSupported = false  
+  
+  
   private def centerScrollBarOn(w: FieldWidget) {
     val loc = Components.getLocationUnderParent(w.editor, editScreenPanel)
     val scrollTo = loc.y + w.editor.size.height/2 - scroller.size.height/2
@@ -68,7 +69,6 @@ class WidgetEditScreen(theRefType: RefType,
       w.fieldValue = newValue
     }
   }
-
   
   listenTo(fieldWidgets: _*)
   deafTo(self)
@@ -80,6 +80,7 @@ class WidgetEditScreen(theRefType: RefType,
       publish(w)
       
     case w @ WidgetFocusEvent(widget, false, level) => 
+      fireUpdatedValues()
       publish(w) 
       
     case w: WidgetFocusEvent => 

@@ -43,7 +43,7 @@ class MainPanel(settings: GameContentEditor.Settings) extends NestedBorderPanel 
     import EditorDialog.Result._
     
     val initialValues = settings.currentLibrary.allResourcesByType(refType).toSeq
-    val listAndEditScreen = new ListAndEditScreen(refType, initialValues, settings.currentLibrary, settings.makeWidget)
+    val listAndEditScreen = new ListAndEditScreen(refType, initialValues, settings.currentLibrary, settings.makeEditScreen)
     
     import Dialogs.enrichWindow
     

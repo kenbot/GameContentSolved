@@ -12,6 +12,7 @@ import kenbot.gcsolved.resource.ResourceSchema
 object TestSettings extends Settings with PublishableLibraryChanges {
  
   def makeWidget = DefaultMakeWidget(this, None)
+  def makeEditScreen = DummyEditScreen.apply
   
   def iconDir = "icondir"
   def iconFileExt = ".foo"

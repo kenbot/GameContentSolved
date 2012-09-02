@@ -1,5 +1,7 @@
 package kenbot.gcsolved.editor
 import kenbot.gcsolved.editor.gui.widgets.FieldWidget
+import kenbot.gcsolved.resource.types.RefType
+import kenbot.gcsolved.editor.gui.{EditScreen, WidgetEditScreen}
 import kenbot.gcsolved.resource.ResourceSchema
 import scala.swing.Frame
 import kenbot.gcsolved.resource.ResourceEnvironment
@@ -16,7 +18,7 @@ case class LibraryChangeRequest(source: Any, newLibrary: ResourceLibrary) extend
 
 trait Settings {
  
-  def makeWidget: Field => FieldWidget
+  def makeEditScreen: RefType => EditScreen
   
   def iconDir: String
   def iconFileExt: String
