@@ -66,8 +66,7 @@ class FileSelectorWidget(theField: Field,
     
     val returnVal = chooser.showOpenDialog(editor.peer)
     if (returnVal == JFileChooser.APPROVE_OPTION) {
-       System.out.println("You chose to open this file: " +
-            chooser.getSelectedFile().getName());
+       println("You chose to open this file: " + chooser.getSelectedFile.getName)
     }
   }
   

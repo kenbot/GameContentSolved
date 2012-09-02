@@ -78,7 +78,6 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
       }
       
       it("should leave a resource with the new ID in the list view") {
-        println(">> " + screen.allResources)
         screen.allResources.exists(_.currentId == newId.id) should be (true)
       }
       

@@ -124,10 +124,6 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
         }
         
         it ("should not appear in 'allResources' if shadowed by a locally stored resource") {
-          println(libWithLinked.allResources.toList.map(_.debugString))
-          
-          println("****" + libWithLinked.allResources.toList)
-          println("****" + libWithLinked.allResources.map(_.ref).toList)
           libWithLinked.allResources.exists(_("a") == 4) should be (false)
         }
       }

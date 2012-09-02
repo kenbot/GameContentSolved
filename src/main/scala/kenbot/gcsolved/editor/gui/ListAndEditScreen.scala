@@ -96,8 +96,6 @@ class ListAndEditScreen(val refType: RefType,
   }
   
   private def receiveValuesChanged(newValues: Seq[RefData]) {
-     println("Received update newValues: " + newValues)
-     
      val idChangeRequired = selectedResources.size == 1 && 
                             newValues(0).id != selectedResources(0).currentId  
      if (idChangeRequired) {

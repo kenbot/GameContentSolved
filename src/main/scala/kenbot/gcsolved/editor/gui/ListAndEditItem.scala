@@ -19,11 +19,6 @@ class ListAndEditItem(private var currentVar: RefData, val original: Option[RefD
     currentVar = c
   }
   
-  def printState() {
-    println("Current: " + current.debugString)
-    println("Original: " + original.map(_.debugString))
-  }
-  
   def hasNoIdYet = currentId.isEmpty
   def isNew = original.isEmpty
   def isModified = original.map(current !=) getOrElse false 
