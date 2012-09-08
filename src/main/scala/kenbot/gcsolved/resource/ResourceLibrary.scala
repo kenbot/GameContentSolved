@@ -39,10 +39,12 @@ final class ResourceLibrary private (
   def ref: ResourceLibraryRef = id
   def unsaved: Boolean = version == 0
   
-  def containsLocally(resourceRef: ResourceRef): Boolean = resourceMap contains resourceRef
+  def contains(resource: RefData) = containsRef(resource.ref)
+  def containsLocally(resource: RefData) = containsRefLocally(resource.ref)
+  def containsRefLocally(resourceRef: ResourceRef): Boolean = resourceMap contains resourceRef
   
-  def contains(resourceRef: ResourceRef): Boolean = 
-      containsLocally(resourceRef) || linkedLibraries.exists(_ containsLocally resourceRef)
+  def containsRef(resourceRef: ResourceRef): Boolean = 
+      containsRefLocally(resourceRef) || linkedLibraries.exists(_ containsRefLocally resourceRef)
       
   def findLocalResource(resourceRef: ResourceRef): Option[RefData] = resourceMap get resourceRef
   
@@ -72,12 +74,16 @@ final class ResourceLibrary private (
   def failures: List[String] = {
     val regularFailures = allResources.flatMap(_.failures).toList
     def invalidMessage(ref: ResourceRef) = "Can't resolve resource: " + ref
-    val linkageFailures = allResources.flatMap(_.externalRefs filterNot contains map invalidMessage)
+    val linkageFailures = allResources.flatMap(_.externalRefs filterNot containsRef map invalidMessage)
     
     regularFailures ++ linkageFailures
   }
   
-  def isResourceValid(resource: RefData): Boolean = resource.valid && (resource.externalRefs forall contains)
+  def isShadowingLinkedResource(ref: ResourceRef): Boolean = {
+    containsRefLocally(ref) && linkedLibraries.exists(_ containsRef ref) 
+  } 
+
+  def isResourceValid(resource: RefData): Boolean = resource.valid && (resource.externalRefs forall containsRef)
   def valid: Boolean = allResources forall isResourceValid
   def isLibraryLinked(library: ResourceLibrary): Boolean = linkedLibraries.exists(_.ref == library.ref)
   
@@ -109,6 +115,10 @@ final class ResourceLibrary private (
     copy(resourceMap = newResourceMap)
   }
   
+  def replaceResource(existingResourceRef: ResourceRef, replaceWith: RefData): ResourceLibrary = {
+    updateResourceId(existingResourceRef, replaceWith.id) addResource replaceWith 
+  }
+  
   def markAsSaved() = copy(version = version+1)
 
   private def asNewEntry(r: RefData) = r.ref -> (r asDefinedIn this)
@@ -129,7 +139,7 @@ final class ResourceLibrary private (
   def allExternalRefs: Iterator[ResourceRef] = localResources.flatMap(_.externalRefs)
   
   def containsReferencesTo(library: ResourceLibrary): Boolean = {
-    allExternalRefs.exists(r => !containsLocally(r) && (library containsLocally r))
+    allExternalRefs.exists(r => !containsRefLocally(r) && (library containsRefLocally r))
   }
   
   def addLinkedLibraries(libraries: ResourceLibrary*) = {

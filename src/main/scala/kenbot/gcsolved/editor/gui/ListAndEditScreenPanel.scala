@@ -9,6 +9,8 @@ import scala.swing.FlowPanel
 import scala.swing.Label
 import scala.swing.ListView
 import scala.swing.ScrollPane
+import scala.swing.event.Event
+import scala.swing.event.ButtonClicked
 import javax.swing.BorderFactory
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
 import kenbot.gcsolved.editor.gui.util.SearchBar
@@ -20,17 +22,28 @@ import scala.swing.event.MouseEntered
 import scala.swing.event.MouseExited
 import java.awt.Color
 
+
 class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Component) extends NestedBorderPanel  {
   
-  
+  top => 
+
+  object events { 
+    case object NewPressed extends Event
+    case object ClonePressed extends Event
+    case object UndoPressed extends Event
+    case object DeletePressed extends Event
+    case object ImportPressed extends Event
+    case class ResourcesSelected(items: Seq[ListAndEditItem]) extends Event
+  } 
+  import events._
+
   private var allResourcesVar: List[ListAndEditItem] = initialValues.toList
+  private val newButton = Button("New")(publish(NewPressed))
+  private val cloneButton = Button("Clone")(publish(ClonePressed))
+  private val revertButton = Button("Undo Changes")(publish(UndoPressed))
+  private val deleteButton = Button("Delete")(publish(DeletePressed))
   
-  val newButton = new Button("New")
-  val cloneButton = new Button("Clone")
-  val revertButton = new Button("Undo Changes")
-  val deleteButton = new Button("Delete")
-  
-  val importButton = new Button("This one lives in another library. Click here to make a local one, so you can edit it.") {
+  private val importButton = new Button("This one lives in another library. Click here to make a local one, so you can edit it.") {
     opaque = false
     borderPainted = false
     contentAreaFilled = false
@@ -38,6 +51,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     private val normalTextColor = foreground
     listenTo(mouse.moves)
     reactions += {
+      case ButtonClicked(_) => top publish(ImportPressed)
       case MouseEntered(_, _, _) => 
         foreground = Color.blue
         repaint()
@@ -46,17 +60,24 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
         foreground = normalTextColor
         repaint()
     }
-    
   }
 
-  val searchBar = SearchBar { searchString => 
+  private val searchBar = SearchBar { searchString => 
     listView.listData = allResources.filter(_.current matches searchString) 
     listView.repaint
   }
   
-  val listView = new ListView(initialValues) { 
+  private val listView = new ListView(initialValues) { 
     if (initialValues.nonEmpty)
       selectIndices(0)
+   
+    listenTo(selection) 
+    reactions += { 
+      case ListSelectionChanged(_, _, true) => 
+        val selectedResources = selection.items.toSeq
+        updateViewForSelection(selectedResources)
+        top publish ResourcesSelected(selectedResources)
+    }
   }
   
   private val pleaseSelectPanel = new FlowPanel {
@@ -69,55 +90,48 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     border = BorderFactory.createEmptyBorder(0, 10, 0, 0)
   }
 
-  def title = titleLabel.text
-  def title_=(t: String) { 
-    titleLabel.text = t
-  }
-  
-  def selectedResources: Seq[ListAndEditItem] = listView.selection.items.toList
-  def selectedResources_=(selected: Seq[ListAndEditItem]) {
-    val indices = selected map { s => allResources indexWhere s.eq }
-    listView.selectIndices(indices: _*)
-    onSelectionChanged()
-  }
-  
-  private def onSelectionChanged() {
-    centerPanel.center = if (selectedResources.nonEmpty) mainPanel
-                         else pleaseSelectPanel
-    revalidate()
-    repaint()
-  }
-  
-  def allResources: Seq[ListAndEditItem] = allResourcesVar
 
+  def allResources: Seq[ListAndEditItem] = allResourcesVar
   def allResources_=(resources: Seq[ListAndEditItem]) {
-    val currentSelection = listView.selection.indices.toSet
-    
     allResourcesVar = resources.toList
     listView.listData = resources
-    
-    listView.selection.indices.clear()
-    listView.selection.indices ++= currentSelection
-    listView.repaint()
-  }
-  
-  def updateResourceWithNewId(newData: RefData, oldId: Any) {
-    allResources.find(_.currentId == oldId).foreach(_.current = newData)
-  }   
-  
-  def updateResourcesFromLibrary(lib: ResourceLibrary) {
-    allResourcesVar = allResourcesVar filter { r => lib.contains(r.current.ref)}
-    allResourcesVar foreach { _.updateCurrentFromLibrary(lib) }
-  }
-  
-  
-    
-  listenTo(listView.selection)
-  
-  reactions += {
-    case ListSelectionChanged(_, _, true) => onSelectionChanged()
+     
+    val selectedResources = allResources.filter(_.isSelected)
+    val indicesToSelect = selectedResources.map(allResources indexOf _) 
+    listView.selectIndices(indicesToSelect: _*)
+    updateViewForSelection(selectedResources)
   }
 
+  private def updateButtonStates(selectedResources: Seq[ListAndEditItem]) {
+    val anythingSelected = selectedResources.nonEmpty
+    val noneExternal = selectedResources.forall(!_.isExternal)
+    val anyModified = selectedResources.exists(_.isModified)
+    importButton.visible = !noneExternal//guiSelection.exists(_.isExternal)
+    deleteButton.enabled = anythingSelected && noneExternal
+    revertButton.enabled = anythingSelected && noneExternal && anyModified
+  }
+
+  
+  private def getTitleForSelectedResources(resources: Seq[ListAndEditItem]): String = {
+    val result = resources.size match {
+      case 0 => "" 
+      case 1 => resources.head.currentId
+      case 2 | 3 => resources.map(_.currentId).mkString(", ")
+      case n => resources(0).currentId + ", " + 
+                resources(1).currentId + " + " + 
+                (resources.size-2) + " more"
+    }
+    result
+  }
+ 
+  private def updateViewForSelection(selectedResources: Seq[ListAndEditItem]) {
+     titleLabel.text = getTitleForSelectedResources(selectedResources) 
+     updateButtonStates(selectedResources)
+     centerPanel.center = if (selectedResources.nonEmpty) mainPanel
+                         else pleaseSelectPanel
+  }
+
+    
   west = new NestedBorderPanel {
     preferredSize = (150, 200)
     north = new NestedBorderPanel {

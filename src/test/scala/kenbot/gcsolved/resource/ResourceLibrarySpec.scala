@@ -58,7 +58,7 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
     
     describe("Adding") {
       it ("should result in the library containing it") {
-        libWithAddedResource contains fooRes.ref should be (true)
+        libWithAddedResource contains fooRes should be (true)
       }
       it ("should result in the resource knowing it is defined in the library") {
         val addedResource = libWithAddedResource.findResource(fooRes.ref).get
@@ -88,7 +88,7 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
       }
       it ("should result in the library without the resource, if the remove succeeds") {
         val libWithRemovedResource = libWithAddedResource removeResource fooRes.ref
-        libWithRemovedResource contains fooRes.ref should be (false)
+        libWithRemovedResource contains fooRes should be (false)
       }
     }
     
@@ -102,7 +102,7 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
       }
       
       it ("should be findable") {
-        libWithLinked contains linkedRes.ref should be (true)
+        libWithLinked contains linkedRes should be (true)
       }
       
       it ("should be findable by reference") {
@@ -121,6 +121,10 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
         it ("should should not be findable if shadowed by a locally stored resource") {
           val foundRes = (libWithLinked findResource res2.ref).get
           foundRes("a") should equal (1)
+        }
+ 
+        it ("should recognise that is has been shadowed") {
+          libWithLinked isShadowingLinkedResource fooRes.ref should be (true) 
         }
         
         it ("should not appear in 'allResources' if shadowed by a locally stored resource") {
@@ -210,10 +214,10 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
           tangledLib.allExternalRefs.toList should contain (otherLibResource.ref)
         }
         it("should be found by contains") {
-          tangledLib contains otherLibResource.ref should be (true)
+          tangledLib contains otherLibResource should be (true)
         }
         it("should not be found by containsLocally") {
-          tangledLib containsLocally otherLibResource.ref should be (false)
+          tangledLib containsLocally otherLibResource should be (false)
         }
         it("should not be in localResources") {
           tangledLib.localResources.toList should not contain (otherLibResource)
@@ -247,13 +251,13 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
   }
   
   describe("Renaming a resource") {
-    lazy val fooType: RefType = RefType("Foo", idField, Field("other", fooType))
+    lazy val fooType: RefType = RefType("Foo", idField, Field("other", fooType), Field("blah", StringType))
     val fooListType = RefType("FooList", idField, 'foos -> ListType(fooType))
     val fooMapType = RefType("FooMap", idField, 'foos -> MapType(fooType, fooType))
     val fooValueType = ValueType("FooValue", idField, 'foo -> fooType)
     val fooValueDataType = RefType("FooValueData", idField, 'foo -> fooValueType)
     
-    val a = RefData(fooType, 'id -> "a")
+    val a = RefData(fooType, 'id -> "a", "blah" -> "umblob")
     val b = RefData(fooType, 'id -> "b", 'other -> a.ref)
     val fooList = RefData(fooListType, 'id -> "fooList", 'foos -> List(a.ref, b.ref))
     val fooMap = RefData(fooMapType, 'id -> "fooMap", 'foos -> Map(a.ref -> a.ref))
@@ -281,6 +285,24 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
     it ("should result in a library with all ValueData references to the resource having been updated") {
       val res = updatedLib.findResource(fooValueData.ref).get
       res.fields("foo") should equal (ValueData(fooValueType, 'foo -> newRef))
+    }
+    
+    describe("by replacing it") { 
+      val oldRef = a.ref
+      val newResource = RefData(fooType, 'id -> "monkey", "blah" -> "fiddles") 
+      val updatedLib = libWithData.replaceResource(oldRef, newResource) 
+
+      it("should result in a library with the new resource") {
+        updatedLib contains newResource should be (true)
+      }
+
+      it("should result in a library without the old resource") {
+        updatedLib containsRef oldRef should be (false)
+      }
+
+      it("should result in the new resource's fields being saved") {
+        updatedLib.findResource(newResource.ref).get("blah") should equal ("fiddles") 
+      }
     }
   }
   

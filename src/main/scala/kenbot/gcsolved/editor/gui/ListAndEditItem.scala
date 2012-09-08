@@ -1,23 +1,30 @@
 package kenbot.gcsolved.editor.gui
 import kenbot.gcsolved.resource.RefData
 import kenbot.gcsolved.resource.ResourceLibrary
+import kenbot.gcsolved.resource.ResourceRef
 import scala.sys.error
 
+import ResourceLibrary.ResourceLibraryRef
 
 object ListAndEditItem {
-  def apply(current: RefData, original: Option[RefData], localLibraryRef: ResourceLibrary.ResourceLibraryRef) = {
-    new ListAndEditItem(current, original, localLibraryRef)
+  def asExisting(current: RefData, original: Option[RefData], 
+      localLibraryRef: ResourceLibraryRef) = {
+
+    new ListAndEditItem(current, original, original.map(_.ref), localLibraryRef, false)
   }
+ 
+  def asNew(current: RefData, localLibraryRef: ResourceLibraryRef) = {
+    new ListAndEditItem(current, None, None, localLibraryRef, false)
+  } 
 }
 
-class ListAndEditItem(private var currentVar: RefData, val original: Option[RefData], val localLibraryRef: ResourceLibrary.ResourceLibraryRef) {
+class ListAndEditItem private (
+    val current: RefData, 
+    val original: Option[RefData], 
+    private val previousRef: Option[ResourceRef],
+    val localLibraryRef: ResourceLibraryRef, 
+    val isSelected: Boolean) {
   
-  private var previousRef = original.map(_.ref)
-  def current = currentVar
-  def current_=(c: RefData) {
-    previousRef = Some(currentVar.ref)
-    currentVar = c
-  }
   
   def hasNoIdYet = currentId.isEmpty
   def isNew = original.isEmpty
@@ -26,28 +33,31 @@ class ListAndEditItem(private var currentVar: RefData, val original: Option[RefD
   def isExternal = current.definedIn.map(localLibraryRef !=) getOrElse false
   def canImport = isExternal
   def isValid = current.valid
+
+  def reset = {
+    val newCurrent = original getOrElse current.resourceType.emptyData
+    new ListAndEditItem(newCurrent, original, Some(current.ref), localLibraryRef, isSelected)
+  }
+  
+  def updateFromLibrary(lib: ResourceLibrary) = {
+    val latest = lib findResource current.ref getOrElse error("Resource wasn't in library anymore: " + current.ref)
     
-  def resetToOriginal() {
-    current = original getOrElse current.resourceType.emptyData
+    withCurrent(latest)
   }
+ 
+  def addToLibrary(lib: ResourceLibrary): ResourceLibrary = previousRef match {
+    case Some(prevRef) => lib.replaceResource(prevRef, current)
+    case None => lib addResource current 
+  } 
+
+  def withCurrent(c: RefData) = new ListAndEditItem(c, original, Some(current.ref), localLibraryRef, isSelected) 
   
-  def updateCurrentFromLibrary(lib: ResourceLibrary) {
-    current = lib.findResource(current.ref) getOrElse error("")
-  }
-  
-  def updateLibraryFromCurrent(lib: ResourceLibrary): ResourceLibrary = {
-    original match {
-      case Some(orig) if isIdModified && previousRef.isDefined => 
-        lib.updateResourceId(previousRef.get, current.id).addResource(current)
-        
-      case _ => lib.addResource(current)
-    }
-  }
+  def select(s: Boolean) = new ListAndEditItem(current, original, previousRef, localLibraryRef, s)
   
   def currentId = current.id
   
-  private def equality = (currentVar, original, localLibraryRef)
-  
+  private def equality = (current, original, previousRef, localLibraryRef)
+
   override def hashCode() = equality.hashCode
   
   override def equals(a: Any) = a match {

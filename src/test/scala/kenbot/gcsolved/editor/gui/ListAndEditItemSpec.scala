@@ -30,9 +30,9 @@ class ListAndEditItemSpec extends Spec with ShouldMatchers {
   val refData2 = mooLibrary.findResource(ResourceRef("flob", bananaType)).get
   val externalData = booLibrary.findResource(ResourceRef("flib", bananaType)).get
   val noLibraryData = RefData(bananaType, "foo" -> "hhh")
-  val itemWithDifferent = ListAndEditItem(refData1, Some(refData2), "moo")
-  val itemWithSame = ListAndEditItem(refData1, Some(refData1), "moo")
-  val itemWithMissing = ListAndEditItem(refData1, None, "moo")
+  val itemWithDifferent = ListAndEditItem.asExisting(refData1, Some(refData2), "moo")
+  val itemWithSame = ListAndEditItem.asExisting(refData1, Some(refData1), "moo")
+  val itemWithMissing = ListAndEditItem.asNew(refData1, "moo")
   
   describe("Modified status") {
     it ("should be true if the original item is different from the current") {
@@ -50,16 +50,16 @@ class ListAndEditItemSpec extends Spec with ShouldMatchers {
   
   describe("External status") {
     it ("should be false if defined in the local library") {
-      ListAndEditItem(refData1, Some(refData1), "moo").isExternal should be (false)
+      ListAndEditItem.asExisting(refData1, Some(refData1), "moo").isExternal should be (false)
     }
     
     it ("should be true if defined in a different library") {
-      val itemWithExternal = ListAndEditItem(externalData, Some(externalData), "tttt")
+      val itemWithExternal = ListAndEditItem.asExisting(externalData, Some(externalData), "tttt")
       itemWithExternal should be ('isExternal)
     }
     
     it ("should be false if not defined in a library") {
-      val itemWithExternal = ListAndEditItem(noLibraryData, Some(noLibraryData), "tttt")
+      val itemWithExternal = ListAndEditItem.asExisting(noLibraryData, Some(noLibraryData), "tttt")
       itemWithExternal should not be ('isExternal)
     }
   }
@@ -87,31 +87,5 @@ class ListAndEditItemSpec extends Spec with ShouldMatchers {
       itemWithMissing.toString should include ("(new)")
     }
   }
-  
-  describe("Updating current item from library") {
-    val dataInLibrary = mooLibrary.findResource(refData1.ref).get
-    val currentData = refData1.updateField("noo", 444)
-    val item = ListAndEditItem(currentData, None, "moo")
     
-    it("should replace the current item with the one from the library") {
-      item.updateCurrentFromLibrary(mooLibrary)
-      item.current should not equal (currentData)
-      item.current should equal (dataInLibrary)
-    }
-  }
-  
-  describe("Updating library from current item") {
-    val dataInLibrary = mooLibrary.findResource(refData1.ref).get
-    val currentData = refData1.updateField("noo", 444)
-    val item = ListAndEditItem(currentData, None, "moo")
-    
-    it("should replace the one from the library with the current item") {
-      val updatedLib = item.updateLibraryFromCurrent(mooLibrary)
-      
-      updatedLib.findResource(currentData.ref) should not equal (Some(dataInLibrary))
-      updatedLib.findResource(currentData.ref) should equal (Some(currentData))
-    }
-    
-    
-  }
 }

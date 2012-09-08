@@ -39,78 +39,107 @@ class ListAndEditScreen(val refType: RefType,
  
   lazy val panel = new ListAndEditScreenPanel(initialValuesOrDefault.toList, editScreen.panel)
 
-  private[this] var updatedLibraryVar = originalLibrary
+  private var updatedLibraryVar = originalLibrary
+  private var allResourcesVar: Seq[ListAndEditItem] = initialValuesOrDefault.toList
   
+  def allResources = allResourcesVar
+  private def allResources_=(rs: Seq[ListAndEditItem]) { allResourcesVar = rs }
   def updatedLibrary = updatedLibraryVar
   private def updatedLibrary_=(lib: ResourceLibrary) { updatedLibraryVar = lib }
-  
-  def selectedResources: Seq[ListAndEditItem] = panel.selectedResources
-  def selectedResources_=(selected: Seq[ListAndEditItem]) {
-    panel.selectedResources = selected
-    onResourcesSelected(selectedResources)
+
+  def selectedResources = allResources.filter(_.isSelected)
+
+  def select(items: Seq[ListAndEditItem]) {
+    allResources = allResources.map(r => r.select(items contains r))
   }
-  
-  def allResources: Seq[ListAndEditItem] = panel.allResources
+
 
   def addNew() {
+    println("addNew")
     val alreadyExistingNewOne = allResources.find(r => r.isNew && r.hasNoIdYet)
     
     if (alreadyExistingNewOne.isDefined) {
-      selectedResources = alreadyExistingNewOne.toList
+      select(alreadyExistingNewOne.toList)
     } 
-    else {
-        val newValue = refType.emptyData
-        val newItem = ListAndEditItem(newValue, None, originalLibrary.id)
-    
-        suppressEvents {
-          panel.allResources :+= newItem
-          selectedResources = List(newItem)
-        }
+    else suppressEvents {
+      val newItem = ListAndEditItem.asNew(refType.emptyData, originalLibrary.id) 
+      allResources +:= newItem
+      select(Seq(newItem)) 
     }
+    updateView() 
+    updateEditScreen()
   }
   
+
   def importSelected() {
-    updatedLibrary = updatedLibrary.addResources(editScreen.values: _*)
-    selectedResources.foreach(_ updateCurrentFromLibrary updatedLibrary)
-    onResourcesSelected(selectedResources)
+    println("importSelected: " + selectedResources.map(_.currentId))
+    addSelectedToLibrary()
+    updateSelectedOnly(_ updateFromLibrary updatedLibrary)
+    updateView()
+    updateEditScreen()
   }
   
   def undoChanges() {
-    selectedResources.foreach(_.resetToOriginal())
-    updatedLibrary = originalLibrary
-    onResourcesSelected(selectedResources)
+    println("undoChanges: " + selectedResources.map(_.currentId))
+    updateSelectedOnly(_.reset)
+    addSelectedToLibrary()
+    updateEditScreen()
+    updateView()
   }
   
   def delete() {
-    val selectedRefs = selectedResources.filter(!_.isNew).map(_.current.ref)
-    updatedLibrary = updatedLibrary.removeResources(selectedRefs)
-    panel updateResourcesFromLibrary updatedLibrary
-    
-    suppressEvents {
-      def shouldRemove(item: ListAndEditItem) = selectedResources.contains(item) && !item.isExternal
-      panel.allResources = panel.allResources filterNot shouldRemove
-      selectedResources = Nil
+    println("delete: " + selectedResources.map(_.currentId))
+    if (isSelectedShadowingLinked) {
+      unimportSelected()
     }
-    updateButtonStates()
+    else {
+      suppressEvents {
+        removeSelectedFromLibrary()
+        allResources = allResources.filterNot(_.isSelected)
+      }
+      updateView()
+    }
+  }
+  
+  def unimportSelected() {
+    println("unimport: " + selectedResources.map(_.currentId))
+    removeSelectedFromLibrary() 
+    updateSelectedOnly(_ updateFromLibrary updatedLibrary)
+    //updateEditScreen()
+    updateView()
+  }
+  
+  private def updateEditScreen() {
+    println("updateEditScreen: " + selectedResources.map(_.currentId))
+    val selected = selectedResources
+    suppressEvents {
+      editScreen.values = selected.map(_.current)
+    }
+    editScreen.editable = selected.forall(!_.isExternal)
+    editScreen.panel.revalidate()
+    editScreen.panel.repaint()
+  }
+  
+  private def updateView() {
+    println("updateView: " + selectedResources.map(_.currentId))
+    panel.allResources = allResources
+    panel.revalidate()
     panel.repaint()
   }
   
-  private def receiveValuesChanged(newValues: Seq[RefData]) {
-     val idChangeRequired = selectedResources.size == 1 && 
-                            newValues(0).id != selectedResources(0).currentId  
-     if (idChangeRequired) {
-       val newData = newValues(0)
-       val origData = selectedResources(0).current
-       updatedLibrary = updatedLibrary.updateResourceId(origData.ref, newData.id) addResource newData
-       panel.updateResourceWithNewId(newData, origData.id)
-     }
-     else {
-       updatedLibrary = updatedLibrary.addResources(newValues: _*)
-     }      
-     panel updateResourcesFromLibrary updatedLibrary
-     updateButtonStates()
+  private def addSelectedToLibrary() {
+    println("addSelectedToLibrary: " + selectedResources.map(_.currentId))
+    selectedResources.headOption.foreach { r => 
+      updatedLibrary = r addToLibrary updatedLibrary
+    }
   }
 
+  private def removeSelectedFromLibrary() {
+    println("removeSelectedFromLibrary: " + selectedResources.map(_.currentId))
+    val refsToRemove = selectedResources.filter(!_.isNew).map(_.current.ref)
+    updatedLibrary = updatedLibrary removeResources refsToRemove 
+  }
+  
   private def initialValuesOrDefault = {
     val data = if (initialValues.nonEmpty) initialValues
                else List(refType.emptyData)
@@ -118,56 +147,58 @@ class ListAndEditScreen(val refType: RefType,
     data map newListItem
   }
     
-  private def newListItem(refData: RefData) = ListAndEditItem(refData, Some(refData), originalLibrary.id)
+  private def newListItem(refData: RefData) = ListAndEditItem.asExisting(refData, Some(refData), originalLibrary.id)
+
+  private def updateSelectedOnly(f: ListAndEditItem => ListAndEditItem) {
+    allResources = allResources.map(r => if (r.isSelected) f(r) else r) 
+  } 
+
+  private def updateFromEditScreen(singleValue: RefData) {
+    println("updateFromEditScreen: " + singleValue.id)
+    updateSelectedOnly(_ withCurrent singleValue)
+    addSelectedToLibrary()   
+    updateView()
+  }
   
-  private def getTitleForSelectedResources(resources: Seq[ListAndEditItem]): String = {
-    val result = resources.size match {
-      case 0 => "" 
-      case 1 => resources.head.currentId
-      case 2 | 3 => resources.map(_.currentId).mkString(", ")
-      case n => resources(0).currentId + ", " + 
-                resources(1).currentId + " + " + 
-                (resources.size-2) + " more"
+  private def updateForListSelection(newSelection: Seq[ListAndEditItem]) {
+    println("updateForListSelection: " + newSelection.map(_.currentId))
+
+    editScreen.values.headOption.foreach { singleValue => 
+      if (updatedLibrary containsLocally singleValue) {
+        updateSelectedOnly(_ withCurrent singleValue) 
+        addSelectedToLibrary()
+      } 
     }
-    result
+
+    select(newSelection)
+    updateEditScreen()
   }
   
-  private def onResourcesSelected(selected: Seq[ListAndEditItem]) {
-    var hasExternalResources = selected.exists(_.isExternal)
-    
-    editScreen.values = selected.map(_.current)
-    editScreen.editable = !hasExternalResources
-    
-    panel.importButton.visible = hasExternalResources
-    panel.title = getTitleForSelectedResources(selected)
-    updateButtonStates()
+  private def isSelectedShadowingLinked = {
+    val shadowing = for (r <- allResources.find(_.isSelected))
+                    yield updatedLibrary isShadowingLinkedResource r.current.ref 
+    shadowing getOrElse false
   }
-  
-  private def updateButtonStates() {
-    val anythingSelected = selectedResources.nonEmpty
-    val noneExternal = selectedResources.forall(!_.isExternal)
-    val anyModified = selectedResources.exists(_.isModified)
-    panel.deleteButton.enabled = anythingSelected && noneExternal
-    panel.revertButton.enabled = anythingSelected && noneExternal && anyModified
-    panel.repaint()
-  }
-  
-  
-  listenTo(panel.newButton, panel.revertButton, 
-      panel.importButton, panel.deleteButton, panel.listView.selection, editScreen)
- 
+  listenTo(panel, editScreen) 
+
+  import panel.events._ 
+
   reactions += {
     case _ if shouldSuppressEvents => 
     
-    case ButtonClicked(panel.newButton) => addNew()
-    case ButtonClicked(panel.revertButton) => undoChanges()
-    case ButtonClicked(panel.importButton) => importSelected()
-    case ButtonClicked(panel.deleteButton) => delete()
-    case ListSelectionChanged(_, _, true) => onResourcesSelected(selectedResources)
-    case UpdateValues(_, values) => receiveValuesChanged(values) 
-    case LibraryChangedEvent(source, newLib, _) => 
-      panel.allResources = newLib.allResourcesByType(refType).toList map newListItem
+    case NewPressed => addNew()
+    case UndoPressed => undoChanges()
+    case ImportPressed => importSelected()
+    case DeletePressed => delete() 
+    case ResourcesSelected(newSelection) => updateForListSelection(newSelection) 
+    case UpdateValues(_, Seq(singleValue)) => updateFromEditScreen(singleValue) 
+    case UpdateValues(_, values) => error("Bulk edit is not supported")
+    case LibraryChangedEvent(source, newLib, _) => error("No idea what to do here.")
+      // Don't forget to re-add the new items! 
+      //panel.allResources = newLib.allResourcesByType(refType).toList map newListItem
   }
   
-  selectedResources = allResources.headOption.toList
+  select(allResources.headOption.toList)
+  updateView()
+  updateEditScreen()
 }
