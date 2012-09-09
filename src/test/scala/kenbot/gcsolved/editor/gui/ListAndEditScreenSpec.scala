@@ -90,16 +90,26 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
   
   describe("Changing the selection") {
     val screen = newScreen()
-
-    it("should save any changes in progress in the EditScreen") {
-
+    
+    describe("with unsaved changes") {
       screen.editScreen.values = Seq(legoMan.updateField("head", "darthVader") ) 
-
       findUpdatedResourceValue(screen, legoMan.ref, "head") should equal ("pirate")
-      
       fireResourcesSelected(screen, Nil)
-      
-      findUpdatedResourceValue(screen, legoMan.ref, "head") should equal ("darthVader")
+
+      it("should save them to the library") {
+        findUpdatedResourceValue(screen, legoMan.ref, "head") should equal ("darthVader")
+      }
+
+      describe("the previously selected item") {
+        val legoManItem = screen.allResources.find(_.currentId == legoMan.id).get
+
+        it("should be marked as 'modified'") {
+          legoManItem should be ('isModified)
+        }
+        it("should contain the modified value") {
+          legoManItem.current("head") should equal ("darthVader") 
+        }
+      }
     }
     
     it("should not add external resources") {

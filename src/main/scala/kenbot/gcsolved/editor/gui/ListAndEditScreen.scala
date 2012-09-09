@@ -105,7 +105,6 @@ class ListAndEditScreen(val refType: RefType,
     println("unimport: " + selectedResources.map(_.currentId))
     removeSelectedFromLibrary() 
     updateSelectedOnly(_ updateFromLibrary updatedLibrary)
-    //updateEditScreen()
     updateView()
   }
   
@@ -179,6 +178,7 @@ class ListAndEditScreen(val refType: RefType,
                     yield updatedLibrary isShadowingLinkedResource r.current.ref 
     shadowing getOrElse false
   }
+
   listenTo(panel, editScreen) 
 
   import panel.events._ 

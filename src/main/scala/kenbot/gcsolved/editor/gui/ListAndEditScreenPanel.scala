@@ -106,7 +106,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     val anythingSelected = selectedResources.nonEmpty
     val noneExternal = selectedResources.forall(!_.isExternal)
     val anyModified = selectedResources.exists(_.isModified)
-    importButton.visible = !noneExternal//guiSelection.exists(_.isExternal)
+    importButton.visible = !noneExternal
     deleteButton.enabled = anythingSelected && noneExternal
     revertButton.enabled = anythingSelected && noneExternal && anyModified
   }
