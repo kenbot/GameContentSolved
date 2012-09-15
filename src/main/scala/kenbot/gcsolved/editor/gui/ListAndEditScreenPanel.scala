@@ -14,7 +14,7 @@ import scala.swing.event.ButtonClicked
 import javax.swing.BorderFactory
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
 import kenbot.gcsolved.editor.gui.util.SearchBar
-import kenbot.gcsolved.resource.RefData
+import kenbot.gcsolved.resource.{RefData, ResourceRef}
 import scala.swing.event.ListSelectionChanged
 import kenbot.gcsolved.resource.ResourceLibrary
 import scala.swing.GridPanel
@@ -22,8 +22,17 @@ import scala.swing.event.MouseEntered
 import scala.swing.event.MouseExited
 import java.awt.Color
 
-
-class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Component) extends NestedBorderPanel  {
+case class ViewItem(id: String, isModified: Boolean, isNew: Boolean, isSelected: Boolean, externalRef: Option[String]) {
+  def isExternal = externalRef.isDefined
+  override def toString() = {
+    def modifiedStr = if (isModified) "*" else ""
+    def externalStr = externalRef.map(" - " + _) getOrElse ""
+    def newStr = if (isNew) " (new)" else ""
+    <html>{modifiedStr + id}<span color="blue">{newStr}</span> <span color="gray">{externalStr}</span></html>.toString
+  }
+}
+	
+class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component) extends NestedBorderPanel  {
   
   top => 
 
@@ -33,11 +42,12 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     case object UndoPressed extends Event
     case object DeletePressed extends Event
     case object ImportPressed extends Event
-    case class ResourcesSelected(items: Seq[ListAndEditItem]) extends Event
+    case class ResourcesSelected(items: Seq[String]) extends Event
   } 
+   
   import events._
 
-  private var allResourcesVar: List[ListAndEditItem] = initialValues.toList
+  private var allResourcesVar: List[ViewItem] = initialValues.toList
   private val newButton = Button("New")(publish(NewPressed))
   private val cloneButton = Button("Clone")(publish(ClonePressed))
   private val revertButton = Button("Undo Changes")(publish(UndoPressed))
@@ -51,7 +61,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     private val normalTextColor = foreground
     listenTo(mouse.moves)
     reactions += {
-      case ButtonClicked(_) => top publish(ImportPressed)
+      case ButtonClicked(_) => top publish ImportPressed
       case MouseEntered(_, _, _) => 
         foreground = Color.blue
         repaint()
@@ -63,7 +73,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
   }
 
   private val searchBar = SearchBar { searchString => 
-    listView.listData = allResources.filter(_.current matches searchString) 
+    listView.listData = allResources.filter(_.id.toLowerCase contains searchString.toLowerCase) 
     listView.repaint
   }
   
@@ -76,7 +86,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
       case ListSelectionChanged(_, _, true) => 
         val selectedResources = selection.items.toSeq
         updateViewForSelection(selectedResources)
-        top publish ResourcesSelected(selectedResources)
+        top publish ResourcesSelected(selectedResources.map(_.id))
     }
   }
   
@@ -91,8 +101,8 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
   }
 
 
-  def allResources: Seq[ListAndEditItem] = allResourcesVar
-  def allResources_=(resources: Seq[ListAndEditItem]) {
+  def allResources: Seq[ViewItem] = allResourcesVar
+  def allResources_=(resources: Seq[ViewItem]) {
     allResourcesVar = resources.toList
     listView.listData = resources
      
@@ -102,7 +112,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
     updateViewForSelection(selectedResources)
   }
 
-  private def updateButtonStates(selectedResources: Seq[ListAndEditItem]) {
+  private def updateButtonStates(selectedResources: Seq[ViewItem]) {
     val anythingSelected = selectedResources.nonEmpty
     val noneExternal = selectedResources.forall(!_.isExternal)
     val anyModified = selectedResources.exists(_.isModified)
@@ -112,19 +122,19 @@ class ListAndEditScreenPanel(initialValues: Seq[ListAndEditItem], mainPanel: Com
   }
 
   
-  private def getTitleForSelectedResources(resources: Seq[ListAndEditItem]): String = {
+  private def getTitleForSelectedResources(resources: Seq[ViewItem]): String = {
     val result = resources.size match {
       case 0 => "" 
-      case 1 => resources.head.currentId
-      case 2 | 3 => resources.map(_.currentId).mkString(", ")
-      case n => resources(0).currentId + ", " + 
-                resources(1).currentId + " + " + 
+      case 1 => resources.head.id
+      case 2 | 3 => resources.map(_.id).mkString(", ")
+      case n => resources(0).id + ", " + 
+                resources(1).id + " + " + 
                 (resources.size-2) + " more"
     }
     result
   }
  
-  private def updateViewForSelection(selectedResources: Seq[ListAndEditItem]) {
+  private def updateViewForSelection(selectedResources: Seq[ViewItem]) {
      titleLabel.text = getTitleForSelectedResources(selectedResources) 
      updateButtonStates(selectedResources)
      centerPanel.center = if (selectedResources.nonEmpty) mainPanel

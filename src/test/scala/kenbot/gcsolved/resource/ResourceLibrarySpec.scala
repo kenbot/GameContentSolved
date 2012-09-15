@@ -61,23 +61,21 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
         libWithAddedResource contains fooRes should be (true)
       }
       it ("should result in the resource knowing it is defined in the library") {
-        val addedResource = libWithAddedResource.findResource(fooRes.ref).get
+        val addedResource = libWithAddedResource(fooRes.ref)
         addedResource.definedIn should equal (Some(libWithAddedResource.id))
       }
       it ("should result in the library being able to find it by reference") {
-        libWithAddedResource findResource fooRes.ref should equal (Some(fooRes))
+        libWithAddedResource(fooRes.ref) should equal (fooRes)
       }
       it ("should result in the library being able to find it locally by reference") {
-        libWithAddedResource findLocalResource fooRes.ref should equal (Some(fooRes))
+        libWithAddedResource(fooRes.ref) should equal (fooRes)
       }
     }
      
     describe("Removing") {
-      it ("should fail if the resource could not be found") {
+      it ("should silently succeed if the resource could not be found") {
         val fakeRes = RefData(RefType("boo", idField), 'id -> "blah")
-        evaluating { 
-          libWithAddedResource removeResource fakeRes.ref 
-        } should produce [IllegalArgumentException]
+        libWithAddedResource removeResource fakeRes.ref 
       }
       it ("should fail if other resources refer to it") {
         val res2 = RefData(fooType, 'id -> "other", 'referToFoo -> ResourceRef(fooRes.id, fooType))
@@ -130,14 +128,6 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
         it ("should not appear in 'allResources' if shadowed by a locally stored resource") {
           libWithLinked.allResources.exists(_("a") == 4) should be (false)
         }
-      }
-
-      
-      
-      it ("should not be removable from the linking library") {
-        evaluating {
-          libWithLinked removeResource linkedRes.ref
-        } should produce [IllegalArgumentException]
       }
     }
     

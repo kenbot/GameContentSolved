@@ -25,158 +25,105 @@ import scala.collection.mutable.ListBuffer
 import scala.swing.FlowPanel
 import scala.swing.Publisher
 import kenbot.gcsolved.editor.gui.widgets.FieldWidget
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.resource.{Field, LibraryEditSession}
 import kenbot.gcsolved.resource.ResourceRef
 import kenbot.gcsolved.editor.gui.util.SuppressableEvents
 
 
 class ListAndEditScreen(val refType: RefType, 
-            initialValues: Seq[RefData], 
             val originalLibrary: ResourceLibrary, 
             makeEditScreen: RefType => EditScreen) extends Reactor with SuppressableEvents {
   
   val editScreen: EditScreen = makeEditScreen(refType)
  
-  lazy val panel = new ListAndEditScreenPanel(initialValuesOrDefault.toList, editScreen.panel)
+  lazy val panel = new ListAndEditScreenPanel(initialValuesOrDefault map makeViewItem, editScreen.panel)
+   
+  var editSession = LibraryEditSession(originalLibrary, Seq(initialValuesOrDefault.head))
 
-  private var updatedLibraryVar = originalLibrary
-  private var allResourcesVar: Seq[ListAndEditItem] = initialValuesOrDefault.toList
-  
-  def allResources = allResourcesVar
-  private def allResources_=(rs: Seq[ListAndEditItem]) { allResourcesVar = rs }
-  def updatedLibrary = updatedLibraryVar
-  private def updatedLibrary_=(lib: ResourceLibrary) { updatedLibraryVar = lib }
+  def updatedLibrary = editSession.library
 
-  def selectedResources = allResources.filter(_.isSelected)
-
-  def select(items: Seq[ListAndEditItem]) {
-    allResources = allResources.map(r => r.select(items contains r))
-  }
-
+  def selectedResources = editSession.currentEdits 
+  def allResources: Seq[RefData] = updatedLibrary.allResourcesByType(refType).toIndexedSeq ++ selectedResources.filter(!_.hasId)
 
   def addNew() {
     println("addNew")
-    val alreadyExistingNewOne = allResources.find(r => r.isNew && r.hasNoIdYet)
-    
-    if (alreadyExistingNewOne.isDefined) {
-      select(alreadyExistingNewOne.toList)
-    } 
-    else suppressEvents {
-      val newItem = ListAndEditItem.asNew(refType.emptyData, originalLibrary.id) 
-      allResources +:= newItem
-      select(Seq(newItem)) 
-    }
+    editSession = editSession selectItems Seq(refType.emptyData) 
     updateView() 
     updateEditScreen()
   }
   
 
   def importSelected() {
-    println("importSelected: " + selectedResources.map(_.currentId))
-    addSelectedToLibrary()
-    updateSelectedOnly(_ updateFromLibrary updatedLibrary)
-    updateView()
+    println("importSelected: " + selectedResources.map(_.id))
+    editSession = editSession.importLinked
     updateEditScreen()
+    updateView()
   }
   
   def undoChanges() {
-    println("undoChanges: " + selectedResources.map(_.currentId))
-    updateSelectedOnly(_.reset)
-    addSelectedToLibrary()
+    println("undoChanges: " + selectedResources.map(_.id))
+    editSession = editSession.reset 
     updateEditScreen()
     updateView()
   }
   
   def delete() {
-    println("delete: " + selectedResources.map(_.currentId))
-    if (isSelectedShadowingLinked) {
-      unimportSelected()
-    }
-    else {
-      suppressEvents {
-        removeSelectedFromLibrary()
-        allResources = allResources.filterNot(_.isSelected)
-      }
-      updateView()
-    }
-  }
-  
-  def unimportSelected() {
-    println("unimport: " + selectedResources.map(_.currentId))
-    removeSelectedFromLibrary() 
-    updateSelectedOnly(_ updateFromLibrary updatedLibrary)
+    println("delete: " + selectedResources.map(_.id))
+    editSession = editSession.delete 
+    updateEditScreen()
     updateView()
   }
-  
+
   private def updateEditScreen() {
-    println("updateEditScreen: " + selectedResources.map(_.currentId))
+    println("updateEditScreen: " + selectedResources.map(_.id))
     val selected = selectedResources
     suppressEvents {
-      editScreen.values = selected.map(_.current)
+      editScreen.values = selected
     }
-    editScreen.editable = selected.forall(!_.isExternal)
+    editScreen.editable = !editSession.externalResourcesSelected 
     editScreen.panel.revalidate()
     editScreen.panel.repaint()
   }
   
   private def updateView() {
-    println("updateView: " + selectedResources.map(_.currentId))
-    panel.allResources = allResources
+    println("updateView: " + selectedResources.map(_.id))
+    panel.allResources = allResources map makeViewItem
     panel.revalidate()
     panel.repaint()
   }
   
-  private def addSelectedToLibrary() {
-    println("addSelectedToLibrary: " + selectedResources.map(_.currentId))
-    selectedResources.headOption.foreach { r => 
-      updatedLibrary = r addToLibrary updatedLibrary
-    }
-  }
-
-  private def removeSelectedFromLibrary() {
-    println("removeSelectedFromLibrary: " + selectedResources.map(_.currentId))
-    val refsToRemove = selectedResources.filter(!_.isNew).map(_.current.ref)
-    updatedLibrary = updatedLibrary removeResources refsToRemove 
-  }
-  
-  private def initialValuesOrDefault = {
-    val data = if (initialValues.nonEmpty) initialValues
-               else List(refType.emptyData)
-              
-    data map newListItem
-  }
-    
-  private def newListItem(refData: RefData) = ListAndEditItem.asExisting(refData, Some(refData), originalLibrary.id)
-
-  private def updateSelectedOnly(f: ListAndEditItem => ListAndEditItem) {
-    allResources = allResources.map(r => if (r.isSelected) f(r) else r) 
-  } 
-
-  private def updateFromEditScreen(singleValue: RefData) {
-    println("updateFromEditScreen: " + singleValue.id)
-    updateSelectedOnly(_ withCurrent singleValue)
-    addSelectedToLibrary()   
+  private def updateFromEditScreen(values: Seq[RefData]) {
+    println("updateFromEditScreen: " + values.map(_.id))
+    editSession = editSession applyEdits values 
     updateView()
   }
   
-  private def updateForListSelection(newSelection: Seq[ListAndEditItem]) {
-    println("updateForListSelection: " + newSelection.map(_.currentId))
+  private def updateForListSelection(selectedIds: Seq[String]) {
+    println("updateForListSelection: " + selectedIds)
 
-    editScreen.values.headOption.foreach { singleValue => 
-      if (updatedLibrary containsLocally singleValue) {
-        updateSelectedOnly(_ withCurrent singleValue) 
-        addSelectedToLibrary()
-      } 
+    if (!editSession.externalResourcesSelected && selectedResources.nonEmpty) {
+      editSession = editSession applyEdits editScreen.values
     }
 
-    select(newSelection)
+    val items = selectedIds.map { id => 
+      if (id.isEmpty) refType.emptyData
+      else updatedLibrary(ResourceRef(id, refType))
+    }
+    editSession = editSession selectItems items
     updateEditScreen()
   }
   
-  private def isSelectedShadowingLinked = {
-    val shadowing = for (r <- allResources.find(_.isSelected))
-                    yield updatedLibrary isShadowingLinkedResource r.current.ref 
-    shadowing getOrElse false
+  def initialValuesOrDefault: Seq[RefData] = {
+    val initialValues = originalLibrary.allResourcesByType(refType).toIndexedSeq
+    if (initialValues.nonEmpty) initialValues else Vector(refType.emptyData)
+  }
+
+  def makeViewItem(r: RefData): ViewItem = {
+    val isNew = editSession isAddedSinceOriginal r.ref
+    val modified = editSession isModifiedSinceOriginal r 
+    val selected = editSession.currentEdits contains r
+    val externalRef = r.definedIn.filterNot(updatedLibrary.ref ==)
+    ViewItem(r.id, modified, isNew, selected, externalRef)
   }
 
   listenTo(panel, editScreen) 
@@ -191,14 +138,12 @@ class ListAndEditScreen(val refType: RefType,
     case ImportPressed => importSelected()
     case DeletePressed => delete() 
     case ResourcesSelected(newSelection) => updateForListSelection(newSelection) 
-    case UpdateValues(_, Seq(singleValue)) => updateFromEditScreen(singleValue) 
-    case UpdateValues(_, values) => error("Bulk edit is not supported")
+    case UpdateValues(_, values) => updateFromEditScreen(values) 
     case LibraryChangedEvent(source, newLib, _) => error("No idea what to do here.")
       // Don't forget to re-add the new items! 
       //panel.allResources = newLib.allResourcesByType(refType).toList map newListItem
   }
   
-  select(allResources.headOption.toList)
   updateView()
   updateEditScreen()
 }

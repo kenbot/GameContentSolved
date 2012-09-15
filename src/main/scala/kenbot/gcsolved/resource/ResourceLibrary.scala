@@ -52,6 +52,8 @@ final class ResourceLibrary private (
     val res = findLocalResource(resourceRef)
     (res /: linkedLibraries)(_ orElse _.findResource(resourceRef))
   }
+  
+  def apply(resourceRef: ResourceRef): RefData = findResource(resourceRef) getOrElse error("Resource " + resourceRef + " not found")
 
   def files: Set[File] = fileSet
   
@@ -115,6 +117,7 @@ final class ResourceLibrary private (
     copy(resourceMap = newResourceMap)
   }
   
+  @deprecated
   def replaceResource(existingResourceRef: ResourceRef, replaceWith: RefData): ResourceLibrary = {
     updateResourceId(existingResourceRef, replaceWith.id) addResource replaceWith 
   }
@@ -129,7 +132,6 @@ final class ResourceLibrary private (
     require(findResourcesThatReferTo(resourceRef).isEmpty, 
         "Cannot remove '" + resourceRef + "', as other resources still refer to it")
     
-    require(findLocalResource(resourceRef).isDefined, "No such resource defined locally: " + resourceRef)
     copy(resourceMap = resourceMap - resourceRef)
   }
   

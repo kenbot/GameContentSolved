@@ -39,7 +39,7 @@ class RefData private (
   def incrementVersion(): RefData = copy(version = version+1)
   def updateId(newId: Any) = updateField(resourceType.idField, newId)
   def asDefinedIn(externalLibrary: ResourceLibrary) = copy(definedIn = Some(externalLibrary.id))
-  
+  def isDefinedIn(externalLibrary: ResourceLibrary): Boolean = definedIn.map(externalLibrary.ref ==) getOrElse false 
 
   def updateResourceRefs(resourceRef: ResourceRef, newId: String): RefData = {
     val updatedFields = getFieldsWithUpdatedResourceRefs(resourceRef, newId)

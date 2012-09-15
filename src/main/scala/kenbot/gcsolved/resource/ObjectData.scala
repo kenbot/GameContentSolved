@@ -8,6 +8,7 @@ trait ObjectData {
       "Cannot directly instantiate abstract resource type: " + resourceType)
   
   def id = ""
+  def hasId: Boolean = id != ""
 
   def resourceType: ObjectType
   def fields: Map[Field.Name, Any]

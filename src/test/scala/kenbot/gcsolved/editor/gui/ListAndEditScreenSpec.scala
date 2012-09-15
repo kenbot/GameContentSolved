@@ -78,11 +78,11 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
       }
       
       it("should not leave a resource with the old ID in the list view") {
-        screen.allResources.exists(_.currentId == oldId.id) should be (false)
+        screen.allResources.exists(_.id == oldId.id) should be (false)
       }
       
       it("should leave a resource with the new ID in the list view") {
-        screen.allResources.exists(_.currentId == newId.id) should be (true)
+        screen.allResources.exists(_.id == newId.id) should be (true)
       }
       
     }
@@ -101,14 +101,26 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
       }
 
       describe("the previously selected item") {
-        val legoManItem = screen.allResources.find(_.currentId == legoMan.id).get
+        val legoManItem = screen.allResources.find(_.id == legoMan.id).get
 
         it("should be marked as 'modified'") {
-          legoManItem should be ('isModified)
+          screen.editSession isModifiedSinceOriginal legoManItem should be (true)
         }
         it("should contain the modified value") {
-          legoManItem.current("head") should equal ("darthVader") 
+          legoManItem("head") should equal ("darthVader") 
         }
+      }
+    }
+    
+    describe("to a new item") {
+      val screen = newScreen()
+      screen.addNew()
+      val newOne = screen.selectedResources(0)
+      fireResourcesSelected(screen, Seq(legoMan))
+      fireResourcesSelected(screen, Seq(newOne))
+       
+      it("should select it without any problems") {
+        screen.selectedResources(0) should equal (newOne)
       }
     }
     
@@ -131,14 +143,14 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
     }
     
     it ("should remove the item from the screen") {
-      screen.allResources.exists(_.currentId == legoMan.id) should be (false)
+      screen.allResources.exists(_.id == legoMan.id) should be (false)
     }
 
     describe ("a local resource that exists in a linked library") {
       val linkedLib = ResourceLibrary("blah", schema).addLinkedLibraries(library).addResource(legoMan)
       val screen = newScreen(linkedLib)
       screen.delete()
-      val remainingItem = screen.allResources.find(_.currentId == legoMan.id)
+      val remainingItem = screen.allResources.find(_.id == legoMan.id)
 
       it("should still hold the linked item in the library") {
         screen.updatedLibrary contains legoMan should be (true)
@@ -148,10 +160,6 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
  	remainingItem should be ('defined)
       }
       
-      it ("should be marked as external") {
-        remainingItem.get should be ('isExternal)
-      }
-     
       it ("should leave the the edit screen non-editable") {
         screen.editScreen should not be ('editable)
       }
@@ -176,8 +184,8 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
     }
     
     it("should revert the selected resource/s to the original state in the list view") {
-      val legoManItem = screen.allResources.find(_.currentId == legoMan.id).get
-      legoManItem.current("head") should equal ("pirate")
+      val legoManItem = screen.allResources.find(_.id == legoMan.id).get
+      legoManItem("head") should equal ("pirate")
     }
     
     describe("if reverting an ID change") {
@@ -199,11 +207,11 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
       }
       
       it("should have the old ID back in the list view") {
-        screen.allResources.exists(_.current.ref == oldId) should be (true)
+        screen.allResources.exists(_.ref == oldId) should be (true)
       }
       
       it("shouldn't have the new ID in the list view anymore") {
-        screen.allResources.exists(_.current.ref == newId) should be (false)
+        screen.allResources.exists(_.ref == newId) should be (false)
       }
       
       it("should have the old ID back in the edit screen") {
@@ -228,7 +236,7 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
       
       it("should add the resource locally to the library") {
         screen.importSelected()
-        val screenItem = screen.selectedResources.head.current
+        val screenItem = screen.selectedResources.head
         screen.updatedLibrary containsLocally screenItem should be (true)
       }
     }
@@ -251,6 +259,11 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
       screen.allResources.size should equal (numStartingResources + 1)
     }
     
+    it("should be editable") {
+      val screen = newScreen()
+      screen.addNew()
+      screen.editScreen should be ('editable)
+    } 
     
     it("shouldn't add anything to the library yet") {
       val screen = newScreen()
@@ -289,7 +302,7 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
   }
     
   private def newScreen(lib: ResourceLibrary = library) = {
-    new ListAndEditScreen(legoManType, Seq(legoMan), lib, DummyEditScreen.apply) 
+    new ListAndEditScreen(legoManType, lib, DummyEditScreen.apply) 
   }
  
   private def fireValueUpdate(screen: ListAndEditScreen, value: RefData) {
@@ -298,10 +311,10 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
     screen deafTo this
   }
 
-  private def fireResourcesSelected(screen: ListAndEditScreen, values: Seq[ListAndEditItem]) {
+  private def fireResourcesSelected(screen: ListAndEditScreen, values: Seq[RefData]) {
     screen listenTo this
     import screen.panel.events._
-    publish(ResourcesSelected(values))
+    publish(ResourcesSelected(values.map(_.id)))
     screen deafTo this
   }
   
