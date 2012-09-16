@@ -68,7 +68,7 @@ package object types {
   val Terrain = RefType("Terrain", AnyRefType, true,
       'Name -> StringType ^ (isId=true),
       'Layer -> TerrainLayer,
-      /*'IsOrganic -> BoolType,
+      'IsOrganic -> BoolType,
       'BlocksProjectiles -> BoolType, 
       'BurnTime -> RangeType, 
       'MapColor -> ColorType, 
@@ -77,11 +77,11 @@ package object types {
       'ContentOffsetY -> IntType,
       'Overhang -> PointType, 
       'ClipContentRect -> RectType,
-      'OverlayImage -> ImageType,*/
+      'OverlayImage -> ImageType,
       'OverlayImageClippable -> ImageType)
     
-  val DoorTerrain: RefType = RefType("DoorTerrain", Terrain, false)
-     /* 'DefaultImageCombo -> TerrainNeighbourCombo,    
+  val DoorTerrain: RefType = RefType("DoorTerrain", Terrain, false,
+      'DefaultImageCombo -> TerrainNeighbourCombo,    
       'OpenImages -> MapType(Direction, ListType(ImageType)) ^ (required=true), 
       'ClosedImages -> MapType(Direction, ListType(ImageType)) ^ (required=true),
       'SolidToVision -> MapType(OrthogonalDirection, BoolType),
@@ -101,7 +101,7 @@ package object types {
       'Lock -> BoolType,
       'LockComplexity -> IntType,
       'LockDestroysKey -> BoolType,
-      'KeyType -> Tool )*/
+      'KeyType -> Tool )
       
   
   

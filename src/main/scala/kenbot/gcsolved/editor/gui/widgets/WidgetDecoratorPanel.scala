@@ -60,7 +60,7 @@ class WidgetDecoratorPanel(val widget: FieldWidget) extends NestedBorderPanel {
   listenTo(widget, label.mouse.clicks)
   
   private def updateText() {
-    background = FormColors.getColor(widget.hasFocus, widget.valid)
+    background = FormColors.getColor(widget.hasFocus, widget.valid || widget.subWidgets.nonEmpty)
     tooltip = if (widget.valid) field.description
               else <html> 
                      { failures.map { f => <p> {f} </p>} } 

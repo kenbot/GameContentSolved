@@ -1,6 +1,6 @@
 package kenbot.gcsolved.editor.gui.sidebar
 import scala.swing.BorderPanel
-import kenbot.gcsolved.resource.types.RefType
+import kenbot.gcsolved.resource.types.{AnyRefType, RefType}
 import scala.swing.ListView
 import scala.swing.tree.Tree
 import scala.swing.tree.InternalTreeModel
@@ -31,8 +31,8 @@ class LibraryPage(val refTypes: Seq[RefType], val library: ResourceLibrary) exte
   }
   treeView.expandAll()
   
-  private def makeTreeModel = TreeModel(refTypes: _*)(getChildren)
-  private def hasChildren(t: RefType) = getChildren(t).nonEmpty
+  private def roots = refTypes.filter(_.parent == AnyRefType) 
+  private def makeTreeModel = TreeModel(roots: _*)(getChildren)
   private def getChildren(t: RefType) = refTypes.filter(_.parent == t)
   
   listenTo(searchBar, treeView.mouse.clicks)

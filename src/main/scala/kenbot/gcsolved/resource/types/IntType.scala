@@ -46,8 +46,8 @@ class IntType(val min: Option[Int] = None,
   def isTooLarge(i: Int) = max.map(i >) getOrElse false
   
   override def getFailures(value: Any): List[String] = {
-    def minError(i: Int) = if (isTooSmall(i)) List("Less than minimum value of " + min + ": " + value) else Nil
-    def maxError(i: Int) = if (isTooLarge(i)) List("Greater than maximum value of " + min + ": " + value) else Nil
+    def minError(i: Int) = if (isTooSmall(i)) List("Less than minimum value of " + min.get + ": " + value) else Nil
+    def maxError(i: Int) = if (isTooLarge(i)) List("Greater than maximum value of " + max.get + ": " + value) else Nil
     
     try {
       val i = asValue(value)

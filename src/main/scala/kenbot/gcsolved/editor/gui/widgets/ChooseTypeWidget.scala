@@ -41,20 +41,17 @@ class ChooseTypeWidget(theField: Field,
     
     top listenTo typesCombo.selection
     
-    listenTo(typesCombo)
-   
-    reactions += {
-      case FocusGained(`typesCombo`, other, temp) => publish(FocusGained(this, other, temp)) 
-      case FocusLost(`typesCombo`, other, temp) => publish(FocusLost(this, other, temp)) 
-    }
+    //listenTo(typesCombo)
+    //reactions += {
+    //  case FocusGained(`typesCombo`, other, temp) => publish(FocusGained(this, other, temp)) 
+    //  case FocusLost(`typesCombo`, other, temp) => publish(FocusLost(this, other, temp)) 
+    //}
     
-    println("Initializing editor...")
     typesCombo.selectedItem foreach updateForType
   } 
   
   
   def updateForType(t: ObjectType) {
-    println("updateForType")
     centerContent.contents.clear()
     deafTo(currentFieldWidgets: _*)
     
@@ -64,7 +61,6 @@ class ChooseTypeWidget(theField: Field,
     listenTo(currentFieldWidgets: _*)
     
     centerContent.contents += typePanel
-    validateAndUpdate()
   }
 
   reactions += {
@@ -73,9 +69,9 @@ class ChooseTypeWidget(theField: Field,
     case ValidationEvent(widget, success) if widget ne this => validateAndUpdate()
     
     case SelectionChanged(`typesCombo`) => 
-      println("Selection changed")
       val selectedType = typesCombo.selectedItem getOrElse noTypeSelectedError
       updateForType(selectedType)
+      validateAndUpdate()
       editor.revalidate()
       editor.repaint()
   }

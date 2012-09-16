@@ -20,7 +20,7 @@ abstract class ObjectType private[resource] (name: String,
   protected def initFields(theLocalFields: Seq[Field]): Seq[Field] = theLocalFields
   
   def fields: Map[Field.Name, Field] = if (parent eq this) localFields 
-                                       else localFields ++ parent.fields
+                                       else ListMap() ++ parent.fields ++ localFields
                                        
   lazy val categories: Seq[Field.Name] = fields.values.map(_.category).filter(_.nonEmpty).toSeq
   
