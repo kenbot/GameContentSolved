@@ -36,7 +36,7 @@ class ListAndEditScreen(val refType: RefType,
   
   val editScreen: EditScreen = makeEditScreen(refType)
  
-  lazy val panel = new ListAndEditScreenPanel(initialValuesOrDefault map makeViewItem, editScreen.panel)
+  lazy val panel = new ListAndEditScreenPanel(initialValuesOrDefault map makeViewItem, editScreen.panel, editScreen.isBulkEditSupported)
    
   var editSession = LibraryEditSession(originalLibrary, Seq(initialValuesOrDefault.head))
 
@@ -46,7 +46,6 @@ class ListAndEditScreen(val refType: RefType,
   def allResources: Seq[RefData] = updatedLibrary.allResourcesByType(refType).toIndexedSeq ++ selectedResources.filter(!_.hasId)
 
   def addNew() {
-    println("addNew")
     editSession = editSession selectItems Seq(refType.emptyData) 
     updateView() 
     updateEditScreen()
@@ -54,28 +53,24 @@ class ListAndEditScreen(val refType: RefType,
   
 
   def importSelected() {
-    println("importSelected: " + selectedResources.map(_.id))
     editSession = editSession.importLinked
     updateEditScreen()
     updateView()
   }
   
   def undoChanges() {
-    println("undoChanges: " + selectedResources.map(_.id))
     editSession = editSession.reset 
     updateEditScreen()
     updateView()
   }
   
   def delete() {
-    println("delete: " + selectedResources.map(_.id))
     editSession = editSession.delete 
     updateEditScreen()
     updateView()
   }
 
   private def updateEditScreen() {
-    println("updateEditScreen: " + selectedResources.map(_.id))
     val selected = selectedResources
     suppressEvents {
       editScreen.values = selected
@@ -86,20 +81,19 @@ class ListAndEditScreen(val refType: RefType,
   }
   
   private def updateView() {
-    println("updateView: " + selectedResources.map(_.id))
-    panel.allResources = allResources map makeViewItem
-    panel.revalidate()
-    panel.repaint()
+    suppressEvents {
+      panel.allResources = allResources map makeViewItem
+      panel.revalidate()
+      panel.repaint()
+    }
   }
   
   private def updateFromEditScreen(values: Seq[RefData]) {
-    println("updateFromEditScreen: " + values.map(_.id))
     editSession = editSession applyEdits values 
     updateView()
   }
   
   private def updateForListSelection(selectedIds: Seq[String]) {
-    println("updateForListSelection: " + selectedIds)
 
     if (!editSession.externalResourcesSelected && selectedResources.nonEmpty) {
       editSession = editSession applyEdits editScreen.values

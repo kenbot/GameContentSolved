@@ -32,7 +32,7 @@ case class ViewItem(id: String, isModified: Boolean, isNew: Boolean, isSelected:
   }
 }
 	
-class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component) extends NestedBorderPanel  {
+class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component, supportMultiSelect: Boolean) extends NestedBorderPanel  {
   
   top => 
 
@@ -80,16 +80,20 @@ class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component)
   private val listView = new ListView(initialValues) { 
     if (initialValues.nonEmpty)
       selectIndices(0)
-   
+    
+    import ListView.IntervalMode._
+    selection.intervalMode = if (supportMultiSelect) MultiInterval 
+                             else Single
+
     listenTo(selection) 
     reactions += { 
-      case ListSelectionChanged(_, _, true) => 
+      case ListSelectionChanged(_, _, false) => 
         val selectedResources = selection.items.toSeq
         updateViewForSelection(selectedResources)
         top publish ResourcesSelected(selectedResources.map(_.id))
     }
   }
-  
+ 
   private val pleaseSelectPanel = new FlowPanel {
     contents += new Label("Select entries from the left to edit them") 
   }

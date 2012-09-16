@@ -37,21 +37,26 @@ trait WidgetFocusBehaviour extends FieldWidget {
   
   reactions += {
     case FocusGained(`editor`, other, false) => 
+      println(field.name + ": Editor gained focus")
       hasFocus = true
       validateAndUpdate()
 
     case FocusLost(`editor`, other, false) =>
+      println(field.name + ": Editor lost focus")
       validateAndUpdate()
           
     case WidgetFocusEvent(`self`, true, _) if subWidgets.isEmpty => 
+      println(field.name + ": Gained from self, no children")
       editor.requestFocusInWindow()
       
     case WidgetFocusEvent(focusedChild, true, level) if level == this.level+1 => 
+      println(field.name + ": Child from next level gained focus")
       hasFocus = true
       unFocusChildrenExcept(focusedChild)
       publish(WidgetFocusEvent(this, true, this.level))
       
     case WidgetFocusEvent(unfocusedChild, false, level) if level == this.level+1 =>
+      println(field.name + ": Child from next level lost focus")
       if (subWidgets.forall(!_.hasFocus)) {
         hasFocus = false
       }
