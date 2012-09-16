@@ -90,7 +90,10 @@ class ListAndEditScreen(val refType: RefType,
   
   private def updateFromEditScreen(values: Seq[RefData]) {
     editSession = editSession applyEdits values 
-    updateView()
+    val viewItems = values map makeViewItem
+    panel updateSelectedOnly viewItems
+    panel.repaint()
+    //updateView()
   }
   
   private def updateForListSelection(selectedIds: Seq[String]) {

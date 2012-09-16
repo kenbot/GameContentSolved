@@ -44,10 +44,14 @@ class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component,
     case object ImportPressed extends Event
     case class ResourcesSelected(items: Seq[String]) extends Event
   } 
+  
+  private case class ViewItemWrapper(var item: ViewItem) {
+    override def toString() = item.toString
+  }
    
   import events._
 
-  private var allResourcesVar: List[ViewItem] = initialValues.toList
+  private var allResourcesVar: IndexedSeq[ViewItemWrapper] = (initialValues map ViewItemWrapper.apply).toIndexedSeq
   private val newButton = Button("New")(publish(NewPressed))
   private val cloneButton = Button("Clone")(publish(ClonePressed))
   private val revertButton = Button("Undo Changes")(publish(UndoPressed))
@@ -73,11 +77,11 @@ class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component,
   }
 
   private val searchBar = SearchBar { searchString => 
-    listView.listData = allResources.filter(_.id.toLowerCase contains searchString.toLowerCase) 
-    listView.repaint
+    listView.listData = allResources.filter(_.id.toLowerCase contains searchString.toLowerCase) map ViewItemWrapper.apply 
+    listView.repaint()
   }
   
-  private val listView = new ListView(initialValues) { 
+  private val listView = new ListView(initialValues map ViewItemWrapper.apply) { 
     if (initialValues.nonEmpty)
       selectIndices(0)
     
@@ -89,8 +93,8 @@ class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component,
     reactions += { 
       case ListSelectionChanged(_, _, false) => 
         val selectedResources = selection.items.toSeq
-        updateViewForSelection(selectedResources)
-        top publish ResourcesSelected(selectedResources.map(_.id))
+        updateViewForSelection(selectedResources.map(_.item))
+        top publish ResourcesSelected(selectedResources.map(_.item.id))
     }
   }
  
@@ -105,15 +109,21 @@ class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component,
   }
 
 
-  def allResources: Seq[ViewItem] = allResourcesVar
+  def allResources: Seq[ViewItem] = allResourcesVar.map(_.item)
   def allResources_=(resources: Seq[ViewItem]) {
-    allResourcesVar = resources.toList
-    listView.listData = resources
+    allResourcesVar = (resources map ViewItemWrapper.apply).toIndexedSeq
+    listView.listData = allResourcesVar
      
     val selectedResources = allResources.filter(_.isSelected)
     val indicesToSelect = selectedResources.map(allResources indexOf _) 
     listView.selectIndices(indicesToSelect: _*)
     updateViewForSelection(selectedResources)
+  }
+  
+  def updateSelectedOnly(items: Seq[ViewItem]) {
+    listView.selection.items zip items foreach {
+      case (old, newOne) => old.item = newOne 
+    }
   }
 
   private def updateButtonStates(selectedResources: Seq[ViewItem]) {
@@ -142,7 +152,7 @@ class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component,
      titleLabel.text = getTitleForSelectedResources(selectedResources) 
      updateButtonStates(selectedResources)
      centerPanel.center = if (selectedResources.nonEmpty) mainPanel
-                         else pleaseSelectPanel
+                          else pleaseSelectPanel
   }
 
     
