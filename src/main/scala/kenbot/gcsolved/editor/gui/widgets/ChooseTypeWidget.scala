@@ -1,11 +1,13 @@
 package kenbot.gcsolved.editor.gui.widgets
-import scala.swing.event.SelectionChanged
+import scala.swing.event.{SelectionChanged, FocusGained, FocusLost}
 import scala.swing.ComboBox
 import scala.swing.Component
 import scala.swing.GridPanel
 import scala.swing.Label
 import kenbot.gcsolved.editor.gui.util.FilteringComboBox
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
+import kenbot.gcsolved.editor.gui.util.SuppressableEvents
+import kenbot.gcsolved.editor.gui.WidgetEditScreenPanel
 import kenbot.gcsolved.resource.types.ObjectType
 import kenbot.gcsolved.resource.types.ResourceType
 import kenbot.gcsolved.resource.types.ValueType
@@ -15,23 +17,19 @@ import kenbot.gcsolved.resource.ValueData
 import scala.swing.FlowPanel
 import scala.swing.TextField
 
+
 class ChooseTypeWidget(theField: Field, 
     schema: ResourceSchema, 
     makeWidget: Field => FieldWidget, 
     parentWidget:  => Option[FieldWidget] = None, 
-    level: Int = 0) extends DefaultFieldWidget(theField, parentWidget, level) {
+    level: Int = 0) extends DefaultFieldWidget(theField, parentWidget, level) with SuppressableEvents {
   
   top => 
   
-  val editor = new TextField with MyEditorMixin
-  def rawFieldValue: Option[Any] = None
-  def fieldValue_=(v: Option[Any]) {}
-  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
-    /*
  
   lazy val fieldType: ValueType = theField.fieldType.asInstanceOf[ValueType]
   lazy val concreteSubTypes = schema.valueTypes.filter(t => !t.isAbstract && t <:< fieldType).toList
-  //def makeWidgets(forSubType: ObjectType): List[FieldWidget] = forSubType.fields.values.toList map makeWidget
+  def makeWidgets(forSubType: ObjectType): List[FieldWidget] = forSubType.fields.values.toList map makeWidget
   
   private lazy val centerContent = new GridPanel(1,1)
   private lazy val typesCombo = new FilteringComboBox(concreteSubTypes, false)(_.name)
@@ -42,39 +40,47 @@ class ChooseTypeWidget(theField: Field,
     center = centerContent
     
     top listenTo typesCombo.selection
+    
+    listenTo(typesCombo)
+   
+    reactions += {
+      case FocusGained(`typesCombo`, other, temp) => publish(FocusGained(this, other, temp)) 
+      case FocusLost(`typesCombo`, other, temp) => publish(FocusLost(this, other, temp)) 
+    }
+    
+    println("Initializing editor...")
     typesCombo.selectedItem foreach updateForType
   } 
   
   
-  
   def updateForType(t: ObjectType) {
+    println("updateForType")
     centerContent.contents.clear()
     deafTo(currentFieldWidgets: _*)
     
-    val typePanel = new EditScreenPanel(makeWidgets(t))
+    val typePanel = new WidgetEditScreenPanel(makeWidgets(t))
     
-    currentFieldWidgets = typePanel.fieldEditors.toList
+    currentFieldWidgets = typePanel.widgets.toList
     listenTo(currentFieldWidgets: _*)
     
     centerContent.contents += typePanel
     validateAndUpdate()
-    editor.revalidate()
-    editor.repaint()
   }
-  
+
   reactions += {
+    case _ if shouldSuppressEvents =>
+
     case ValidationEvent(widget, success) if widget ne this => validateAndUpdate()
     
     case SelectionChanged(`typesCombo`) => 
+      println("Selection changed")
       val selectedType = typesCombo.selectedItem getOrElse noTypeSelectedError
       updateForType(selectedType)
+      editor.revalidate()
+      editor.repaint()
   }
 
-  //override def hasFocus: Boolean = subWidgets.exists(_.hasFocus)
-  
   override def subWidgets: Seq[FieldWidget] = currentFieldWidgets
-  
-  //override def hasFocus_=(b: Boolean) { subWidgets.headOption.foreach(_.hasFocus = b) }
   
   def rawFieldValue: Option[Any] = {
     if (subWidgets.isEmpty) {
@@ -97,5 +103,7 @@ class ChooseTypeWidget(theField: Field,
     }
   }
 
-  private def noTypeSelectedError = error("Expected a value to be selected")*/
+  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
+
+  private def noTypeSelectedError = error("Expected a value to be selected")
 }

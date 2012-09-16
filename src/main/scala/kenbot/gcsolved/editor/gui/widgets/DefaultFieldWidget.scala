@@ -68,4 +68,5 @@ abstract class DefaultFieldWidget(val field: Field, parentWidgetParam: => Option
     
   def rawFieldValue: Option[Any]
   def fieldValue_=(v: Option[Any]): Unit
+
 }

@@ -66,9 +66,9 @@ package object types {
       'Name -> StringType ^ (isId=true))
   
   val Terrain = RefType("Terrain", AnyRefType, true,
-      'Name -> StringType ^ (isId=true)/*,
+      'Name -> StringType ^ (isId=true),
       'Layer -> TerrainLayer,
-      'IsOrganic -> BoolType,
+      /*'IsOrganic -> BoolType,
       'BlocksProjectiles -> BoolType, 
       'BurnTime -> RangeType, 
       'MapColor -> ColorType, 
@@ -77,11 +77,11 @@ package object types {
       'ContentOffsetY -> IntType,
       'Overhang -> PointType, 
       'ClipContentRect -> RectType,
-      'OverlayImage -> ImageType,
-      'OverlayImageClippable -> ImageType*/)
+      'OverlayImage -> ImageType,*/
+      'OverlayImageClippable -> ImageType)
     
-  val DoorTerrain: RefType = RefType("DoorTerrain", Terrain, false,
-      'DefaultImageCombo -> TerrainNeighbourCombo,    
+  val DoorTerrain: RefType = RefType("DoorTerrain", Terrain, false)
+     /* 'DefaultImageCombo -> TerrainNeighbourCombo,    
       'OpenImages -> MapType(Direction, ListType(ImageType)) ^ (required=true), 
       'ClosedImages -> MapType(Direction, ListType(ImageType)) ^ (required=true),
       'SolidToVision -> MapType(OrthogonalDirection, BoolType),
@@ -101,7 +101,7 @@ package object types {
       'Lock -> BoolType,
       'LockComplexity -> IntType,
       'LockDestroysKey -> BoolType,
-      'KeyType -> Tool)
+      'KeyType -> Tool )*/
       
   
   
@@ -114,7 +114,7 @@ package object types {
       'Images -> MapType(TerrainNeighbourCombo, ListType(ImageType)),
       'HoleImages -> ListType(ImageType),
       'CoolImages -> ListType(StillImageType),
-      /*'FilledHoleImages -> ListType(ImageType),
+      'FilledHoleImages -> ListType(ImageType),
       'SolidToVision -> MapType(OrthogonalDirection, BoolType),
       'SolidToMovement -> MapType(OrthogonalDirection, BoolType),
       'SolidToProjectiles -> MapType(OrthogonalDirection, BoolType),
@@ -137,7 +137,7 @@ package object types {
       'DamageLevel -> IntType,
       'BurnLevel -> IntType,
       'SpeedPenalty -> DoubleType,
-      'ItemDropGFX -> GraphicFX,*/
+      'ItemDropGFX -> GraphicFX,
       'StaminaPenalty -> IntType))
       
   import Field._

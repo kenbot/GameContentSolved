@@ -26,7 +26,7 @@ class WidgetEditScreen(theRefType: RefType,
   
   lazy val fieldWidgets: Seq[FieldWidget] = objectType.fields.values.toList map makeWidget
   
-  private lazy val editScreenPanel = new EditScreenPanel(fieldWidgets)
+  private lazy val editScreenPanel = new WidgetEditScreenPanel(fieldWidgets)
   
   private lazy val scroller = new ScrollPane(editScreenPanel) {
     import ScrollPane.BarPolicy
@@ -93,7 +93,7 @@ class WidgetEditScreen(theRefType: RefType,
 
 }
 
-class EditScreenPanel(val widgets: Seq[FieldWidget]) extends NestedBorderPanel {
+class WidgetEditScreenPanel(val widgets: Seq[FieldWidget]) extends NestedBorderPanel {
   north = new BoxPanel(Orientation.Vertical) {
     contents ++= widgets.map(w => new WidgetDecoratorPanel(w))
   }

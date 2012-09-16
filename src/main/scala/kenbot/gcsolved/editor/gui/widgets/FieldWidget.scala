@@ -10,7 +10,6 @@ trait FieldWidget extends Publisher {
   def validateAndUpdate()
   def valid: Boolean
   def subWidgets: Seq[FieldWidget]
-  
   def level: Int
   var hasFocus: Boolean
   var editable: Boolean

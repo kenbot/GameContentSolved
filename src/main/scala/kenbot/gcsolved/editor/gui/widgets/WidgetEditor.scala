@@ -5,6 +5,6 @@ trait WidgetEditor {
   this: Component => 
     
   def widget: FieldWidget
-  
-  widget listenTo this
+
+  widget listenTo this 
 }
