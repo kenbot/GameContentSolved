@@ -162,7 +162,7 @@ package object meta {
       
       case IntType(minOpt, maxOpt) => 
         val minMapping = minOpt.map("Min" ->)
-        val maxMapping = minOpt.map("Min" ->)
+        val maxMapping = maxOpt.map("Max" ->)
         val fields = Map() ++ minMapping ++ maxMapping
         ValueData(MetaIntType, fields)
         
