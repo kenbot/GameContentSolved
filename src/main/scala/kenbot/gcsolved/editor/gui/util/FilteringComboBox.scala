@@ -43,7 +43,7 @@ class FilteringComboBox[A](originalItems: Seq[A], useBlankItem: Boolean = true)(
   def selectedItem: Option[A] = {
     val selectedString = selection.item
     if (selectedString == BlankItem) None
-    else Some(itemMap(selectedString))
+    else itemMap get selectedString
   }
   
   def selectedItem_=(optA: Option[A]) {

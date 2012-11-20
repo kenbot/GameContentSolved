@@ -60,9 +60,9 @@ class LibraryEditSession private (
       case (lib, (oldRef, newId)) => lib.updateResourceId(oldRef, newId) 
     }
 
-    val approvedEdits = newEdits.filter(r => r.hasId)  
+    val approvedEdits = newEdits.filter(_.hasId)  
     val libWithEdits = libWithSwappedIds.addResources(approvedEdits: _*)  
-    val editsInLibrary = newEdits.map { r => libWithEdits findResource r.ref getOrElse r }
+    val editsInLibrary = newEdits map { r => libWithEdits findResource r.ref getOrElse r }
      
     new LibraryEditSession(libWithEdits, editsInLibrary, Some(originalContext), Some(this), None)
   }

@@ -61,6 +61,10 @@ class LibraryEditSessionSpec extends Spec with ShouldMatchers {
       it("should not have the old ID in the library") {
         contextWithNewId.library contains gumby should be (false)
       }
+      
+      it("should not be considered a new resource") {
+        contextWithNewId isAddedSinceOriginal gumbyWithNewId.ref should be (false)
+      }
     } 
     
     describe("Importing items") {
@@ -107,7 +111,6 @@ class LibraryEditSessionSpec extends Spec with ShouldMatchers {
           contextAfterDelete.externalResourcesSelected should be (true)
         }
       }
-      
     }
   
     describe("Selecting items") {
