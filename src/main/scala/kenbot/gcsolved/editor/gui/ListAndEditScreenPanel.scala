@@ -126,6 +126,13 @@ class ListAndEditScreenPanel(initialValues: Seq[ViewItem], mainPanel: Component,
     }
   }
 
+  
+  def updateTitleAndButtons() {
+    val selectedResources = allResources.filter(_.isSelected)
+    updateButtonStates(selectedResources)
+    titleLabel.text = getTitleForSelectedResources(selectedResources)
+  }
+  
   private def updateButtonStates(selectedResources: Seq[ViewItem]) {
     val anythingSelected = selectedResources.nonEmpty
     val noneExternal = selectedResources.forall(!_.isExternal)

@@ -50,7 +50,6 @@ class ListAndEditScreen(val refType: RefType,
     updateView() 
     updateEditScreen()
   }
-  
 
   def importSelected() {
     editSession = editSession.importLinked
@@ -92,8 +91,8 @@ class ListAndEditScreen(val refType: RefType,
     editSession = editSession applyEdits values 
     val viewItems = values map makeViewItem
     panel updateSelectedOnly viewItems
+    panel.updateTitleAndButtons()
     panel.repaint()
-    //updateView()
   }
   
   private def updateForListSelection(selectedIds: Seq[String]) {
@@ -102,10 +101,11 @@ class ListAndEditScreen(val refType: RefType,
       editSession = editSession applyEdits editScreen.values
     }
 
-    val items = selectedIds.map { id => 
+    val items = for (id <- selectedIds) yield {
       if (id.isEmpty) refType.emptyData
       else updatedLibrary(ResourceRef(id, refType))
     }
+                      
     editSession = editSession selectItems items
     updateEditScreen()
   }
@@ -136,7 +136,7 @@ class ListAndEditScreen(val refType: RefType,
     case DeletePressed => delete() 
     case ResourcesSelected(newSelection) => updateForListSelection(newSelection) 
     case UpdateValues(_, values) => updateFromEditScreen(values) 
-    case LibraryChangedEvent(source, newLib, _) => error("No idea what to do here.")
+    case LibraryChangedEvent(source, newLib, _) => sys.error("No idea what to do here.")
       // Don't forget to re-add the new items! 
       //panel.allResources = newLib.allResourcesByType(refType).toList map newListItem
   }
