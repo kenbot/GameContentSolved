@@ -8,15 +8,15 @@ import kenbot.gcsolved.editor.gui.util.FilteringComboBox
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
 import kenbot.gcsolved.editor.gui.util.SuppressableEvents
 import kenbot.gcsolved.editor.gui.WidgetEditScreenPanel
-import kenbot.gcsolved.resource.types.ObjectType
-import kenbot.gcsolved.resource.types.ResourceType
-import kenbot.gcsolved.resource.types.ValueType
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.ResourceSchema
-import kenbot.gcsolved.resource.ValueData
+import kenbot.gcsolved.core.types.ObjectType
+import kenbot.gcsolved.core.types.ResourceType
+import kenbot.gcsolved.core.types.ValueType
+import kenbot.gcsolved.core.Field
+import kenbot.gcsolved.core.ResourceSchema
+import kenbot.gcsolved.core.ValueData
 import scala.swing.FlowPanel
 import scala.swing.TextField
-
+import scala.sys.error
 
 class ChooseTypeWidget(theField: Field, 
     schema: ResourceSchema, 
@@ -98,8 +98,6 @@ class ChooseTypeWidget(theField: Field,
       case x => error("Expected a ValueData, got " + x.getClass.getName + ": " + x)
     }
   }
-
-  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
 
   private def noTypeSelectedError = error("Expected a value to be selected")
 }

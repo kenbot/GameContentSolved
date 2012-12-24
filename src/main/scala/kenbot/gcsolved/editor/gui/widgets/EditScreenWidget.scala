@@ -1,8 +1,8 @@
 package kenbot.gcsolved.editor.gui.widgets
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.Field
 import scala.swing.Reactor
-import kenbot.gcsolved.resource.ValueData
-import kenbot.gcsolved.resource.types.ValueType
+import kenbot.gcsolved.core.ValueData
+import kenbot.gcsolved.core.types.ValueType
 import sys.error
 import javax.swing.BorderFactory
 import java.awt.Color
@@ -28,7 +28,7 @@ class EditScreenWidget(theField: Field,
     border = BorderFactory.createLineBorder(new Color(0xDD, 0xDD, 0xDD), 1)
   }
   
-  protected def enforceEditorEditable(b: Boolean) { }
+  protected override def enforceEditorEditable(b: Boolean) { }
 
   listenTo(subWidgets: _*)
   deafTo(this)

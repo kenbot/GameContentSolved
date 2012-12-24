@@ -1,6 +1,7 @@
 package kenbot.gcsolved.editor.gui.util
 import scala.swing.Component
 import java.awt.Point
+import scala.sys.error
 
 object Components {
   def isChildOf(c: Component, parent: Component): Boolean = {

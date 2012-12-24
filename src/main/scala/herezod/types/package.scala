@@ -1,23 +1,23 @@
 package herezod
 
-import kenbot.gcsolved.resource.Field.symbolAndType2Field
-import kenbot.gcsolved.resource.types.AnyRefType
-import kenbot.gcsolved.resource.types.AnyValueType
-import kenbot.gcsolved.resource.types.BoolType
-import kenbot.gcsolved.resource.types.FileType
-import kenbot.gcsolved.resource.types.IntType
-import kenbot.gcsolved.resource.types.ListType
-import kenbot.gcsolved.resource.types.MapType
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.types.SelectOneType
-import kenbot.gcsolved.resource.types.StringType
-import kenbot.gcsolved.resource.types.ValueType
-import kenbot.gcsolved.resource.types.DoubleType
+import kenbot.gcsolved.core.Field.symbolAndType2Field
+import kenbot.gcsolved.core.types.AnyRefType
+import kenbot.gcsolved.core.types.AnyValueType
+import kenbot.gcsolved.core.types.BoolType
+import kenbot.gcsolved.core.types.FileType
+import kenbot.gcsolved.core.types.IntType
+import kenbot.gcsolved.core.types.ListType
+import kenbot.gcsolved.core.types.MapType
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.types.SelectOneType
+import kenbot.gcsolved.core.types.StringType
+import kenbot.gcsolved.core.types.ValueType
+import kenbot.gcsolved.core.types.DoubleType
 import java.io.File
 import org.w3c.dom.css.Rect
 
 package object types {
-  import kenbot.gcsolved.resource._
+  import kenbot.gcsolved.core._
 
   val RectType = ValueType("Rect", 
     'X1 -> IntType ^ (required=true), 
@@ -144,9 +144,8 @@ package object types {
   
   val someImage = ValueData(StillImageType, 'Filename -> new File("abc.png"), 
       'Bounds -> ValueData(RectType, 'X1 -> 1, 'Y1 -> 2, 'X2 -> 3, 'Y2 -> 4))
-  
+
   val ActorType: RefType = RefType.recursive("ActorType", Seq(
-      
     'Name -> StringType ^ (isId=true, description="The name of the actor type (singular)"),
     'NamePlural -> StringType ^ (description="The name of the actor type (plural)"),
     'AfraidOf -> ActorType ^ (description="Another type of actor that this one is afraid of"),
@@ -159,7 +158,7 @@ package object types {
     'CanBeMale -> BoolType,
     'CanBeFemale -> BoolType ^ (default=Some(true)),
     'BloodColor -> ColorType,
-    'Images -> MapType(ActorState, MapType(Direction, ListType(ImageType))),
+    'Images ->  MapType(ActorState, IntType),  //MapType(ActorState, MapType(Direction, ListType(ImageType))),
     'CorpseImages -> ListType(StillImageType) ^ (default=Some(List(someImage)), description="This is what it looks like dead")))
 
   

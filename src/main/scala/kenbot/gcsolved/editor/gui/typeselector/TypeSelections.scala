@@ -1,19 +1,19 @@
 package kenbot.gcsolved.editor.gui.typeselector
 import scala.sys.error
-import kenbot.gcsolved.resource.types.DoubleType
-import kenbot.gcsolved.resource.types.IntType
-import kenbot.gcsolved.resource.types.ResourceType
-import kenbot.gcsolved.resource.types.StringType
-import kenbot.gcsolved.resource.types.BoolType
-import kenbot.gcsolved.resource.types.FileType
-import kenbot.gcsolved.resource.types.AnyRefType
-import kenbot.gcsolved.resource.types.AnyType
-import kenbot.gcsolved.resource.types.ListType
-import kenbot.gcsolved.resource.types.AnyValueType
-import kenbot.gcsolved.resource.types.MapType
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.types.UserType
-import kenbot.gcsolved.resource.ResourceSchema
+import kenbot.gcsolved.core.types.DoubleType
+import kenbot.gcsolved.core.types.IntType
+import kenbot.gcsolved.core.types.ResourceType
+import kenbot.gcsolved.core.types.StringType
+import kenbot.gcsolved.core.types.BoolType
+import kenbot.gcsolved.core.types.FileType
+import kenbot.gcsolved.core.types.AnyRefType
+import kenbot.gcsolved.core.types.AnyType
+import kenbot.gcsolved.core.types.ListType
+import kenbot.gcsolved.core.types.AnyValueType
+import kenbot.gcsolved.core.types.MapType
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.types.UserType
+import kenbot.gcsolved.core.ResourceSchema
 
 
 object TypeSelection {
@@ -55,7 +55,7 @@ sealed abstract class RefinedTypeSelection[W <: TypeRefinementWidget](name: Stri
   override def makeRefinementWidget(schema: ResourceSchema): Some[W] = Some(make(schema))
   
   override def getResourceType(widget: Option[TypeRefinementWidget]) = widget match {
-    case Some(rw: W) => f(rw)
+    case Some(rw: TypeRefinementWidget with W) => f(rw)
     case _ => error(name + " type needs a refinement widget")
   }
 }

@@ -5,9 +5,9 @@ import scala.swing.Frame
 
 import kenbot.gcsolved.editor.PublishableLibraryChanges
 import kenbot.gcsolved.editor.Settings
-import kenbot.gcsolved.resource.ResourceEnvironment
-import kenbot.gcsolved.resource.ResourceLibrary
-import kenbot.gcsolved.resource.ResourceSchema
+import kenbot.gcsolved.core.ResourceEnvironment
+import kenbot.gcsolved.core.ResourceLibrary
+import kenbot.gcsolved.core.ResourceSchema
 
 object TestSettings extends Settings with PublishableLibraryChanges {
  

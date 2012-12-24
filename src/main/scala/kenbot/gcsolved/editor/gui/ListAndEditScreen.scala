@@ -18,15 +18,15 @@ import kenbot.gcsolved.editor.GameContentEditor
 import kenbot.gcsolved.editor.LibraryChangedEvent
 import kenbot.gcsolved.editor.PublishableLibraryChanges
 import kenbot.gcsolved.editor.Settings
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.RefData
-import kenbot.gcsolved.resource.ResourceLibrary
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.RefData
+import kenbot.gcsolved.core.ResourceLibrary
 import scala.collection.mutable.ListBuffer
 import scala.swing.FlowPanel
 import scala.swing.Publisher
 import kenbot.gcsolved.editor.gui.widgets.FieldWidget
-import kenbot.gcsolved.resource.{Field, LibraryEditSession}
-import kenbot.gcsolved.resource.ResourceRef
+import kenbot.gcsolved.core.{Field, LibraryEditSession}
+import kenbot.gcsolved.core.ResourceRef
 import kenbot.gcsolved.editor.gui.util.SuppressableEvents
 
 

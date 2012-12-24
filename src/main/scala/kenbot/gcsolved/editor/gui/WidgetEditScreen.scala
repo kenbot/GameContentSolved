@@ -6,9 +6,9 @@ import kenbot.gcsolved.editor.gui.util.{NestedBorderPanel, Components}
 import kenbot.gcsolved.editor.gui.widgets.FieldWidget
 import kenbot.gcsolved.editor.gui.widgets.WidgetDecoratorPanel
 import kenbot.gcsolved.editor.gui.widgets.WidgetFocusEvent
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.RefData
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.Field
+import kenbot.gcsolved.core.RefData
 import scala.swing.ScrollPane
 import scala.swing.Component
 import kenbot.gcsolved.editor.gui.util.Components

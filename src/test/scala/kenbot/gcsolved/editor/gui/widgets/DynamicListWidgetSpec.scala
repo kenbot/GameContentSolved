@@ -3,17 +3,17 @@ package kenbot.gcsolved.editor.gui.widgets
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
-import kenbot.gcsolved.resource.Field.symbolAndType2Field
-import kenbot.gcsolved.resource.Field.symbolAndValue2namePair
-import kenbot.gcsolved.resource.types.IntType
-import kenbot.gcsolved.resource.types.ValueType
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.ValueData
+import kenbot.gcsolved.core.Field.symbolAndType2Field
+import kenbot.gcsolved.core.Field.symbolAndValue2namePair
+import kenbot.gcsolved.core.types.IntType
+import kenbot.gcsolved.core.types.ValueType
+import kenbot.gcsolved.core.Field
+import kenbot.gcsolved.core.ValueData
 import org.scalatest.junit.JUnitRunner
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.types.AnyRefType
-import kenbot.gcsolved.resource.RefData
-import kenbot.gcsolved.resource.types.ListType
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.types.AnyRefType
+import kenbot.gcsolved.core.RefData
+import kenbot.gcsolved.core.types.ListType
 import kenbot.gcsolved.editor.gui.TestSettings
 
 @RunWith(classOf[JUnitRunner])

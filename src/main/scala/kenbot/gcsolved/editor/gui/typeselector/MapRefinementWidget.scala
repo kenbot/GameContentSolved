@@ -1,16 +1,17 @@
 package kenbot.gcsolved.editor.gui.typeselector
 import java.awt.Dimension
-import kenbot.gcsolved.resource.ResourceSchema
+import kenbot.gcsolved.core.ResourceSchema
 import scala.swing.FlowPanel
 import scala.swing.Swing.pair2Dimension
 import scala.swing.Label
-import kenbot.gcsolved.resource.types.ResourceType
+import kenbot.gcsolved.core.types.ResourceType
+import kenbot.gcsolved.core.types.SelectOneType
 
 class MapRefinementWidget(schema: ResourceSchema) extends FlowPanel with TypeRefinementWidget {
   private val buttonSize: Dimension = (30, 20)
   
-  def keyType: ResourceType = keySelector.resourceType
-  def keyType_=(t: ResourceType) { keySelector.resourceType = t }
+  def keyType: SelectOneType = keySelector.resourceType.asInstanceOf[SelectOneType]
+  def keyType_=(t: SelectOneType) { keySelector.resourceType = t }
   
   def valueType: ResourceType = valueSelector.resourceType
   def valueType_=(t: ResourceType) { valueSelector.resourceType = t }

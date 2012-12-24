@@ -3,13 +3,13 @@ package kenbot.gcsolved.editor.gui.widgets
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
-import kenbot.gcsolved.resource.Field.symbolAndType2Field
-import kenbot.gcsolved.resource.types.IntType
-import kenbot.gcsolved.resource.types.StringType
+import kenbot.gcsolved.core.Field.symbolAndType2Field
+import kenbot.gcsolved.core.types.IntType
+import kenbot.gcsolved.core.types.StringType
 import org.scalatest.junit.JUnitRunner
-import kenbot.gcsolved.resource.types.BoolType
-import kenbot.gcsolved.resource.types.DoubleType
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.types.BoolType
+import kenbot.gcsolved.core.types.DoubleType
+import kenbot.gcsolved.core.Field
 
 @RunWith(classOf[JUnitRunner])
 class TextWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {

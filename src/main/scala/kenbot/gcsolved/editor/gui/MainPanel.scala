@@ -7,7 +7,7 @@ import scala.swing.Dialog
 import scala.swing.Label
 import scala.swing.Orientation
 import scala.swing.SplitPane
-import kenbot.gcsolved.resource.types.RefType
+import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.editor.gui.sidebar.LibraryPage
 import kenbot.gcsolved.editor.gui.sidebar.SelectionEvent
 import kenbot.gcsolved.editor.gui.sidebar.SideBar

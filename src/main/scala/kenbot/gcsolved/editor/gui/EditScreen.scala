@@ -7,11 +7,11 @@ import scala.swing.Orientation
 import javax.swing.BorderFactory
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
 import kenbot.gcsolved.editor.gui.widgets.FieldWidget
-import kenbot.gcsolved.resource.types.ObjectType
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.types.ResourceType
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.RefData
+import kenbot.gcsolved.core.types.ObjectType
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.types.ResourceType
+import kenbot.gcsolved.core.Field
+import kenbot.gcsolved.core.RefData
 import scala.swing.Publisher
 import kenbot.gcsolved.editor.gui.widgets.WidgetFocusEvent
 import kenbot.gcsolved.editor.gui.widgets.WidgetDecoratorPanel

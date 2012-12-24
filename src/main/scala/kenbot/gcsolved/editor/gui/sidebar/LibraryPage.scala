@@ -1,13 +1,13 @@
 package kenbot.gcsolved.editor.gui.sidebar
 import scala.swing.BorderPanel
-import kenbot.gcsolved.resource.types.{AnyRefType, RefType}
+import kenbot.gcsolved.core.types.{AnyRefType, RefType}
 import scala.swing.ListView
-import scala.swing.tree.Tree
-import scala.swing.tree.InternalTreeModel
-import scala.swing.tree.TreeModel
+import scalaswingcontrib.tree.Tree
+import scalaswingcontrib.tree.InternalTreeModel
+import scalaswingcontrib.tree.TreeModel
 import BorderPanel.Position._
 import scala.swing.event.MouseClicked
-import kenbot.gcsolved.resource.ResourceLibrary
+import kenbot.gcsolved.core.ResourceLibrary
 import scala.swing.Frame
 import scala.swing.Component
 import scala.swing.event.Event

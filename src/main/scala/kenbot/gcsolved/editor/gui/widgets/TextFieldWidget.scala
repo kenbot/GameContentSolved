@@ -2,7 +2,7 @@ package kenbot.gcsolved.editor.gui.widgets
 import scala.swing.event.EditDone
 import scala.swing.Reactor
 import scala.swing.TextField
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.Field
 import kenbot.gcsolved.editor.gui.util.TextFields
 import java.awt.Dimension
 import scala.swing.Swing.pair2Dimension
@@ -20,8 +20,6 @@ class TextFieldWidget(theField: Field,
     top.listenTo(this, keys)
   }
   
-  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
- 
   def rawFieldValue: Option[Any] = {
     val text = editor.text.trim
     if (text != "") Some(text) 

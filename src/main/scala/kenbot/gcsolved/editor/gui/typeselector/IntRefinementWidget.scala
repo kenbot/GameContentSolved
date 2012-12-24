@@ -61,11 +61,11 @@ class IntRefinementWidget extends FlowPanel with TypeRefinementWidget {
     revalidate()
     repaint()
   }
+
   
-  def min: Option[Int] = if (showTextVar) {
-    try Some(minText.text.toInt) 
-    catch { case _ => None }
-  } else None
+  def min: Option[Int] = 
+    if (showTextVar) tryInt(minText.text.toInt) 
+    else None
   
   def min_=(minValue: Option[Int]): Unit = {
     minText.text = minValue.map(_.toString) getOrElse ""
@@ -74,10 +74,9 @@ class IntRefinementWidget extends FlowPanel with TypeRefinementWidget {
   }
 
   
-  def max: Option[Int] = if (showTextVar) {
-    try Some(maxText.text.toInt) 
-    catch { case _ => None }
-  } else None
+  def max: Option[Int] = 
+    if (showTextVar) tryInt(maxText.text.toInt) 
+    else None
 
   
   def max_=(maxValue: Option[Int]): Unit = {
@@ -85,4 +84,9 @@ class IntRefinementWidget extends FlowPanel with TypeRefinementWidget {
     showTextVar = true //(min orElse maxValue).isDefined
     updateComponents()
   }
+  
+    
+  private def tryInt(expr: => Int) = 
+    try Some(expr) 
+    catch { case _: NumberFormatException => None }
 }

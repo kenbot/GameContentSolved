@@ -14,9 +14,9 @@ import scala.swing.event.ButtonClicked
 import javax.swing.BorderFactory
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
 import kenbot.gcsolved.editor.gui.util.SearchBar
-import kenbot.gcsolved.resource.{RefData, ResourceRef}
+import kenbot.gcsolved.core.{RefData, ResourceRef}
 import scala.swing.event.ListSelectionChanged
-import kenbot.gcsolved.resource.ResourceLibrary
+import kenbot.gcsolved.core.ResourceLibrary
 import scala.swing.GridPanel
 import scala.swing.event.MouseEntered
 import scala.swing.event.MouseExited

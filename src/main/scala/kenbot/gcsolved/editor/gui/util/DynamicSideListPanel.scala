@@ -38,7 +38,6 @@ object DynamicSideListPanel {
 }
 
 
-
 class DynamicSideListPanel[C <: Component : ItemDescription](initialPanels: Seq[C]) 
     extends NestedBorderPanel with Publisher with SuppressableEvents {
   

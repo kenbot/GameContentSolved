@@ -5,7 +5,7 @@ import scala.swing.GridPanel
 import scala.swing.Label
 import scala.swing.TextArea
 import scala.swing.TextField
-import kenbot.gcsolved.resource.ResourceLibrary
+import kenbot.gcsolved.core.ResourceLibrary
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
 import javax.swing.BorderFactory
 import java.awt.Color

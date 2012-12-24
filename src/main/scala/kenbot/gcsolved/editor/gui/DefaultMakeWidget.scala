@@ -1,25 +1,9 @@
 package kenbot.gcsolved.editor.gui
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.editor.gui.widgets.CheckBoxWidget
-import kenbot.gcsolved.resource.types.BoolType
-import kenbot.gcsolved.resource.types.ValueType
-import kenbot.gcsolved.editor.gui.widgets.FieldWidget
-import kenbot.gcsolved.editor.gui.widgets.EditScreenWidget
-import kenbot.gcsolved.editor.gui.widgets.ComboBoxWidget
-import kenbot.gcsolved.editor.gui.widgets.TextFieldWidget
-import kenbot.gcsolved.editor.gui.widgets.ChooseTypeWidget
-import kenbot.gcsolved.resource.types.StringType
-import kenbot.gcsolved.resource.types.SelectOneType
-import kenbot.gcsolved.resource.types.ResourceType
-import kenbot.gcsolved.resource.ResourceLibrary
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.types.ListType
-import kenbot.gcsolved.editor.gui.widgets.DynamicListWidget
-import kenbot.gcsolved.resource.types.FileType
-import kenbot.gcsolved.editor.gui.widgets.FileSelectorWidget
+
+import kenbot.gcsolved.core.{Field, ResourceRef}
+import kenbot.gcsolved.core.types.{BoolType, FileType, IntType, ListType, MapType, RefType, ResourceType, SelectOneType, StringType, ValueType}
 import kenbot.gcsolved.editor.Settings
-import kenbot.gcsolved.resource.types.IntType
-import kenbot.gcsolved.resource.ResourceRef
+import kenbot.gcsolved.editor.gui.widgets.{CheckBoxWidget, ChooseTypeWidget, ComboBoxWidget, DynamicListWidget, EditScreenWidget, FieldWidget, FileSelectorWidget, MapWidget, TextFieldWidget}
 
 object DefaultMakeWidget {
   def apply(settings: Settings, parentWidget: => Option[FieldWidget] = None, level: Int = 0) = {
@@ -44,6 +28,9 @@ class DefaultMakeWidget(settings: Settings, parentWidget: => Option[FieldWidget]
     case ListType(_, _) => 
       lazy val w: FieldWidget = new DynamicListWidget(field, makeNextWidget(w), parentWidget, level); w
     
+    case MapType(_, _) => 
+      lazy val w: FieldWidget = new MapWidget(field, makeNextWidget(w), parentWidget, level); w
+      
     case vt: ValueType if vt.isAbstract => 
       lazy val w: FieldWidget = new ChooseTypeWidget(field, settings.schema, makeNextWidget(w), parentWidget, level); w
       

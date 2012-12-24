@@ -7,21 +7,21 @@ import scala.swing.Component
 import scala.swing.FlowPanel
 import scala.swing.MainFrame
 import scala.swing.SimpleSwingApplication
-import kenbot.gcsolved.resource.Field.symbolAndType2Field
-import kenbot.gcsolved.resource.types.AnyRefType
-import kenbot.gcsolved.resource.types.AnyType
-import kenbot.gcsolved.resource.types.AnyValueType
-import kenbot.gcsolved.resource.types.BoolType
-import kenbot.gcsolved.resource.types.DoubleType
-import kenbot.gcsolved.resource.types.FileType
-import kenbot.gcsolved.resource.types.IntType
-import kenbot.gcsolved.resource.types.ListType
-import kenbot.gcsolved.resource.types.MapType
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.types.ResourceType
-import kenbot.gcsolved.resource.types.StringType
-import kenbot.gcsolved.resource.ResourceSchema
-import kenbot.gcsolved.resource.types.UserType
+import kenbot.gcsolved.core.Field.symbolAndType2Field
+import kenbot.gcsolved.core.types.AnyRefType
+import kenbot.gcsolved.core.types.AnyType
+import kenbot.gcsolved.core.types.AnyValueType
+import kenbot.gcsolved.core.types.BoolType
+import kenbot.gcsolved.core.types.DoubleType
+import kenbot.gcsolved.core.types.FileType
+import kenbot.gcsolved.core.types.IntType
+import kenbot.gcsolved.core.types.ListType
+import kenbot.gcsolved.core.types.MapType
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.types.ResourceType
+import kenbot.gcsolved.core.types.StringType
+import kenbot.gcsolved.core.ResourceSchema
+import kenbot.gcsolved.core.types.UserType
 
 
 

@@ -1,6 +1,6 @@
 package kenbot.gcsolved.editor.gui.widgets
 import scala.swing.TextField
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.Field
 import scala.swing.Reactor
 import scala.swing.event.EditDone
 import scala.swing.CheckBox
@@ -11,8 +11,6 @@ class CheckBoxWidget(theField: Field, parentWidget:  => Option[FieldWidget] = No
   lazy val editor = new CheckBox with MyEditorMixin
   
   def rawFieldValue: Option[Any] = Some(editor.selected)
-  
-  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
   
   def fieldValue_=(value: Option[Any]) { 
     value foreach { b => editor.selected = (b == true) } 

@@ -10,8 +10,8 @@ import scala.swing.MainFrame
 import java.awt.Dimension
 import scala.swing.Swing.{pair2Dimension, onEDT}
 import scala.swing.event.KeyPressed
-import kenbot.gcsolved.resource.ResourceSchema
-import kenbot.gcsolved.resource.types.ResourceType
+import kenbot.gcsolved.core.ResourceSchema
+import kenbot.gcsolved.core.types.ResourceType
 
 
 class ListRefinementWidget(schema: ResourceSchema) extends FlowPanel with TypeRefinementWidget {

@@ -3,15 +3,15 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.types.StringType
-import kenbot.gcsolved.resource.RefData
-import kenbot.gcsolved.resource.types.IntType
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.Field._
-import kenbot.gcsolved.resource.ResourceLibrary
-import kenbot.gcsolved.resource.ResourceSchema
-import kenbot.gcsolved.resource.ResourceRef
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.types.StringType
+import kenbot.gcsolved.core.RefData
+import kenbot.gcsolved.core.types.IntType
+import kenbot.gcsolved.core.Field
+import kenbot.gcsolved.core.Field._
+import kenbot.gcsolved.core.ResourceLibrary
+import kenbot.gcsolved.core.ResourceSchema
+import kenbot.gcsolved.core.ResourceRef
 import kenbot.gcsolved.editor.gui.widgets.TextFieldWidget
 
 @RunWith(classOf[JUnitRunner])  

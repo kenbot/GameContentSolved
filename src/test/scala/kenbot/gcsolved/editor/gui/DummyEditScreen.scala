@@ -1,7 +1,7 @@
 package kenbot.gcsolved.editor.gui
 
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.RefData
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.RefData
 
 
 object DummyEditScreen {

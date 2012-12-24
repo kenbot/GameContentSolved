@@ -2,9 +2,9 @@ package kenbot.gcsolved.editor.gui.widgets
 import scala.swing.Component
 import scala.swing.ListView
 import kenbot.gcsolved.editor.gui.util.DynamicSideListPanel
-import kenbot.gcsolved.resource.types.ListType
-import kenbot.gcsolved.resource.types.ResourceType
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.types.ListType
+import kenbot.gcsolved.core.types.ResourceType
+import kenbot.gcsolved.core.Field
 import scala.swing.Label
 import java.awt.Color
 import scala.swing.Alignment
@@ -35,8 +35,6 @@ class DynamicListWidget(theField: Field,
   lazy val editor = new DynamicSideListPanel(initialPanels) with MyEditorMixin {
     top listenTo this
   }
-  
-  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
   
   reactions += {
     case ValidationEvent(widget, success) if widget ne this => validateAndUpdate()
@@ -76,7 +74,7 @@ class DynamicListWidget(theField: Field,
         }
         editor.userPanels = editors
         
-      case None => editor.clear()
+      case _ => editor.clear()
     }
     editor.revalidate()
     editor.repaint()

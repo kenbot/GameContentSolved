@@ -9,7 +9,7 @@ import scala.swing.event.SelectionChanged
 import scala.swing.ComboBox
 import scala.swing.Component
 import scala.swing.ListView
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.Field
 import javax.swing.ComboBoxModel
 import javax.swing.JTextField
 import FilteringComboBox.{BlankItem, withBlankItem}

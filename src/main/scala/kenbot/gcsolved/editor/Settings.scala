@@ -1,12 +1,12 @@
 package kenbot.gcsolved.editor
 import kenbot.gcsolved.editor.gui.widgets.FieldWidget
-import kenbot.gcsolved.resource.types.RefType
+import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.editor.gui.{EditScreen, WidgetEditScreen}
-import kenbot.gcsolved.resource.ResourceSchema
+import kenbot.gcsolved.core.ResourceSchema
 import scala.swing.Frame
-import kenbot.gcsolved.resource.ResourceEnvironment
-import kenbot.gcsolved.resource.ResourceLibrary
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.ResourceEnvironment
+import kenbot.gcsolved.core.ResourceLibrary
+import kenbot.gcsolved.core.Field
 import scala.swing.Publisher
 import scala.swing.event.Event
 import scala.swing.Component

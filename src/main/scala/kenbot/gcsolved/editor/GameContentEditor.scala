@@ -11,13 +11,13 @@ import herezod.types.HerezodSchema
 import kenbot.gcsolved.editor.gui.{EditScreen, WidgetEditScreen}
 import kenbot.gcsolved.editor.gui.DefaultMakeWidget
 import kenbot.gcsolved.editor.gui.MainPanel
-import kenbot.gcsolved.resource.Field.symbolAndValue2namePair
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.RefData
-import kenbot.gcsolved.resource.ResourceEnvironment
-import kenbot.gcsolved.resource.ResourceLibrary
-import kenbot.gcsolved.resource.ResourceSchema
+import kenbot.gcsolved.core.Field.symbolAndValue2namePair
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.Field
+import kenbot.gcsolved.core.RefData
+import kenbot.gcsolved.core.ResourceEnvironment
+import kenbot.gcsolved.core.ResourceLibrary
+import kenbot.gcsolved.core.ResourceSchema
 import javax.swing.UIManager
 
 
@@ -28,7 +28,11 @@ object GameContentEditor extends SimpleSwingApplication {
   type Settings = kenbot.gcsolved.editor.Settings with PublishableLibraryChanges
   
   object Settings extends kenbot.gcsolved.editor.Settings with PublishableLibraryChanges {
-    val makeEditScreen: RefType => EditScreen = r => new WidgetEditScreen(r, currentLibrary.allResourcesByType(r).toList, DefaultMakeWidget(this)) 
+    val makeEditScreen: RefType => EditScreen = 
+      r => new WidgetEditScreen(r, 
+          currentLibrary.allResourcesByType(r).toList, 
+          DefaultMakeWidget(this)) 
+      
     val iconDir = "/icons"
     val iconFileExt = "png"
     val imageFileExt = "png"     

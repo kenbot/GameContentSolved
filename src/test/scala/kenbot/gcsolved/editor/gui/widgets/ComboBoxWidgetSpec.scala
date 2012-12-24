@@ -5,13 +5,13 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
 
-import kenbot.gcsolved.resource.Field.symbolAndType2Field
-import kenbot.gcsolved.resource.Field.symbolAndValue2namePair
-import kenbot.gcsolved.resource.types.RefType
-import kenbot.gcsolved.resource.types.SelectOneType
-import kenbot.gcsolved.resource.types.StringType
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.RefData
+import kenbot.gcsolved.core.Field.symbolAndType2Field
+import kenbot.gcsolved.core.Field.symbolAndValue2namePair
+import kenbot.gcsolved.core.types.RefType
+import kenbot.gcsolved.core.types.SelectOneType
+import kenbot.gcsolved.core.types.StringType
+import kenbot.gcsolved.core.Field
+import kenbot.gcsolved.core.RefData
 
 @RunWith(classOf[JUnitRunner])  
 class ComboBoxWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {

@@ -1,10 +1,10 @@
 package kenbot.gcsolved.editor.gui.widgets
 import scala.swing.TextField
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.Field
 import scala.swing.Reactor
 import scala.swing.event.EditDone
 import scala.swing.ComboBox
-import kenbot.gcsolved.resource.types.SelectOneType
+import kenbot.gcsolved.core.types.SelectOneType
 import kenbot.gcsolved.editor.gui.util.FilteringComboBox
 
 
@@ -16,8 +16,6 @@ class ComboBoxWidget[A](theField: Field,
   top =>
   
   lazy val editor = new FilteringComboBox(items, !field.required)(textFunc) with MyEditorMixin
-  
-  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
   
   def rawFieldValue: Option[Any] = editor.selectedItem
   

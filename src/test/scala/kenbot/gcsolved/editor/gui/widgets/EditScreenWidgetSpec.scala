@@ -4,13 +4,13 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
-import kenbot.gcsolved.resource.Field.symbolAndType2Field
-import kenbot.gcsolved.resource.Field.symbolAndValue2namePair
-import kenbot.gcsolved.resource.types.IntType
-import kenbot.gcsolved.resource.types.ValueType
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.ValueData
-import kenbot.gcsolved.resource.types.ResourceType
+import kenbot.gcsolved.core.Field.symbolAndType2Field
+import kenbot.gcsolved.core.Field.symbolAndValue2namePair
+import kenbot.gcsolved.core.types.IntType
+import kenbot.gcsolved.core.types.ValueType
+import kenbot.gcsolved.core.Field
+import kenbot.gcsolved.core.ValueData
+import kenbot.gcsolved.core.types.ResourceType
 import kenbot.gcsolved.editor.gui.TestSettings
 
 @RunWith(classOf[JUnitRunner])

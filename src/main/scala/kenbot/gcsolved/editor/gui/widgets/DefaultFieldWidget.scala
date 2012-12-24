@@ -12,7 +12,7 @@ import scala.swing.FlowPanel
 import scala.swing.Label
 import javax.swing.BorderFactory
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.Field
 import scala.swing.Swing
 
 
@@ -39,7 +39,7 @@ abstract class DefaultFieldWidget(val field: Field, parentWidgetParam: => Option
     enforceEditorEditable(b)
   }
   
-  protected def enforceEditorEditable(b: Boolean)
+  protected def enforceEditorEditable(b: Boolean) { editor.enabled = b }
   
   /**
    * Mix this in to editors to mark it as belonging to us 
@@ -68,5 +68,4 @@ abstract class DefaultFieldWidget(val field: Field, parentWidgetParam: => Option
     
   def rawFieldValue: Option[Any]
   def fieldValue_=(v: Option[Any]): Unit
-
 }

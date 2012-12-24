@@ -3,10 +3,10 @@ import scala.swing.Frame
 import scala.swing.MainFrame
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
-import kenbot.gcsolved.resource.types.ResourceType
-import kenbot.gcsolved.resource.Field
+import kenbot.gcsolved.core.types.ResourceType
+import kenbot.gcsolved.core.Field
 import scala.swing.Swing
-import kenbot.gcsolved.resource.types.StringType
+import kenbot.gcsolved.core.types.StringType
 
 trait WidgetSpecMethods {
   this: Spec with ShouldMatchers =>

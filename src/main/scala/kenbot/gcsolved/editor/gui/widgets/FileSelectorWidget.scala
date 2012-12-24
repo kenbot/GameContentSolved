@@ -9,9 +9,9 @@ import scala.swing.TextField
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.JFileChooser
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
-import kenbot.gcsolved.resource.types.FileType
-import kenbot.gcsolved.resource.Field
-import kenbot.gcsolved.resource.ResourceEnvironment
+import kenbot.gcsolved.core.types.FileType
+import kenbot.gcsolved.core.Field
+import kenbot.gcsolved.core.ResourceEnvironment
 
 class FileSelectorWidget(theField: Field, 
     env: ResourceEnvironment, 
@@ -52,7 +52,7 @@ class FileSelectorWidget(theField: Field,
   
   def currentText: String = editor.textField.text
   
-  protected def enforceEditorEditable(b: Boolean) { 
+  protected override def enforceEditorEditable(b: Boolean) { 
     editor.textField.enabled = b
     editor.loadButton.enabled = b
   }
