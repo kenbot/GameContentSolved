@@ -1,6 +1,6 @@
 package kenbot.gcsolved.editor.widgets
 import kenbot.gcsolved.core.Field
-import kenbot.gcsolved.core.types.{BoolType, FileType, IntType, ListType, MapType, RefType, ResourceType, SelectOneType, StringType, ValueType}
+import kenbot.gcsolved.core.types.{BoolType, FileType, IntType, ListType, RefType, ResourceType, SelectOneType, StringType, ValueType}
 import kenbot.gcsolved.core.ResourceRef
 import kenbot.gcsolved.editor.Settings
 
@@ -27,9 +27,6 @@ class DefaultMakeWidget(settings: Settings, parentWidget: => Option[FieldWidget]
     case ListType(_, _) => 
       lazy val w: FieldWidget = new DynamicSideListWidget(field, makeNextWidget(w), parentWidget, level); w
     
-    case MapType(_, _) => 
-      lazy val w: FieldWidget = new MapWidget(field, makeNextWidget(w), parentWidget, level); w
-      
     case vt: ValueType if vt.isAbstract => 
       lazy val w: FieldWidget = new ChooseTypeWidget(field, settings.schema, makeNextWidget(w), parentWidget, level); w
       

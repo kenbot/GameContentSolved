@@ -10,9 +10,10 @@ import java.awt.Color
 import scala.swing.Alignment
 import kenbot.gcsolved.editor.gui.util.DynamicListPanel
 import scala.swing.TextField
-import kenbot.gcsolved.core.types.MapType
 import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
 import kenbot.gcsolved.editor.gui.util.DynamicMapPanel
+import kenbot.gcsolved.core.types.StringType
+import kenbot.gcsolved.core.types.IntType
 
 
 class MapWidget(theField: Field, 
@@ -22,9 +23,9 @@ class MapWidget(theField: Field,
   
   top => 
 
-  val mapType = field.fieldType.asInstanceOf[MapType]
-  val keyType = mapType.keyType
-  val valueType = mapType.valueType
+  //val mapType = field.fieldType.asInstanceOf[MapType]
+  val keyType = StringType
+  val valueType = IntType
   type Key = keyType.Value
   type Value = valueType.Value
   

@@ -11,7 +11,6 @@ import kenbot.gcsolved.core.types.DoubleType
 import kenbot.gcsolved.core.types.FileType
 import kenbot.gcsolved.core.types.IntType
 import kenbot.gcsolved.core.types.ListType
-import kenbot.gcsolved.core.types.MapType
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.ResourceType
 import kenbot.gcsolved.core.types.SelectOneType
@@ -24,7 +23,7 @@ package object meta {
       addRefTypes(RefTypeDefinition, ValueTypeDefinition, SelectOneTypeDefinition).
       addValueTypes(MetaFieldType, MetaAnyType, MetaAnyRefType, MetaAnyValueType, 
                     MetaIntType, MetaStringType, MetaBoolType, MetaDoubleType, 
-                    MetaFileType, MetaListType, MetaMapType, MetaRefType, 
+                    MetaFileType, MetaListType, MetaRefType, 
                     MetaValueType, MetaSelectOneType)
   
 
@@ -41,7 +40,6 @@ package object meta {
   lazy val MetaDoubleType = ValueType("MetaDoubleType", MetaAnyType)
   lazy val MetaFileType = ValueType("MetaFileType", MetaAnyType, 'Path -> StringType, 'Extensions -> ListType(StringType))
   lazy val MetaListType = ValueType("MetaListType", MetaAnyType, 'ElementType -> MetaAnyType, 'MaxLength -> IntType)
-  lazy val MetaMapType = ValueType("MetaMapType", MetaAnyType, 'KeyType -> MetaSelectOneType, 'ValueType -> MetaAnyType)
   lazy val MetaRefType = ValueType("MetaRefType", MetaAnyRefType, 'RefType -> RefTypeDefinition)
   lazy val MetaValueType = ValueType("MetaValueType", MetaAnyValueType, 'ValueType -> ValueTypeDefinition)
   lazy val MetaSelectOneType = ValueType("MetaSelectOneType", MetaAnyType, 'SelectOneType -> SelectOneTypeDefinition)
@@ -175,11 +173,7 @@ package object meta {
           val lengthMapping = maxLengthOpt.map("Length" ->)
           val fields = Map("ElementType" -> elementType.typeDescriptor) ++ lengthMapping
           ValueData(MetaListType, fields)
-        
-      case MapType(keyType, valueType) => ValueData(MetaMapType, 
-          'KeyType -> keyType.typeDescriptor, 
-          'ValueType -> valueType.typeDescriptor)
-          
+
       case rt: RefType => ValueData(MetaRefType, 'RefType -> rt.metaRef)
       case vt: ValueType => ValueData(MetaValueType, 'ValueType -> vt.metaRef)
       case s1t: SelectOneType =>  ValueData(MetaSelectOneType, 'SelectOneType -> s1t.metaRef)
@@ -205,13 +199,9 @@ package object meta {
         case MetaStringType => StringType
         case MetaFileType => FileType(valueData("Category").toString, valueData("Extensions").asInstanceOf[List[String]]: _*)
         case MetaListType => ListType(valueData("ElementType").asInstanceOf[ValueData].asResourceType)
-        case MetaMapType => MapType(valueData("KeyType").asInstanceOf[ValueData].asResourceType.asInstanceOf[SelectOneType], 
-                                    valueData("ValueType").asInstanceOf[ValueData].asResourceType)
-                                  
         case MetaRefType => schema.findRefType(valueData("RefType").asInstanceOf[ResourceRef].id).get
         case MetaValueType => schema.findValueType(valueData("ValueType").asInstanceOf[ResourceRef].id).get
         case MetaSelectOneType => schema.findSelectOneType(valueData("SelectOneType").asInstanceOf[ResourceRef].id).get
-      
         case x => error("Unknown meta-type: " + x) 
       }
     

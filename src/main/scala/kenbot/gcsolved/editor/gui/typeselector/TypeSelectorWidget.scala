@@ -16,7 +16,6 @@ import kenbot.gcsolved.core.types.DoubleType
 import kenbot.gcsolved.core.types.FileType
 import kenbot.gcsolved.core.types.IntType
 import kenbot.gcsolved.core.types.ListType
-import kenbot.gcsolved.core.types.MapType
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.ResourceType
 import kenbot.gcsolved.core.types.StringType
@@ -61,7 +60,7 @@ class TypeSelectorWidget(schema: ResourceSchema,
   private def updateComponents() {
     contents.clear()
     contents += selectorCombo
-    refinementWidget.foreach(contents +=) 
+    refinementWidget foreach contents.+=
     revalidate()
     repaint()
   }

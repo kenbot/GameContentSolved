@@ -16,7 +16,6 @@ import kenbot.gcsolved.core.types.DoubleType
 import kenbot.gcsolved.core.types.FileType
 import kenbot.gcsolved.core.types.IntType
 import kenbot.gcsolved.core.types.ListType
-import kenbot.gcsolved.core.types.MapType
 import kenbot.gcsolved.core.types.ObjectType
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.ResourceType
@@ -61,7 +60,6 @@ trait WriteText {
       case IntType | DoubleType | BoolType | StringType => writeLine(out, value)
       case FileType(category, extensions) => writeLine(out, value.asInstanceOf[File].getName)
       case ListType(elementType, _) => writeList(elementType, value.asInstanceOf[List[Any]], out)
-      case MapType(keyType, valueType) => writeMap(keyType, valueType, value.asInstanceOf[Map[Any, Any]], out)
       case vt: ValueType => writeObjectData(value.asInstanceOf[ValueData], out)
       case rt: RefType => writeResourceRef(value.asInstanceOf[ResourceRef], out)
       case s1t: SelectOneType => writeLine(out, value)
@@ -106,15 +104,7 @@ trait WriteText {
     }
     writeLine(out, EndObject)
   }
-  
-  def writeMap(keyType: ResourceType, valueType: ResourceType, map: Map[Any, Any], out: DataOutput) {
-    writeLine(out, StartMap)
-    map foreach {kv => 
-      write(keyType, kv._1, out)
-      write(valueType, kv._2, out)
-    }
-    writeLine(out, EndMap)
-  }
+
 }
 
 trait ReadText {
@@ -163,7 +153,6 @@ trait ReadText {
       case StringType => forLine(identity)
       case FileType(_,_) => forLine(str => new File(str))
       case ListType(elementType, _) => readList(elementType, lib, in).map(resourceType asValue _)
-      case MapType(keyType, valueType) => readMap(keyType, valueType, lib, in).map(resourceType asValue _)
       case rt: RefType => readResourceRef(lib.schema, in).map(resourceType asValue _)
       case vt: ValueType => readObjectData(vt, lib, in).map(resourceType asValue _)
       case s1t: SelectOneType => 
@@ -219,26 +208,6 @@ trait ReadText {
       actualType <- lib.schema.findObjectType(actualTypeName)
     } 
     yield readFieldLoop(actualType.emptyData)
-  }
-
-  def readMap(keyType: ResourceType, valueType: ResourceType, lib: ResourceLibrary, 
-      in: DataInput): Option[Map[keyType.Value, valueType.Value]] = {
-    
-    if (readLine(in) != Some(StartMap)) return None
-    
-    @tailrec
-    def readNextPair(currentMap: Map[keyType.Value, valueType.Value]): Map[keyType.Value, valueType.Value] = {
-      val nextMap = for {
-        k <- readOpt(keyType, lib, in)
-        v <- readOpt(valueType, lib, in)
-      } yield currentMap + (k -> v)
-      
-      nextMap match {
-        case Some(m) => readNextPair(m)
-        case None => currentMap
-      }
-    }
-    Some(readNextPair(Map.empty))
   }
 
   def readList(elementType: ResourceType, lib: ResourceLibrary, in: DataInput): Option[List[elementType.Value]] = {

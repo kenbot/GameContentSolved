@@ -10,7 +10,6 @@ import kenbot.gcsolved.core.types.AnyRefType
 import kenbot.gcsolved.core.types.AnyType
 import kenbot.gcsolved.core.types.ListType
 import kenbot.gcsolved.core.types.AnyValueType
-import kenbot.gcsolved.core.types.MapType
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.UserType
 import kenbot.gcsolved.core.ResourceSchema
@@ -19,7 +18,7 @@ import kenbot.gcsolved.core.ResourceSchema
 object TypeSelection {
   val systemTypes: List[TypeSelection] = List(AnySelection, AnyRefSelection, AnyValueSelection,
                          IntSelection, StringSelection, BoolSelection, 
-                         DoubleSelection, FileSelection, ListSelection, MapSelection)
+                         DoubleSelection, FileSelection, ListSelection)
 
   def systemTypesUnder(t: ResourceType): List[TypeSelection] = t match {
     case AnyType => systemTypes
@@ -37,7 +36,6 @@ object TypeSelection {
     case BoolType => BoolSelection
     case FileType(_, _*) => FileSelection
     case ListType(_, _) => ListSelection
-    case MapType(_,_) => MapSelection
     case ut: UserType => UserTypeSelection(ut)
     case x => error("No type selection found for " + x)
   }
@@ -83,7 +81,4 @@ object FileSelection extends RefinedTypeSelection(FileType.name, _ => new FileRe
 object ListSelection extends RefinedTypeSelection(ListType.name, s => new ListRefinementWidget(s))(
     rw => ListType(rw.elementType))
 
-object MapSelection extends RefinedTypeSelection(MapType.name, s => new MapRefinementWidget(s))(
-    rw => MapType(rw.keyType, rw.valueType))
-    
 case class UserTypeSelection(userType: ResourceType with UserType) extends UnrefinedTypeSelection(userType)

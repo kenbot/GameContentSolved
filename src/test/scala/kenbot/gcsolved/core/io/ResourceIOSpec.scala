@@ -1,12 +1,14 @@
 package kenbot.gcsolved.core.io
 
 import java.io.{DataInput, DataInputStream, DataOutput, DataOutputStream, File, FileInputStream, FileOutputStream}
-import org.scalatest._
+
+import org.scalatest.Spec
+import org.scalatest.matchers.ShouldMatchers
+
 import kenbot.gcsolved.core.{RefData, ResourceLibrary, ResourceRef, ResourceSchema, ValueData}
 import kenbot.gcsolved.core.AnyData
-import kenbot.gcsolved.core.Field._
-import kenbot.gcsolved.core.types.{AnyRefType, AnyType, AnyValueType, BoolType, DoubleType, FileType, IntType, ListType, MapType, RefType, SelectOneType, StringType, ValueType}
-import org.scalatest.matchers.ShouldMatchers
+import kenbot.gcsolved.core.Field.{symbolAndType2Field, symbolAndValue2namePair}
+import kenbot.gcsolved.core.types.{AnyRefType, AnyType, AnyValueType, BoolType, DoubleType, FileType, IntType, ListType, RefType, SelectOneType, StringType, ValueType}
 
 
 abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with ShouldMatchers {
@@ -30,8 +32,7 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
       'id -> StringType ^ (isId = true),
       'xxx -> StringType, 
       'yyy -> ListType(nestedValueType), 
-      'self -> complicatedRefType, 
-      'maps -> MapType(mapKeyType, ListType(MapType(mapKeyType, IntType)))))
+      'self -> complicatedRefType))
       
   complicatedRefType.fields("self").fieldType.toString
       
@@ -163,28 +164,6 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
       }
     }
     
-    it("should be able to write and read back a map") {
-      val mapType = MapType(mapKeyType, StringType)
-      val map = Map("a" -> "aaa", "b" -> "zxvc", "c" -> "ssss")
-      
-      withDataStream { (in, out) =>
-        resourceIO.write(mapType, map, out)
-        resourceIO.read(mapType, lib, in) should equal (map)
-      }
-    }
-
-    it("should be able to write and read back a map of maps") {
-      val mapMapType = MapType(mapKeyType, MapType(mapKeyType, ListType(BoolType)))
-      val mapOfMaps = Map(
-        "a" -> Map("b" -> List(true, false)),
-        "b" -> Map("c" -> List(true)))
-        
-      withDataStream { (in, out) =>
-        resourceIO.write(mapMapType, mapOfMaps, out)
-        resourceIO.read(mapMapType, lib, in) should equal (mapOfMaps)
-      }
-    }
-    
     it("should be able to write and read back a complicated library") {
 
       val valueData1 = ValueData(nestedValueType, 
@@ -207,9 +186,7 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
           'id -> "compy2",
           'xxx -> "Foo",
           'yyy -> List(valueData1, valueData2),
-          'self -> complicatedResource1.ref,
-          'maps -> Map("a" -> List(Map("a" -> 2, "b" ->  4, "c" -> 6), Map("a" -> 20)), 
-                       "b" -> List(Map("a" -> 22, "b" -> 44))))
+          'self -> complicatedResource1.ref)
 
       val beforeLib = lib.addResources(complicatedResource1, complicatedResource2)
       

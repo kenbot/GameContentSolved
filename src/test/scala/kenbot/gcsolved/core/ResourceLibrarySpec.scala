@@ -5,7 +5,6 @@ import org.scalatest._
 import Field._
 import kenbot.gcsolved.core.types.IntType
 import kenbot.gcsolved.core.types.ListType
-import kenbot.gcsolved.core.types.MapType
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.StringType
 import kenbot.gcsolved.core.types.ValueType
@@ -244,17 +243,15 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
     lazy val fooType: RefType = RefType("Foo", idField, Field("other", fooType), Field("blah", StringType))
     val mapKeyType = SelectOneType("enum", StringType, "a", "b", "c")
     val fooListType = RefType("FooList", idField, 'foos -> ListType(fooType))
-    val fooMapType = RefType("FooMap", idField, 'foos -> MapType(mapKeyType, fooType))
     val fooValueType = ValueType("FooValue", idField, 'foo -> fooType)
     val fooValueDataType = RefType("FooValueData", idField, 'foo -> fooValueType)
     
     val a = RefData(fooType, 'id -> "a", "blah" -> "umblob")
     val b = RefData(fooType, 'id -> "b", 'other -> a.ref)
     val fooList = RefData(fooListType, 'id -> "fooList", 'foos -> List(a.ref, b.ref))
-    val fooMap = RefData(fooMapType, 'id -> "fooMap", 'foos -> Map("a" -> a.ref))
     val fooValue = ValueData(fooValueType, 'foo -> a.ref)
     val fooValueData = RefData(fooValueDataType, 'id -> "fooValueData", 'foo -> fooValue)
-    val libWithData = (library /: List(a, b, fooList, fooMap, fooValueData))(_ addResources _)
+    val libWithData = (library /: List(a, b, fooList, fooValueData))(_ addResources _)
     val updatedLib = libWithData updateResourceId (a.ref, "monkey")
     val newRef = ResourceRef("monkey", fooType)
 
@@ -268,10 +265,6 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
     it ("should result in a library with all list references to the resource having been updated") {
       val res = updatedLib.findResource(fooList.ref).get
       res("foos") should equal (List(newRef, b.ref))
-    }
-    it ("should result in a library with all map references to the resource having been updated") {
-      val res = updatedLib.findResource(fooMap.ref).get
-      res.fields("foos") should equal (Map("a" -> newRef))
     }
     it ("should result in a library with all ValueData references to the resource having been updated") {
       val res = updatedLib.findResource(fooValueData.ref).get
