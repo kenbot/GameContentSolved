@@ -1,6 +1,7 @@
 package kenbot.gcsolved.core.types
 
 import kenbot.gcsolved.core.meta.MetaAnyType
+import kenbot.gcsolved.core.AnyData
 
 
 abstract class ResourceType protected[core] (val name: String, parentType: => ResourceType = AnyType) {
@@ -12,8 +13,10 @@ abstract class ResourceType protected[core] (val name: String, parentType: => Re
       other == AnyType || 
       (parent != this && (parent <:< other)))
   
-  def &(other: ResourceType): ResourceType = this
-  def |(other: ResourceType): ResourceType = this
+  // def &(other: ResourceType): ResourceType = this
+  //def |(other: ResourceType): ResourceType = this
+      
+  def asAny(v: Value): AnyData = AnyData(v, this)    
       
   type Value    
   def isAbstract = false

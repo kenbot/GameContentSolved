@@ -134,7 +134,7 @@ package object meta {
     def asData: RefData = RefData(SelectOneTypeDefinition, 
       'Name -> selectOneType.name,
       'ValueType -> selectOneType.valueType.typeDescriptor, 
-      'Values -> selectOneType.values)
+      'Values -> selectOneType.values.map(selectOneType.valueType.asAny))
   } 
   
   class RichField(field: Field) {
@@ -146,7 +146,7 @@ package object meta {
         "Required" -> field.required, 
         "IsId" -> field.isId)
       
-      val defaultMapping = field.default.map("Default" ->)
+      val defaultMapping = field.default.map("Default" -> field.fieldType.asAny(_))
       val categoryMapping = if (field.category.nonEmpty) Some("Category" -> field.category) 
                             else None
                             
@@ -167,8 +167,8 @@ package object meta {
         val fields = Map() ++ minMapping ++ maxMapping
         ValueData(MetaIntType, fields)
         
-      case FileType(category, extensions @ _*) => ValueData(MetaFileType, 
-          'Category -> category,
+      case FileType(path, extensions @ _*) => ValueData(MetaFileType, 
+          'Path -> path,
           'Extensions -> extensions.toList)
           
       case ListType(elementType, maxLengthOpt) => 
@@ -222,7 +222,9 @@ package object meta {
         val description = valueData.getOrElse("Description", "")
         val required = valueData("Required").asInstanceOf[Boolean]
         val isId = valueData("IsId").asInstanceOf[Boolean]
-        val default: Option[fieldType.Value] = valueData.get("Default") map fieldType.asValue
+        val default: Option[fieldType.Value] = valueData.get("Default").map { data => 
+          fieldType asValue (AnyType asValue data).rawValue
+        }
         Field[fieldType.Value](name, fieldType, category, required, isId, default, description)
       }
     }
@@ -246,11 +248,13 @@ package object meta {
         ValueType(name, parent, isAbstract, fields: _*)
       }
         
-        
       def asSelectOneType: SelectOneType = {
         val name = refData("Name").asInstanceOf[String]
-        val valueType: ResourceType = refData("ValueType").asInstanceOf[ValueData]asResourceType
-        val values: List[valueType.Value] = refData("Values").asInstanceOf[List[ValueData]] map valueType.asValue
+        val valueType: ResourceType = refData("ValueType").asInstanceOf[ValueData].asResourceType
+        val values: List[valueType.Value] = {
+          val anyDataList = refData("Values").asInstanceOf[List[AnyData]]
+          anyDataList.map(valueType asValue _.rawValue)
+        }
         SelectOneType[valueType.Value](name, valueType, values: _*)
       }
     }

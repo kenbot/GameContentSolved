@@ -102,7 +102,6 @@ trait WriteText {
       case (fieldName, v) => 
         writeLine(out, fieldName)
         val field = objectType.fields(fieldName)
-        println("Write " + field + ": " + v)
         write(field.fieldType, v, out)
     }
     writeLine(out, EndObject)

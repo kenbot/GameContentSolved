@@ -21,6 +21,8 @@ import kenbot.gcsolved.core.ResourceSchema
 import kenbot.gcsolved.core.ResourceLibrary
 import kenbot.gcsolved.core.ResourceRef
 import org.scalatest.Spec
+import kenbot.gcsolved.core.types.AnyType
+import kenbot.gcsolved.core.AnyData
 
 
 @RunWith(classOf[JUnitRunner]) 
@@ -41,7 +43,8 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
         data("FieldType") should equal (f.fieldType.typeDescriptor)
       }
       it("should have the same default") {
-        data.get("Default") should equal (f.default)
+        val anyData = f.default map f.fieldType.asAny 
+        data.get("Default") should equal (anyData)
       }
       it("should have the same required status") {
         data("Required") should equal (f.required)
@@ -87,7 +90,7 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
           'Category -> "details", 
           'Required -> true, 
           'IsId -> false, 
-          'Default -> 5, 
+          'Default -> IntType.asAny(5), 
           'Description -> "hello!")
       
       val field2 = data.asField 
@@ -100,7 +103,15 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
         field.asData.asField should equal (field)
       }
     }
+    
+    describe("typed as \"Any\"") {
+      val anyField = 'Whatevs -> AnyType ^ (category="stuff", required=true, default=Some(StringType asAny "something"), description="nees hows")
+      val data = anyField.asData
+      
+      checkSameFields(data, anyField)
+    }
   }
+  
   
   describe("RefTypes") {
 
@@ -236,7 +247,7 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
         data("ValueType") should equal (s1t.valueType.typeDescriptor)
       }
       it("should have the same values") {
-        data("Values") should equal (s1t.values)
+        data("Values") should equal (s1t.values map s1t.valueType.asAny)
       }
     }
     
@@ -255,11 +266,11 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
     }
     
     describe("when converted from data") {
+      
       val data = RefData(SelectOneTypeDefinition, 
           'Name -> "Grum",
           'ValueType -> StringType.typeDescriptor,
-          'Values -> List("a", "b", "c")
-          
+          'Values -> List("a", "b", "c").map(StringType.asAny)
       )
       val selectOneType2 = data.asSelectOneType
 
