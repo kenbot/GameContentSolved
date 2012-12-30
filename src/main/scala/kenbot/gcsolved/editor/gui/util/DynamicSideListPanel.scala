@@ -24,7 +24,7 @@ import scala.util.DynamicVariable
 
 object DynamicSideListPanel {
   
-  trait ItemDescription[C <: Component] {
+  trait Support[C <: Component] {
     def newPanel: C
     def getLabel(c: C): String
     def getForeground(c: C): Color
@@ -38,11 +38,11 @@ object DynamicSideListPanel {
 }
 
 
-class DynamicSideListPanel[C <: Component : ItemDescription](initialPanels: Seq[C]) 
+class DynamicSideListPanel[C <: Component : Support](initialPanels: Seq[C]) 
     extends NestedBorderPanel with Publisher with SuppressableEvents {
   
-  private[this] val itemDesc = implicitly[ItemDescription[C]]
-  import itemDesc._
+  private[this] val support = implicitly[Support[C]]
+  import support._
   
   val listView = new ListView(initialPanels) {
     preferredSize = (150, 100)

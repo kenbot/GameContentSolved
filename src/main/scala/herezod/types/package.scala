@@ -7,14 +7,12 @@ import kenbot.gcsolved.core.types.BoolType
 import kenbot.gcsolved.core.types.FileType
 import kenbot.gcsolved.core.types.IntType
 import kenbot.gcsolved.core.types.ListType
-import kenbot.gcsolved.core.types.MapType
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.SelectOneType
 import kenbot.gcsolved.core.types.StringType
 import kenbot.gcsolved.core.types.ValueType
 import kenbot.gcsolved.core.types.DoubleType
 import java.io.File
-import org.w3c.dom.css.Rect
 
 package object types {
   import kenbot.gcsolved.core._
@@ -82,11 +80,11 @@ package object types {
     
   val DoorTerrain: RefType = RefType("DoorTerrain", Terrain, false,
       'DefaultImageCombo -> TerrainNeighbourCombo,    
-      'OpenImages -> MapType(Direction, ListType(ImageType)) ^ (required=true), 
-      'ClosedImages -> MapType(Direction, ListType(ImageType)) ^ (required=true),
-      'SolidToVision -> MapType(OrthogonalDirection, BoolType),
-      'SolidToMovement -> MapType(OrthogonalDirection, BoolType),
-      'SolidToProjectiles -> MapType(OrthogonalDirection, BoolType),
+      'OpenImages -> ValueType.of(Direction, ListType(ImageType)) ^ (required=true), 
+      'ClosedImages -> ValueType.of(Direction, ListType(ImageType)) ^ (required=true),
+      'SolidToVision -> ValueType.of(OrthogonalDirection, BoolType),
+      'SolidToMovement -> ValueType.of(OrthogonalDirection, BoolType),
+      'SolidToProjectiles -> ValueType.of(OrthogonalDirection, BoolType),
       'DamagedTerrain -> NormalTerrain,
       'BurntTerrain -> NormalTerrain,
       'Flammable -> BoolType, 
@@ -102,22 +100,20 @@ package object types {
       'LockComplexity -> IntType,
       'LockDestroysKey -> BoolType,
       'KeyType -> Tool )
-      
-  
   
   val VerticalTerrain: RefType = RefType("VerticalTerrain", Terrain, false,
       'DefaultImageCombo -> TerrainNeighbourCombo,    
-      'Images -> MapType(TerrainNeighbourCombo, ListType(ImageType)))
+      'Images -> ValueType.of(TerrainNeighbourCombo, ListType(ImageType)))
       
   lazy val NormalTerrain: RefType = RefType.recursive("NormalTerrain", Terrain, false, Seq(
       'DefaultImageCombo -> TerrainNeighbourCombo ^ (default = Some("UL")),
-      'Images -> MapType(TerrainNeighbourCombo, ListType(ImageType)),
+      'Images -> ValueType.of(TerrainNeighbourCombo, ListType(ImageType)),
       'HoleImages -> ListType(ImageType),
       'CoolImages -> ListType(StillImageType),
       'FilledHoleImages -> ListType(ImageType),
-      'SolidToVision -> MapType(OrthogonalDirection, BoolType),
-      'SolidToMovement -> MapType(OrthogonalDirection, BoolType),
-      'SolidToProjectiles -> MapType(OrthogonalDirection, BoolType),
+      'SolidToVision -> ValueType.of(OrthogonalDirection, BoolType),
+      'SolidToMovement -> ValueType.of(OrthogonalDirection, BoolType),
+      'SolidToProjectiles -> ValueType.of(OrthogonalDirection, BoolType),
       'SolidToVisionEdgesOnly -> BoolType,
       'SolidToMovementEdgesOnly -> BoolType,
       'SolidToProjectilesEdgesOnly -> BoolType,
@@ -158,7 +154,7 @@ package object types {
     'CanBeMale -> BoolType,
     'CanBeFemale -> BoolType ^ (default=Some(true)),
     'BloodColor -> ColorType,
-    'Images ->  MapType(ActorState, IntType),  //MapType(ActorState, MapType(Direction, ListType(ImageType))),
+    'Images ->  ValueType.of(ActorState, ValueType.of(Direction, ListType(ImageType))),
     'CorpseImages -> ListType(StillImageType) ^ (default=Some(List(someImage)), description="This is what it looks like dead")))
 
   

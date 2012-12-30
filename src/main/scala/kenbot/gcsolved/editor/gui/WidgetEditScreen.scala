@@ -3,9 +3,9 @@ import scala.swing.BoxPanel
 import scala.swing.Orientation
 import javax.swing.BorderFactory
 import kenbot.gcsolved.editor.gui.util.{NestedBorderPanel, Components}
-import kenbot.gcsolved.editor.gui.widgets.FieldWidget
-import kenbot.gcsolved.editor.gui.widgets.WidgetDecoratorPanel
-import kenbot.gcsolved.editor.gui.widgets.WidgetFocusEvent
+import kenbot.gcsolved.editor.widgets.FieldWidget
+import kenbot.gcsolved.editor.widgets.WidgetDecoratorPanel
+import kenbot.gcsolved.editor.widgets.WidgetFocusEvent
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.Field
 import kenbot.gcsolved.core.RefData
@@ -14,6 +14,7 @@ import scala.swing.Component
 import kenbot.gcsolved.editor.gui.util.Components
 import kenbot.gcsolved.editor.gui.util.Components
 import kenbot.gcsolved.editor.gui.util.Components
+import kenbot.gcsolved.editor.screens.EditScreen
 
 class WidgetEditScreen(theRefType: RefType, 
             initialValues: Seq[RefData],

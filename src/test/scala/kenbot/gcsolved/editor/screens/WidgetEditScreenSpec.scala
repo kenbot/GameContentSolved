@@ -1,18 +1,15 @@
-package kenbot.gcsolved.editor.gui
+package kenbot.gcsolved.editor.screens
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.StringType
-import kenbot.gcsolved.core.RefData
-import kenbot.gcsolved.core.types.IntType
-import kenbot.gcsolved.core.Field
 import kenbot.gcsolved.core.Field._
-import kenbot.gcsolved.core.ResourceLibrary
-import kenbot.gcsolved.core.ResourceSchema
-import kenbot.gcsolved.core.ResourceRef
-import kenbot.gcsolved.editor.gui.widgets.TextFieldWidget
+import kenbot.gcsolved.editor.gui.WidgetEditScreen
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import kenbot.gcsolved.editor.widgets.TextFieldWidget
 
 @RunWith(classOf[JUnitRunner])  
 class WidgetEditScreenSpec extends Spec with ShouldMatchers {

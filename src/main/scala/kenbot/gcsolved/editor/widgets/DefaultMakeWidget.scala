@@ -1,9 +1,8 @@
-package kenbot.gcsolved.editor.gui
-
-import kenbot.gcsolved.core.{Field, ResourceRef}
+package kenbot.gcsolved.editor.widgets
+import kenbot.gcsolved.core.Field
 import kenbot.gcsolved.core.types.{BoolType, FileType, IntType, ListType, MapType, RefType, ResourceType, SelectOneType, StringType, ValueType}
+import kenbot.gcsolved.core.ResourceRef
 import kenbot.gcsolved.editor.Settings
-import kenbot.gcsolved.editor.gui.widgets.{CheckBoxWidget, ChooseTypeWidget, ComboBoxWidget, DynamicListWidget, EditScreenWidget, FieldWidget, FileSelectorWidget, MapWidget, TextFieldWidget}
 
 object DefaultMakeWidget {
   def apply(settings: Settings, parentWidget: => Option[FieldWidget] = None, level: Int = 0) = {
@@ -26,7 +25,7 @@ class DefaultMakeWidget(settings: Settings, parentWidget: => Option[FieldWidget]
     case s1t: SelectOneType => new ComboBoxWidget[s1t.Value](field, s1t.values, _.toString, parentWidget, level)
     
     case ListType(_, _) => 
-      lazy val w: FieldWidget = new DynamicListWidget(field, makeNextWidget(w), parentWidget, level); w
+      lazy val w: FieldWidget = new DynamicSideListWidget(field, makeNextWidget(w), parentWidget, level); w
     
     case MapType(_, _) => 
       lazy val w: FieldWidget = new MapWidget(field, makeNextWidget(w), parentWidget, level); w

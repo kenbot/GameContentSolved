@@ -18,12 +18,10 @@ object AnyValueType extends ValueType("AnyValue", isAbstract=true)  {
   
 object ValueType {
 
-  //def fromValues(fieldInfo: SelectOneType { type Value = String })
-//  def fromValues(fieldType: ResourceType, fieldNames: String*): ValueType = {
-//    val fields = fieldNames.map(n => Field(n, fieldType))
-//    apply("", fields: _*)
-//  }
-    
+  def of(fieldNames: SelectOneType, fieldType: ResourceType): ValueType = {
+    val fields = fieldNames.values.map(n => Field[fieldType.Value](n.toString, fieldType))
+    apply("", fields: _*)
+  }
   
   def apply(name: String, fields: Field*): ValueType = apply(name, AnyValueType, false, fields: _*)
   def apply(name: String, parent: => ValueType, fields: Field*): ValueType = 

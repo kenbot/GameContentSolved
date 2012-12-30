@@ -1,32 +1,11 @@
-package kenbot.gcsolved.editor.gui
+package kenbot.gcsolved.editor.screens
 
-
-import scala.swing.ScrollPane._
-import scala.swing.Swing.onEDT
-import scala.swing.Swing.pair2Dimension
-import scala.swing.event.ButtonClicked
-import scala.swing.event.ListSelectionChanged
-import scala.swing.Button
-import scala.swing.Component
-import scala.swing.Label
-import scala.swing.ListView
 import scala.swing.Reactor
-import scala.swing.Swing
-import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
-import kenbot.gcsolved.editor.gui.widgets.WidgetFocusEvent
-import kenbot.gcsolved.editor.GameContentEditor
-import kenbot.gcsolved.editor.LibraryChangedEvent
-import kenbot.gcsolved.editor.PublishableLibraryChanges
-import kenbot.gcsolved.editor.Settings
+
+import kenbot.gcsolved.core.{LibraryEditSession, RefData, ResourceLibrary, ResourceRef}
 import kenbot.gcsolved.core.types.RefType
-import kenbot.gcsolved.core.RefData
-import kenbot.gcsolved.core.ResourceLibrary
-import scala.collection.mutable.ListBuffer
-import scala.swing.FlowPanel
-import scala.swing.Publisher
-import kenbot.gcsolved.editor.gui.widgets.FieldWidget
-import kenbot.gcsolved.core.{Field, LibraryEditSession}
-import kenbot.gcsolved.core.ResourceRef
+import kenbot.gcsolved.editor.LibraryChangedEvent
+import kenbot.gcsolved.editor.gui.{ListAndEditScreenPanel, ViewItem}
 import kenbot.gcsolved.editor.gui.util.SuppressableEvents
 
 

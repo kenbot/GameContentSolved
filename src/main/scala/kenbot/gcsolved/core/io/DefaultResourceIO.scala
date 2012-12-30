@@ -65,7 +65,7 @@ trait WriteText {
       case vt: ValueType => writeObjectData(value.asInstanceOf[ValueData], out)
       case rt: RefType => writeResourceRef(value.asInstanceOf[ResourceRef], out)
       case s1t: SelectOneType => writeLine(out, value)
-      case AnyType => writeAnyData(value.asInstanceOf[AnyData[Any]], out)
+      case AnyType => writeAnyData(value.asInstanceOf[AnyData], out)
       case x => error("Unknown type: " + x) 
     }
   }
@@ -75,7 +75,7 @@ trait WriteText {
     writeLine(out, ref.id)
   }
   
-  def writeAnyData(anyData: AnyData[Any], out: DataOutput) {
+  def writeAnyData(anyData: AnyData, out: DataOutput) {
     import meta._
     write(MetaValueType, anyData.resourceType.typeDescriptor, out)
     write(anyData.resourceType, anyData.value, out)
@@ -102,6 +102,7 @@ trait WriteText {
       case (fieldName, v) => 
         writeLine(out, fieldName)
         val field = objectType.fields(fieldName)
+        println("Write " + field + ": " + v)
         write(field.fieldType, v, out)
     }
     writeLine(out, EndObject)
@@ -183,7 +184,7 @@ trait ReadText {
     yield ResourceRef(id, refType)
   }
   
-  def readAnyData(in: DataInput, lib: ResourceLibrary): Option[AnyData[Any]] = {
+  def readAnyData(in: DataInput, lib: ResourceLibrary): Option[AnyData] = {
     import meta._
     val context = new SchemaContext(lib.schema)
     import context._

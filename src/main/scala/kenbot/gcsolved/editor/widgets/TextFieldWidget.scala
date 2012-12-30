@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 import scala.swing.event.EditDone
 import scala.swing.Reactor
 import scala.swing.TextField

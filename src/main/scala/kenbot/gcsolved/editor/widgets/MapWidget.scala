@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 import scala.swing.Component
 import scala.swing.ListView
 import kenbot.gcsolved.editor.gui.util.DynamicSideListPanel

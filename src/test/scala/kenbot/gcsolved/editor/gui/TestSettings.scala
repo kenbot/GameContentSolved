@@ -1,15 +1,14 @@
 package kenbot.gcsolved.editor.gui
 import java.io.File
-
 import scala.swing.Frame
-
-import kenbot.gcsolved.editor.PublishableLibraryChanges
 import kenbot.gcsolved.editor.Settings
 import kenbot.gcsolved.core.ResourceEnvironment
 import kenbot.gcsolved.core.ResourceLibrary
 import kenbot.gcsolved.core.ResourceSchema
+import kenbot.gcsolved.editor.widgets.DefaultMakeWidget
+import kenbot.gcsolved.editor.screens.DummyEditScreen
 
-object TestSettings extends Settings with PublishableLibraryChanges {
+object TestSettings extends Settings {
  
   def makeWidget = DefaultMakeWidget(this, None)
   def makeEditScreen = DummyEditScreen.apply

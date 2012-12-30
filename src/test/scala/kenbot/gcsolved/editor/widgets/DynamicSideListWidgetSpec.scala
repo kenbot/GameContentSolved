@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
@@ -17,7 +17,7 @@ import kenbot.gcsolved.core.types.ListType
 import kenbot.gcsolved.editor.gui.TestSettings
 
 @RunWith(classOf[JUnitRunner])
-class DynamicListWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {
+class DynamicSideListWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {
   
   def makeWidget(f: Field): FieldWidget = new TextFieldWidget(f)
   val listType = ListType(IntType)
@@ -25,8 +25,8 @@ class DynamicListWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMeth
   
   
   describe("For a list type") {
-    checkSettingValues(new DynamicListWidget(field, makeWidget), List(1,2,3))
-    checkValidation(f => new DynamicListWidget(f, makeWidget), field, List("aaa", "bbb", "ccc"), List(5,6,7))
+    checkSettingValues(new DynamicSideListWidget(field, makeWidget), List(1,2,3))
+    checkValidation(f => new DynamicSideListWidget(f, makeWidget), field, List("aaa", "bbb", "ccc"), List(5,6,7))
   }
   
   checkFocusing {

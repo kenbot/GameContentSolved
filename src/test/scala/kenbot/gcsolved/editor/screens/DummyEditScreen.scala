@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui
+package kenbot.gcsolved.editor.screens
 
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.RefData

@@ -19,9 +19,9 @@ import scala.swing.TextField
 import scala.swing.Swing.onEDT
 import Icons.AddIcon
 import Icons.DeleteIcon
-import kenbot.gcsolved.editor.gui.widgets.WidgetEditor
 import scala.swing.event.FocusGained
 import scala.swing.event.FocusLost
+
 
 
 class DynamicListPanel[C <: Component](initialPanels: Seq[C], newPanel: => C) 

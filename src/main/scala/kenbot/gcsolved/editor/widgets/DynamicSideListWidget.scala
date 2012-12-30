@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 import scala.swing.Component
 import scala.swing.ListView
 import kenbot.gcsolved.editor.gui.util.DynamicSideListPanel
@@ -10,7 +10,7 @@ import java.awt.Color
 import scala.swing.Alignment
 
 
-class DynamicListWidget(theField: Field, 
+class DynamicSideListWidget(theField: Field, 
     makeWidget: Field => FieldWidget, 
     parentWidget:  => Option[FieldWidget] = None, 
     level: Int = 0) extends DefaultFieldWidget(theField, parentWidget, level) {
@@ -18,13 +18,12 @@ class DynamicListWidget(theField: Field,
   top => 
   
   private def initialPanels = Seq[Component with WidgetEditor]() 
-  private def getPanelLabel(p: Component with WidgetEditor) = p.widget.fieldValue.getOrElse("").toString
   
   type ListPanel = Component with WidgetEditor
   
-  private implicit object listDescription extends DynamicSideListPanel.ItemDescription[ListPanel] {
+  private implicit object widgetSupport extends DynamicSideListPanel.Support[ListPanel] {
     override def newPanel = registerNewElementWidget().editor
-    override def getLabel(panel: ListPanel) = getPanelLabel(panel)
+    override def getLabel(panel: ListPanel) = panel.widget.fieldValue.getOrElse("").toString
     override def getForeground(panel: ListPanel) = Color.black 
     override def getBackground(panel: ListPanel) = {
       val selected = editor.selectedItems contains panel

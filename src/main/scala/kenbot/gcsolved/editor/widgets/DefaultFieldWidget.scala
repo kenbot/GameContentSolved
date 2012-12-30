@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 import java.awt.Color
 import java.awt.Dimension
 import scala.swing.Swing.pair2Dimension

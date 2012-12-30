@@ -8,8 +8,9 @@ import scala.swing.MainFrame
 import scala.swing.SimpleSwingApplication
 import herezod.types.ActorType
 import herezod.types.HerezodSchema
-import kenbot.gcsolved.editor.gui.{EditScreen, WidgetEditScreen}
-import kenbot.gcsolved.editor.gui.DefaultMakeWidget
+import kenbot.gcsolved.editor.gui.{WidgetEditScreen}
+import kenbot.gcsolved.editor.screens.EditScreen
+import kenbot.gcsolved.editor.widgets.DefaultMakeWidget
 import kenbot.gcsolved.editor.gui.MainPanel
 import kenbot.gcsolved.core.Field.symbolAndValue2namePair
 import kenbot.gcsolved.core.types.RefType
@@ -22,12 +23,9 @@ import javax.swing.UIManager
 
 
 
-object GameContentEditor extends SimpleSwingApplication {
-
+object Main extends SimpleSwingApplication {
   
-  type Settings = kenbot.gcsolved.editor.Settings with PublishableLibraryChanges
-  
-  object Settings extends kenbot.gcsolved.editor.Settings with PublishableLibraryChanges {
+  object Settings extends Settings {
     val makeEditScreen: RefType => EditScreen = 
       r => new WidgetEditScreen(r, 
           currentLibrary.allResourcesByType(r).toList, 
@@ -39,7 +37,7 @@ object GameContentEditor extends SimpleSwingApplication {
     val frameTitle = "GameContentSolved"
     val resourceDir = "examples"
     
-
+  
     lazy val otherLibrary = ResourceLibrary("blah", HerezodSchema).
         addResource( RefData(ActorType, 'Name -> "Gremlin") )
     
@@ -53,8 +51,8 @@ object GameContentEditor extends SimpleSwingApplication {
     
     lazy val mainFrame = new MainFrame {
       contents = new MainPanel(Settings)
-      title = Settings.frameTitle + " - <none>"
-      size = (1024, 768): Dimension
+      title = frameTitle + " - <none>"
+      size = (1024, 768)
     }
   }
   

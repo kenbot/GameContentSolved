@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 import scala.swing.event.{SelectionChanged, FocusGained, FocusLost}
 import scala.swing.ComboBox
 import scala.swing.Component

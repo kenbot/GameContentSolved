@@ -1,14 +1,12 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 
 import org.junit.runner.RunWith
-import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.Spec
-import kenbot.gcsolved.core.Field.symbolAndType2Field
-import kenbot.gcsolved.core.types.IntType
-import kenbot.gcsolved.core.types.StringType
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.matchers.ShouldMatchers
+
+import kenbot.gcsolved.core.Field.symbolAndType2Field
 import kenbot.gcsolved.core.types.BoolType
-import kenbot.gcsolved.core.types.DoubleType
 
 @RunWith(classOf[JUnitRunner])
 class CheckBoxWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {

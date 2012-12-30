@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 import kenbot.gcsolved.core.Field
 import scala.swing.Component
 import scala.swing.Publisher

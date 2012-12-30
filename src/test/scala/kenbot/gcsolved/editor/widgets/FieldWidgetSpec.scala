@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers

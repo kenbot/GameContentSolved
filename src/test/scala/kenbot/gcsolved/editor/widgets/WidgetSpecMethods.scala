@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 import scala.swing.Frame
 import scala.swing.MainFrame
 import org.scalatest.matchers.ShouldMatchers

@@ -1,33 +1,43 @@
 package kenbot.gcsolved.editor.gui
 
-import scala.swing.Swing.pair2Dimension
-import scala.swing.Swing.pair2Point
-import scala.swing.Button
-import scala.swing.Dialog
-import scala.swing.Label
-import scala.swing.Orientation
-import scala.swing.SplitPane
+import scala.swing.{Button, Label, Orientation, SplitPane}
+import scala.swing.event.Event
+import EditorDialog.Result.{Cancel, Close, OK}
 import kenbot.gcsolved.core.types.RefType
-import kenbot.gcsolved.editor.gui.sidebar.LibraryPage
-import kenbot.gcsolved.editor.gui.sidebar.SelectionEvent
-import kenbot.gcsolved.editor.gui.sidebar.SideBar
-import kenbot.gcsolved.editor.gui.util.NestedBorderPanel
-import kenbot.gcsolved.editor.gui.util.ToolBar
-import kenbot.gcsolved.editor.Settings
+import kenbot.gcsolved.editor.gui.sidebar.{LibraryPage, SelectionEvent, SideBar}
+import kenbot.gcsolved.editor.gui.util.{Dialogs, NestedBorderPanel, ToolBar}
 import scala.swing.BorderPanel
-import kenbot.gcsolved.editor.GameContentEditor
-import kenbot.gcsolved.editor.gui.util.Dialogs
+import scala.swing.Publisher
+import kenbot.gcsolved.editor.screens.ListAndEditScreen
+import kenbot.gcsolved.editor.Settings
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileFilter
+import java.io.File
 
 
 
-class MainPanel(settings: GameContentEditor.Settings) extends NestedBorderPanel {
+class MainPanel(settings: Settings) extends NestedBorderPanel with Publisher {
+  top => 
   
+
   val fileToolBar = new ToolBar("File", Orientation.Horizontal) {
-    contents += new Button("New")
-    contents += new Button("Open")
-    contents += new Button("Save")
-    contents += new Button("Revert")
+    contents += Button("New") { settings.newLibrary() }
+    contents += Button("Open") { 
+      val chooser = new JFileChooser
+      chooser.setFileFilter(new FileFilter {
+        def accept(f: File) = f.isDirectory() || settings.environment.isLibraryFile(f)
+        def getDescription() = "Resource Libraries"
+      })
+      
+      chooser.showOpenDialog(top.peer) match {
+        case JFileChooser.APPROVE_OPTION => settings.loadLibrary(chooser.getSelectedFile().getName())
+        case _ => 
+      }
+    }
+    contents += Button("Save") { settings.saveLibrary() }
+    contents += Button("Revert") { settings.currentLibrary }
   }
+  
   val sideBar = new SideBar(settings)
   val mainPanel = new Label("center panel")
   import BorderPanel.Position._
@@ -48,7 +58,7 @@ class MainPanel(settings: GameContentEditor.Settings) extends NestedBorderPanel 
     import Dialogs.enrichWindow
     
     EditorDialog(refType.name, parent, listAndEditScreen.panel) {
-      case OK => settings.updateLibrary(listAndEditScreen, listAndEditScreen.updatedLibrary); true
+      case OK => settings.replaceLibrary(listAndEditScreen, listAndEditScreen.updatedLibrary); true
       case Cancel | Close => Dialogs.confirm(null, 
           title = "Cancel changes?", 
           message = "Are you sure you wish to close now? Your changes will be lost.")

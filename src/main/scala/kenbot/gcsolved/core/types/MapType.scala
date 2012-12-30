@@ -2,10 +2,12 @@ package kenbot.gcsolved.core.types
 
 import kenbot.gcsolved.core.meta._
 
+@deprecated("Build a ValueType from a SelectOneType instead")
 object MapType {
   val name = "Map"
 }
 
+@deprecated("Build a ValueType from a SelectOneType instead")
 final case class MapType(val keyType: SelectOneType, val valueType: ResourceType) 
     extends ResourceType("Map(%s, %s)".format(keyType.name, valueType.name)) {
   

@@ -1,4 +1,4 @@
-package kenbot.gcsolved.editor.gui.widgets
+package kenbot.gcsolved.editor.widgets
 import scala.swing.Swing
 import scala.util.DynamicVariable
 import scala.swing.event.FocusGained
