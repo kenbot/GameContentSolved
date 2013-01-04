@@ -14,7 +14,7 @@ import kenbot.gcsolved.editor.widgets.TextFieldWidget
 @RunWith(classOf[JUnitRunner])  
 class WidgetEditScreenSpec extends Spec with ShouldMatchers {
   
-  lazy val bananaType = RefType("Banana", 'name -> StringType ^ (isId = true))
+  lazy val bananaType = RefType("Banana") defines ('name -> StringType ^ (isId = true))
   
   def editScreen = new WidgetEditScreen(bananaType, Seq(bananaType.emptyData), new TextFieldWidget(_))
   

@@ -11,7 +11,7 @@ import org.scalatest.matchers.ShouldMatchers
 @RunWith(classOf[JUnitRunner])
 class ValueDataSpec extends Spec with ShouldMatchers {
   val rabbit = ValueType("Rabbit")
-  val ghost = RefType("Ghost", 'id -> StringType ^ (isId = true))
+  val ghost = RefType("Ghost") defines ('id -> StringType ^ (isId = true))
   def makeData = ValueData(rabbit, 
     'weight -> 44, 
     'toes -> 3, 

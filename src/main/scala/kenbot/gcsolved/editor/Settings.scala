@@ -26,6 +26,7 @@ trait Settings extends Publisher {
   def imageFileExt: String
   def frameTitle: String
   def resourceDir: String
+  final def packageExt: String = environment.packager.packageExtension
   final def currentLibrary: ResourceLibrary = libraryVar
   final def schema: ResourceSchema = currentLibrary.schema
   def environment: ResourceEnvironment

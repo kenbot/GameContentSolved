@@ -16,7 +16,7 @@ import kenbot.gcsolved.core.RefData
 @RunWith(classOf[JUnitRunner])  
 class ComboBoxWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {
   
-  val PotatoType = RefType("Potato", 'Name -> StringType ^ (isId = true))
+  val PotatoType = RefType("Potato") defines ('Name -> StringType ^ (isId = true))
   val colorList = List("red", "green", "blue", "purple")
   val ColorsType = SelectOneType("Colors", StringType, colorList: _*)
   

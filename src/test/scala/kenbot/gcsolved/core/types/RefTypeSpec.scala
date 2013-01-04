@@ -15,9 +15,11 @@ class RefTypeSpec extends Spec with ShouldMatchers {
   def idField: Field = 'id -> StringType ^ (isId = true)
   
   describe("Reference types") {
-    val fruit = RefType("fruit", idField, 'healthy -> BoolType)
-    val hammer = RefType("hammer", idField)
-    val banana = RefType("banana", fruit, false, 'peeled -> BoolType, 'latinName -> StringType ^ (default=Some("defaultus")))
+    val fruit = RefType("fruit") defines (idField, 'healthy -> BoolType)
+    val hammer = RefType("hammer") defines idField
+    val banana = RefType("banana") extend fruit defines (
+        'peeled -> BoolType, 
+        'latinName -> StringType ^ (default=Some("defaultus")))
     
     describe("construction") {
       it ("should set the right values") {
@@ -42,19 +44,21 @@ class RefTypeSpec extends Spec with ShouldMatchers {
     
     describe("equality") {
       it("should equal a type with the same properties") {
-         banana should equal (RefType("banana", fruit, false, 'peeled -> BoolType, 'latinName -> StringType ^ (default=Some("defaultus"))))
+         banana should equal (RefType("banana") extend fruit defines (
+             'peeled -> BoolType, 
+             'latinName -> StringType ^ (default=Some("defaultus"))))
       }
       it("shouldn't equal a type with different fields") {
-         banana should not equal (RefType("banana", fruit, false, 'peeled -> IntType))
+         banana should not equal (RefType("banana") extend fruit defines 'peeled -> IntType)
       }
       it("shouldn't equal a type with a different name") {
-         banana should not equal (RefType("apple", fruit, false, 'peeled -> BoolType))
+         banana should not equal (RefType("apple") extend fruit defines 'peeled -> BoolType)
       }
       it("shouldn't equal a value type with a different supertype") {
-         banana should not equal (RefType("apple", idField, 'peeled -> BoolType))
+         banana should not equal (RefType("apple") defines (idField, 'peeled -> BoolType))
       }
       it("shouldn't equal a type with a different abstractness") {
-         banana should not equal (RefType("apple", fruit, true, 'peeled -> BoolType))
+         banana should not equal (RefType("apple").abstractly extend fruit defines 'peeled -> BoolType)
       }
     }
     
@@ -78,12 +82,12 @@ class RefTypeSpec extends Spec with ShouldMatchers {
     describe("validation") {
       describe("of AnyRefType") {
         it("should accept any resource reference") {
-          val refType = RefType("grumpus", idField)
+          val refType = RefType("grumpus") defines idField
           AnyRefType acceptsValue ResourceRef("bumblefoo", refType) should be (true)
         }
         
         it("should not accept any other value") {
-          val refType = RefType("grogan", idField)
+          val refType = RefType("grogan") defines idField
           AnyRefType acceptsValue RefData(refType, "id" -> "abc") should be (false)
         }
       }
@@ -95,7 +99,7 @@ class RefTypeSpec extends Spec with ShouldMatchers {
         fruit acceptsValue (ResourceRef("1234", banana)) should be (true)
       }
       it("should not accept ResourceRefs of the wrong type") {
-        fruit acceptsValue (ResourceRef("1234", RefType("froo", idField))) should be (false)
+        fruit acceptsValue (ResourceRef("1234", RefType("froo") defines idField)) should be (false)
       }
       
       it("should not accept non-ResourceRefs") {
@@ -105,7 +109,7 @@ class RefTypeSpec extends Spec with ShouldMatchers {
     
     describe("Recursive RefTypes") {
       it("shouldn't self destruct") {
-        lazy val mirror: RefType = RefType.recursive("mirror", Seq(idField, 'mirror -> mirror))
+        lazy val mirror: RefType = RefType("mirror") definesLazy Seq(idField, 'mirror -> mirror)
         
         mirror.fields("mirror").fieldType should equal (mirror)
       }
@@ -113,7 +117,7 @@ class RefTypeSpec extends Spec with ShouldMatchers {
     
     describe("Fields") {
       it("should be in the same order it was declared in") {
-        val someType = RefType("someType",
+        val someType = RefType("someType") defines (
             'a -> StringType ^ (isId = true), 
             'b -> StringType, 
             'c -> StringType, 
@@ -124,18 +128,18 @@ class RefTypeSpec extends Spec with ShouldMatchers {
       describe("with no ID") {
         it("should cause an error if the type is not abstract") {
           evaluating {  
-            RefType("ConcreteNoID", 'a -> StringType).fields
+            RefType("ConcreteNoID").defines('a -> StringType).fields
           } should produce [IllegalArgumentException]
         }
         it("shouldn't cause an error if the type is abstract") {
-          RefType("AbstractNoID", AnyRefType, true, 'a -> StringType).fields
+          RefType("AbstractNoID").abstractly.defines('a -> StringType).fields
         }
       }
       
       describe("with many IDs") {
         it("should cause an error") {
           evaluating {  
-            RefType("ConcreteManyIDs", 
+            RefType("ConcreteManyIDs").defines(
                 'a -> StringType ^ (isId = true), 
                 'b -> IntType ^ (isId = true)).fields
           } should produce [IllegalArgumentException]

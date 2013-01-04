@@ -27,7 +27,7 @@ class ListTypeSpec extends Spec with ShouldMatchers {
     
     val A = StringType
     val AnimalType = ValueType("Animal")
-    val PandaType = ValueType("Panda", AnimalType, false)
+    val PandaType = ValueType("Panda") extend AnimalType
     
     it("should conform with AnyType") {
       ListType(A) <:< AnyType should be (true)

@@ -16,8 +16,8 @@ import kenbot.gcsolved.editor.gui.TestSettings
 @RunWith(classOf[JUnitRunner])
 class EditScreenWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {
   
-  val EditScreenType = ValueType("EditScreenType", 'a -> IntType, 'b -> IntType)
-  val NestedType = ValueType("Nested", 'nested -> EditScreenType)
+  val EditScreenType = ValueType("EditScreenType") defines ('a -> IntType, 'b -> IntType)
+  val NestedType = ValueType("Nested") defines 'nested -> EditScreenType
                                 
   val makeWidget = TestSettings.makeWidget
   

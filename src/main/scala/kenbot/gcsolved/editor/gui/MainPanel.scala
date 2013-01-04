@@ -26,11 +26,13 @@ class MainPanel(settings: Settings) extends NestedBorderPanel with Publisher {
       val chooser = new JFileChooser
       chooser.setFileFilter(new FileFilter {
         def accept(f: File) = f.isDirectory() || settings.environment.isLibraryFile(f)
-        def getDescription() = "Resource Libraries"
+        def getDescription() = "Resource Libraries (*." + settings.packageExt + ")"
       })
       
+      chooser.setCurrentDirectory(new File("./" + settings.resourceDir))
+      
       chooser.showOpenDialog(top.peer) match {
-        case JFileChooser.APPROVE_OPTION => settings.loadLibrary(chooser.getSelectedFile().getName())
+        case JFileChooser.APPROVE_OPTION => settings.loadLibrary(chooser.getSelectedFile().getName().takeWhile('.' !=))
         case _ => 
       }
     }

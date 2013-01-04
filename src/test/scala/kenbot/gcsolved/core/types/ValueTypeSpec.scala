@@ -13,9 +13,9 @@ import kenbot.gcsolved.core.Field
 class ValueTypeSpec extends Spec with ShouldMatchers {
 
   describe("Value types") {
-    val fruit = ValueType("fruit", 'healthy -> BoolType)
+    val fruit = ValueType("fruit") defines 'healthy -> BoolType
     val hammer = ValueType("hammer")
-    val banana = ValueType("banana", fruit, false, 'peeled -> BoolType)
+    val banana = ValueType("banana") extend fruit defines 'peeled -> BoolType
      
     describe("construction") {
       it ("should set the right values") {
@@ -32,19 +32,32 @@ class ValueTypeSpec extends Spec with ShouldMatchers {
     
     describe("equality") {
       it("should equal a type with the same properties") {
-         banana should equal (ValueType("banana", fruit, false, 'peeled -> BoolType))
+         banana should equal (ValueType("banana") extend fruit defines 'peeled -> BoolType)
       }
+      it("should equal a nested value type with the same properties") {
+        val RectType = ValueType("Rect") defines (
+          'X1 -> IntType ^ (required=true), 
+          'Y1 -> IntType ^ (required=true), 
+          'X2 -> IntType ^ (required=true), 
+          'Y2 -> IntType ^ (required=true))
+          
+        val ImageType = ValueType("Image").abstractly
+        val StillImageType = ValueType("StillImage") extend ImageType defines 'Bounds -> RectType
+        
+        StillImageType should equal (StillImageType)
+      }
+      
       it("shouldn't equal a type with different fields") {
-         banana should not equal (ValueType("banana", fruit, false, 'peeled -> IntType))
+         banana should not equal (ValueType("banana") extend fruit defines 'peeled -> IntType)
       }
       it("shouldn't equal a type with a different name") {
-         banana should not equal (ValueType("apple", fruit, false, 'peeled -> BoolType))
+         banana should not equal (ValueType("aple") extend fruit defines 'peeled -> BoolType)
       }
       it("shouldn't equal a value type with a different supertype") {
-         banana should not equal (ValueType("apple", 'peeled -> BoolType))
+         banana should not equal (ValueType("apple") defines 'peeled -> BoolType)
       }
       it("shouldn't equal a type with a different abstractness") {
-         banana should not equal (ValueType("apple", fruit, true, 'peeled -> BoolType))
+         banana should not equal (ValueType("apple").abstractly extend fruit defines 'peeled -> BoolType)
       }
     }
     describe("inheritance") {
@@ -74,7 +87,7 @@ class ValueTypeSpec extends Spec with ShouldMatchers {
         }
         
         it("should not accept any other value") {
-          val refType = RefType("abc", 'id -> StringType ^ (isId = true))
+          val refType = RefType("abc") defines ('id -> StringType ^ (isId = true))
 
           AnyValueType acceptsValue RefData(refType, 'id -> "grumpus") should be (false)
         }

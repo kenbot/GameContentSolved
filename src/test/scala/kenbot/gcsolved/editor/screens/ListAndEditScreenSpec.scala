@@ -23,13 +23,15 @@ class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
 
   import Field._
   
-  val legoManType = RefType("LegoMan", 
+  val legoManType = RefType("LegoMan") defines (
       'id -> IntType ^ (isId = true),
       'head -> StringType, 
       'body -> StringType, 
       'pants -> StringType)
       
-  val legoTruckType = RefType("LegoTruck", 'id -> IntType ^ (isId = true), 'legoMan -> legoManType)
+  val legoTruckType = RefType("LegoTruck") defines (
+      'id -> IntType ^ (isId = true), 
+      'legoMan -> legoManType)
       
   val schema = ResourceSchema().addRefTypes(legoManType, legoTruckType)
   val library = {

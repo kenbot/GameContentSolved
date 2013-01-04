@@ -115,8 +115,8 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
   
   describe("RefTypes") {
 
-    val parent = RefType("parent", AnyRefType, true, 'Blah -> StringType)
-    val refType = RefType("foo", parent, false, idField, 'Flum -> IntType, 'Grum -> ListType(BoolType))
+    val parent = RefType("parent").abstractly defines 'Blah -> StringType
+    val refType = RefType("foo") extend parent defines (idField, 'Flum -> IntType, 'Grum -> ListType(BoolType))
     val schema = ResourceSchema().addRefTypes(parent, refType)
     val context = new SchemaContext(schema)
     import context._   
@@ -176,8 +176,8 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
   }
   
   describe("ValueTypes") {
-    val parent = ValueType("parent", AnyValueType, true, 'Blah -> StringType)
-    val valueType = ValueType("foo", parent, false, 'Flum -> IntType, 'Grum -> ListType(BoolType))
+    val parent = ValueType("parent").abstractly extend AnyValueType defines 'Blah -> StringType
+    val valueType = ValueType("foo") extend parent defines ('Flum -> IntType, 'Grum -> ListType(BoolType))
     val schema = ResourceSchema().addValueTypes(parent, valueType)
     val context = new SchemaContext(schema)
     import context._   
@@ -286,10 +286,10 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
   
   describe("ResourceSchema") {
     val fruitCompanyType = SelectOneType("FruitCompany", StringType, "Bob's Fruit Co", "BananaCorp", "Grocerinos")
-    val seedType = ValueType("Seed", 'Color -> StringType, 'Size -> IntType)
-    val fruitType = RefType("Fruit", AnyRefType, true, idField, 'Color -> StringType, 'Company -> fruitCompanyType)
-    val bananaType = RefType("Banana", fruitType, false, 'Slipperiness -> IntType)
-    val appleType = RefType("Apple", fruitType, false, 'Seeds -> ListType(seedType))
+    val seedType = ValueType("Seed") defines ('Color -> StringType, 'Size -> IntType)
+    val fruitType = RefType("Fruit").abstractly defines (idField, 'Color -> StringType, 'Company -> fruitCompanyType)
+    val bananaType = RefType("Banana") extend fruitType defines 'Slipperiness -> IntType
+    val appleType = RefType("Apple") extend fruitType defines 'Seeds -> ListType(seedType)
     
     
     val schema = ResourceSchema().

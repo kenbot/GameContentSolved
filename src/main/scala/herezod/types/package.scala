@@ -17,21 +17,21 @@ import java.io.File
 package object types {
   import kenbot.gcsolved.core._
 
-  val RectType = ValueType("Rect", 
+  val RectType = ValueType("Rect") defines (
     'X1 -> IntType ^ (required=true), 
     'Y1 -> IntType ^ (required=true), 
     'X2 -> IntType ^ (required=true), 
     'Y2 -> IntType ^ (required=true))
     
-  val RangeType = ValueType("Range", 
+  val RangeType = ValueType("Range") defines (
       'Min -> IntType ^ (required=true), 
       'Max -> IntType ^ (required=true))
       
-  val PointType = ValueType("Point", 
+  val PointType = ValueType("Point") defines (
       'X -> IntType ^ (required=true), 
       'Y -> IntType ^ (required=true))
       
-  val ColorType = ValueType("Color", 
+  val ColorType = ValueType("Color") defines (
       'R -> IntType(Some(0), Some(255)) ^ (required=true, description="Red"), 
       'G -> IntType(Some(0), Some(255)) ^ (required=true, description="Green"), 
       'B -> IntType(Some(0), Some(255)) ^ (required=true, description="Blue"))
@@ -45,25 +45,21 @@ package object types {
       "None", "U", "D", "UD", "L", "UL", "DL", "UDL", "R", "UR", 
       "DR", "UDR", "LR", "ULR", "DLR", "ALL")
   
-  val ImageType = ValueType("Image", AnyValueType, true)
+  val ImageType = ValueType("Image").abstractly
 
-  val StillImageType = ValueType("StillImage", ImageType, false,
+  val StillImageType = ValueType("StillImage") defines (
     'Filename -> FileType("image", "png") ^ (required=true, description="File containing the image"),
     'Bounds -> RectType ^ (description="Bounds of the image within the file"))
 
-  val AnimImageType = ValueType("Animation", ImageType, false,
-    'Frames -> ListType(StillImageType))
+  val AnimImageType = ValueType("Animation")   defines 'Frames -> ListType(StillImageType)
 
-  val SideEffect = RefType("SideEffect", AnyRefType, true, 
-      'Name -> StringType ^ (isId=true))
+  val SideEffect = RefType("SideEffect").abstractly defines 'Name -> StringType ^ (isId=true)
     
-  val GraphicFX = RefType("GraphicFX", AnyRefType, false,
-      'Name -> StringType ^ (isId=true))
+  val GraphicFX = RefType("GraphicFX") defines 'Name -> StringType ^ (isId=true)
       
-  val Tool = RefType("Tool", AnyRefType, false, 
-      'Name -> StringType ^ (isId=true))
+  val Tool = RefType("Tool") defines 'Name -> StringType ^ (isId=true)
   
-  val Terrain = RefType("Terrain", AnyRefType, true,
+  val Terrain = RefType("Terrain").abstractly defines (
       'Name -> StringType ^ (isId=true),
       'Layer -> TerrainLayer,
       'IsOrganic -> BoolType,
@@ -74,17 +70,18 @@ package object types {
       'MyNeighbourID -> IntType,
       'ContentOffsetY -> IntType,
       'Overhang -> PointType, 
-      'ClipContentRect -> RectType,
-      'OverlayImage -> ImageType,
-      'OverlayImageClippable -> ImageType)
-    
-  val DoorTerrain: RefType = RefType("DoorTerrain", Terrain, false,
+      'ClipContentRect -> RectType
+      //'OverlayImage -> ImageType,
+      //'OverlayImageClippable -> ImageType
+      )
+  
+  val DoorTerrain = RefType("DoorTerrain") extend Terrain defines (
       'DefaultImageCombo -> TerrainNeighbourCombo,    
-      'OpenImages -> ValueType.of(Direction, ListType(ImageType)) ^ (required=true), 
-      'ClosedImages -> ValueType.of(Direction, ListType(ImageType)) ^ (required=true),
-      'SolidToVision -> ValueType.of(OrthogonalDirection, BoolType),
-      'SolidToMovement -> ValueType.of(OrthogonalDirection, BoolType),
-      'SolidToProjectiles -> ValueType.of(OrthogonalDirection, BoolType),
+      //'OpenImages -> ValueType.of(Direction, ListType(ImageType)) ^ (required=true), 
+      //'ClosedImages -> ValueType.of(Direction, ListType(ImageType)) ^ (required=true),
+      //'SolidToVision -> ValueType.of(OrthogonalDirection, BoolType),
+      //'SolidToMovement -> ValueType.of(OrthogonalDirection, BoolType),
+      //'SolidToProjectiles -> ValueType.of(OrthogonalDirection, BoolType),
       'DamagedTerrain -> NormalTerrain,
       'BurntTerrain -> NormalTerrain,
       'Flammable -> BoolType, 
@@ -99,21 +96,21 @@ package object types {
       'Lock -> BoolType,
       'LockComplexity -> IntType,
       'LockDestroysKey -> BoolType,
-      'KeyType -> Tool )
+      'KeyType -> Tool)
   
-  val VerticalTerrain: RefType = RefType("VerticalTerrain", Terrain, false,
-      'DefaultImageCombo -> TerrainNeighbourCombo,    
-      'Images -> ValueType.of(TerrainNeighbourCombo, ListType(ImageType)))
+  val VerticalTerrain = RefType("VerticalTerrain") extend Terrain defines (
+      'DefaultImageCombo -> TerrainNeighbourCombo)   
+      //'Images -> ValueType.of(TerrainNeighbourCombo, ListType(ImageType)))
       
-  lazy val NormalTerrain: RefType = RefType.recursive("NormalTerrain", Terrain, false, Seq(
+  lazy val NormalTerrain: RefType = RefType("NormalTerrain") extend Terrain definesLazy Seq(
       'DefaultImageCombo -> TerrainNeighbourCombo ^ (default = Some("UL")),
-      'Images -> ValueType.of(TerrainNeighbourCombo, ListType(ImageType)),
-      'HoleImages -> ListType(ImageType),
-      'CoolImages -> ListType(StillImageType),
-      'FilledHoleImages -> ListType(ImageType),
-      'SolidToVision -> ValueType.of(OrthogonalDirection, BoolType),
-      'SolidToMovement -> ValueType.of(OrthogonalDirection, BoolType),
-      'SolidToProjectiles -> ValueType.of(OrthogonalDirection, BoolType),
+      //'Images -> ValueType.of(TerrainNeighbourCombo, ListType(ImageType)),
+      //'HoleImages -> ListType(ImageType),
+      //'CoolImages -> ListType(StillImageType),
+      //'FilledHoleImages -> ListType(ImageType),
+      //'SolidToVision -> ValueType.of(OrthogonalDirection, BoolType),
+      //'SolidToMovement -> ValueType.of(OrthogonalDirection, BoolType),
+      //'SolidToProjectiles -> ValueType.of(OrthogonalDirection, BoolType),
       'SolidToVisionEdgesOnly -> BoolType,
       'SolidToMovementEdgesOnly -> BoolType,
       'SolidToProjectilesEdgesOnly -> BoolType,
@@ -134,14 +131,14 @@ package object types {
       'BurnLevel -> IntType,
       'SpeedPenalty -> DoubleType,
       'ItemDropGFX -> GraphicFX,
-      'StaminaPenalty -> IntType))
+      'StaminaPenalty -> IntType)
       
   import Field._
   
-  val someImage = ValueData(StillImageType, 'Filename -> new File("abc.png"), 
-      'Bounds -> ValueData(RectType, 'X1 -> 1, 'Y1 -> 2, 'X2 -> 3, 'Y2 -> 4))
+  //val someImage = ValueData(StillImageType, 'Filename -> new File("abc.png"), 
+  //    'Bounds -> ValueData(RectType, 'X1 -> 1, 'Y1 -> 2, 'X2 -> 3, 'Y2 -> 4))
 
-  val ActorType: RefType = RefType.recursive("ActorType", Seq(
+  val ActorType: RefType = RefType("ActorType") definesLazy Seq(
     'Name -> StringType ^ (isId=true, description="The name of the actor type (singular)"),
     'NamePlural -> StringType ^ (description="The name of the actor type (plural)"),
     'AfraidOf -> ActorType ^ (description="Another type of actor that this one is afraid of"),
@@ -153,13 +150,14 @@ package object types {
     'MagicRegen -> RangeType,
     'CanBeMale -> BoolType,
     'CanBeFemale -> BoolType ^ (default=Some(true)),
-    'BloodColor -> ColorType,
-    'Images ->  ValueType.of(ActorState, ValueType.of(Direction, ListType(ImageType))),
-    'CorpseImages -> ListType(StillImageType) ^ (default=Some(List(someImage)), description="This is what it looks like dead")))
+    'BloodColor -> ColorType
+    //'Images ->  ValueType.of(ActorState, ValueType.of(Direction, ListType(ImageType))),
+    //'CorpseImages -> ListType(StillImageType) ^ (default=Some(List(someImage)), description="This is what it looks like dead")
+    )
 
   
   val HerezodSchema = ResourceSchema().
-      addValueTypes(RectType, RangeType, PointType, ColorType, ImageType, StillImageType, AnimImageType).
-      addSelectOneTypes(ActorState, Race, Direction, TerrainNeighbourCombo, OrthogonalDirection).
-      addRefTypes(ActorType, Terrain, NormalTerrain, VerticalTerrain, Tool, DoorTerrain, GraphicFX, SideEffect)
+      addValueTypes(/*RectType,*/ RangeType, PointType, ColorType, /*ImageType, StillImageType */ AnimImageType).
+      addSelectOneTypes()
+      
 }

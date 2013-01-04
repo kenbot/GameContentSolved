@@ -29,7 +29,7 @@ class ResourceSchemaSpec extends Spec with ShouldMatchers {
   }
   
   describe("User ref types") {
-    val refType = RefType("foo", 'Name -> StringType ^ (isId=true), 'Age -> IntType)
+    val refType = RefType("foo") defines ('Name -> StringType ^ (isId=true), 'Age -> IntType)
     val schema = ResourceSchema().addRefTypes(refType)
     
     it("should contain the user type") {
@@ -42,7 +42,7 @@ class ResourceSchemaSpec extends Spec with ShouldMatchers {
   }
 
   describe("User value types") {
-    val valueType = ValueType("foo", 'Name -> StringType, 'Age -> IntType)
+    val valueType = ValueType("foo") defines ('Name -> StringType, 'Age -> IntType)
     val schema = ResourceSchema().addValueTypes(valueType)
     
     it("should contain the user type") {
@@ -68,7 +68,7 @@ class ResourceSchemaSpec extends Spec with ShouldMatchers {
   }
   
   describe("Added RefTypes") {
-    val refType = RefType("foo", 'Name -> StringType ^ (isId=true), 'Age -> IntType)
+    val refType = RefType("foo") defines ('Name -> StringType ^ (isId=true), 'Age -> IntType)
     val schema = ResourceSchema().addRefTypes(refType)
     
     it("should be in the list of RefTypes") {
@@ -95,7 +95,7 @@ class ResourceSchemaSpec extends Spec with ShouldMatchers {
   }
   
   describe("Added ValueTypes") {
-    val valueType = ValueType("foo", 'Name -> StringType, 'Age -> IntType)
+    val valueType = ValueType("foo") defines ('Name -> StringType, 'Age -> IntType)
     val schema = ResourceSchema().addValueTypes(valueType)
     
     it("should be in the list of ValueTypes") {

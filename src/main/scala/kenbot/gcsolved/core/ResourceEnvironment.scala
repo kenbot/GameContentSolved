@@ -20,7 +20,8 @@ sealed trait ResourceEnvironment {
   def homeDirectory: File
   def libraries: Seq[ResourceLibraryRef]
 
-  def isLibraryFile(dir: File): Boolean
+  def isLibraryFile(f: File): Boolean
+  
   def isUnpacked(libraryRef: ResourceLibraryRef): Boolean = findUnpackedDirectory(libraryRef).isDefined
   def findPackedFile(libraryRef: ResourceLibraryRef): Option[File]
   def findUnpackedDirectory(libraryRef: ResourceLibraryRef): Option[File]
@@ -59,7 +60,7 @@ object ResourceEnvironment {
     
     private def getPackedFileName(libraryRef: ResourceLibraryRef) = libraryRef + "." + packager.packageExtension
     
-    def isLibraryFile(dir: File): Boolean = dir.isFile && dir.getName.endsWith("." + packager.packageExtension)
+    def isLibraryFile(f: File): Boolean = f.isFile && f.getName.endsWith("." + packager.packageExtension)
     
     private def getUnpackedLibraryPath(libraryRef: ResourceLibraryRef) = unpackedArea.getAbsolutePath + "/" + libraryRef
     

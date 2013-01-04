@@ -10,7 +10,7 @@ object AnyRefType extends RefType("AnyRef", isAbstract=true) {
   override lazy val localFields: Map[Field.Name, Field] = Map.empty
   override protected def initFields(theLocalFields: Seq[Field]): Seq[Field] = theLocalFields
   override def fields: Map[Field.Name, Field] = Map.empty
-  
+
   override lazy val defaultValueMap: Map[Field.Name, Any] = Map.empty 
   
   override def getFailures(value: Any): List[String] = {
@@ -25,7 +25,9 @@ object AnyRefType extends RefType("AnyRef", isAbstract=true) {
 }
 
 object RefType {
-
+  
+  def apply(name: String): RefType = new RefType(name)
+/*
   def recursive(name: String, fields: => Seq[Field]): RefType = recursive(name, AnyRefType, false, fields)
   def recursive(name: String, parent: => RefType, isAbstract: Boolean, fields: => Seq[Field]): RefType = {
     new RefType(name, parent, isAbstract, fields)
@@ -35,7 +37,7 @@ object RefType {
   def apply(name: String, parent: => RefType, fields: Field*): RefType = new RefType(name, parent, false, fields)
   def apply(name: String, parent: => RefType, isAbstract: Boolean, fields: Field*): RefType = {
     new RefType(name, parent, isAbstract, fields)
-  }
+  }*/
   
   def unapply(resourceType: ResourceType): Option[String] = resourceType match {
     case rt: RefType => Some(rt.name)
@@ -51,13 +53,21 @@ class RefType(
     
   extends ObjectType(name, parentType, true, false, theFields) {
 	  
+  
+  
   def metaType: MetaAnyType = MetaRefType
   type Value = ResourceRef
+  protected type MyType = RefType
   
   def idField: Field.Name = fields.values.find(_.isId) match {
     case Some(field) => field.name
     case None => error("RefType " + name + " doesn't have an ID field!")
   }
+  
+  def abstractly = new RefType(name, parent, true, theFields)
+  def extend(parent: => RefType) = new RefType(name, parent, isAbstract, theFields)
+  def defines(fields: Field*) = definesLazy(fields)
+  def definesLazy(fields: => Seq[Field]) = new RefType(name, parentType, isAbstract, theFields ++ fields)
   
   override protected def initFields(theLocalFields: Seq[Field]): Seq[Field] = {
     def idCount = {

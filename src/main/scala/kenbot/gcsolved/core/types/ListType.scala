@@ -9,7 +9,8 @@ object ListType {
 final case class ListType(val elementType: ResourceType, 
                           val maxLength: Option[Int] = None) extends ResourceType(ListType.name + "(" + elementType.name + ")") {
   
-  type Value = List[elementType.Value]
+  type Element = elementType.Value
+  type Value = List[Element]
   
   def metaType: MetaAnyType = MetaListType
   

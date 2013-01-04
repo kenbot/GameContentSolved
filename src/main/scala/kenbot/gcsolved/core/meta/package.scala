@@ -1,6 +1,5 @@
 package kenbot.gcsolved.core
 import scala.sys.error
-
 import kenbot.gcsolved.core.Field.symbolAndType2Field
 import kenbot.gcsolved.core.Field.symbolAndValue2namePair
 import kenbot.gcsolved.core.types.AnyRefType
@@ -16,6 +15,8 @@ import kenbot.gcsolved.core.types.ResourceType
 import kenbot.gcsolved.core.types.SelectOneType
 import kenbot.gcsolved.core.types.StringType
 import kenbot.gcsolved.core.types.ValueType
+import kenbot.gcsolved.core.types.UserType
+import kenbot.gcsolved.core.types.ObjectType
 
 package object meta {
   
@@ -26,42 +27,41 @@ package object meta {
                     MetaFileType, MetaListType, MetaRefType, 
                     MetaValueType, MetaSelectOneType)
   
-
   lazy val SchemaLibrary = ResourceLibrary("Schema", MetaSchema)
   
   type MetaAnyType = ValueType
-  lazy val MetaAnyType = ValueType("MetaAnyType", AnyValueType)
-  lazy val MetaNothingType = ValueType("MetaNothingType", AnyValueType)
-  lazy val MetaAnyRefType = ValueType("MetaAnyRefType", MetaAnyType)
-  lazy val MetaAnyValueType = ValueType("MetaAnyValueType", MetaAnyType)
-  lazy val MetaIntType = ValueType("MetaIntType", MetaAnyType, 'Min -> IntType, 'Max -> IntType)
-  lazy val MetaStringType = ValueType("MetaStringType", MetaAnyType, 'MaxLength -> IntType)
-  lazy val MetaBoolType = ValueType("MetaBooleanType", MetaAnyType)
-  lazy val MetaDoubleType = ValueType("MetaDoubleType", MetaAnyType)
-  lazy val MetaFileType = ValueType("MetaFileType", MetaAnyType, 'Path -> StringType, 'Extensions -> ListType(StringType))
-  lazy val MetaListType = ValueType("MetaListType", MetaAnyType, 'ElementType -> MetaAnyType, 'MaxLength -> IntType)
-  lazy val MetaRefType = ValueType("MetaRefType", MetaAnyRefType, 'RefType -> RefTypeDefinition)
-  lazy val MetaValueType = ValueType("MetaValueType", MetaAnyValueType, 'ValueType -> ValueTypeDefinition)
-  lazy val MetaSelectOneType = ValueType("MetaSelectOneType", MetaAnyType, 'SelectOneType -> SelectOneTypeDefinition)
+  lazy val MetaAnyType = ValueType("MetaAnyType") extend AnyValueType
+  lazy val MetaNothingType = ValueType("MetaNothingType") extend AnyValueType
+  lazy val MetaAnyRefType = ValueType("MetaAnyRefType") extend MetaAnyType
+  lazy val MetaAnyValueType = ValueType("MetaAnyValueType") extend MetaAnyType
+  lazy val MetaIntType = ValueType("MetaIntType") extend MetaAnyType defines ('Min -> IntType, 'Max -> IntType)
+  lazy val MetaStringType = ValueType("MetaStringType") extend MetaAnyType defines 'MaxLength -> IntType
+  lazy val MetaBoolType = ValueType("MetaBooleanType") extend MetaAnyType
+  lazy val MetaDoubleType = ValueType("MetaDoubleType") extend MetaAnyType
+  lazy val MetaFileType = ValueType("MetaFileType") extend MetaAnyType defines ('Path -> StringType, 'Extensions -> ListType(StringType))
+  lazy val MetaListType = ValueType("MetaListType") extend MetaAnyType defines ('ElementType -> MetaAnyType, 'MaxLength -> IntType)
+  lazy val MetaRefType = ValueType("MetaRefType") extend MetaAnyRefType defines 'RefType -> RefTypeDefinition
+  lazy val MetaValueType = ValueType("MetaValueType") extend MetaAnyValueType defines 'ValueType -> ValueTypeDefinition
+  lazy val MetaSelectOneType = ValueType("MetaSelectOneType") extend MetaAnyType defines 'SelectOneType -> SelectOneTypeDefinition
   
-  lazy val RefTypeDefinition: RefType = RefType.recursive("RefTypeDefinition", AnyRefType, false, Seq(
+  lazy val RefTypeDefinition: RefType = RefType("RefTypeDefinition") definesLazy Seq(
       'Name -> StringType ^ (isId=true), 
       'Parent -> RefTypeDefinition, 
       'Abstract -> BoolType, 
-      'Fields -> ListType(MetaFieldType)))
+      'Fields -> ListType(MetaFieldType))
   
-  lazy val ValueTypeDefinition: RefType = RefType.recursive("ValueTypeDefinition", AnyRefType, false, Seq(
+  lazy val ValueTypeDefinition: RefType = RefType("ValueTypeDefinition") definesLazy Seq(
       'Name -> StringType ^ (isId=true), 
       'Parent -> ValueTypeDefinition, 
       'Abstract -> BoolType, 
-      'Fields -> ListType(MetaFieldType)))
+      'Fields -> ListType(MetaFieldType))
 
-  lazy val SelectOneTypeDefinition: RefType = RefType("SelectOneTypeDefinition", AnyRefType, false, 
+  lazy val SelectOneTypeDefinition = RefType("SelectOneTypeDefinition") defines ( 
       'Name -> StringType ^ (isId=true), 
       'ValueType -> MetaAnyType, 
       'Values -> ListType(AnyType))
       
-  lazy val MetaFieldType: ValueType = ValueType("MetaField", 
+  lazy val MetaFieldType: ValueType = ValueType("MetaField") defines (
       'Name -> StringType ^ (required=true, description="The field name"), 
       'FieldType -> MetaAnyType ^ (required=true, description="The type of this field"), 
       'Category -> StringType ^ (description="Optionally some category that the field belongs in, like 'Details' or 'Images'"),
@@ -189,6 +189,7 @@ package object meta {
     implicit def enrichValueData(vd: ValueData) = new RichValueData(vd)
     
     class RichValueData(valueData: ValueData) {
+
       def asResourceType: ResourceType = valueData.resourceType match {    
         case MetaAnyType => AnyType
         case MetaAnyRefType => AnyRefType
@@ -197,14 +198,15 @@ package object meta {
         case MetaDoubleType => DoubleType
         case MetaBoolType => BoolType
         case MetaStringType => StringType
-        case MetaFileType => FileType(valueData("Category").toString, valueData("Extensions").asInstanceOf[List[String]]: _*)
+        case MetaFileType => FileType(valueData("Path").toString, valueData("Extensions").asInstanceOf[List[String]]: _*)
         case MetaListType => ListType(valueData("ElementType").asInstanceOf[ValueData].asResourceType)
-        case MetaRefType => schema.findRefType(valueData("RefType").asInstanceOf[ResourceRef].id).get
-        case MetaValueType => schema.findValueType(valueData("ValueType").asInstanceOf[ResourceRef].id).get
-        case MetaSelectOneType => schema.findSelectOneType(valueData("SelectOneType").asInstanceOf[ResourceRef].id).get
+        case MetaRefType => getUserType("RefType", _ findRefType _)
+        case MetaValueType => getUserType("ValueType", _ findValueType _)
+        case MetaSelectOneType => getUserType("SelectOneType", _ findSelectOneType _)
+          
         case x => error("Unknown meta-type: " + x) 
       }
-    
+      
       def asField: Field = {
         val name = valueData("Name").asInstanceOf[String]
         val fieldType = valueData("FieldType").asInstanceOf[ValueData].asResourceType
@@ -217,16 +219,27 @@ package object meta {
         }
         Field[fieldType.Value](name, fieldType, category, required, isId, default, description)
       }
+            
+      private def getUserType[A <: UserType](fieldName: String, findOptType: (ResourceSchema, String) => Option[A]) = {
+        val id = valueData(fieldName).asInstanceOf[ResourceRef].id
+        findOptType(schema, id) getOrElse {
+          println("s1ts: " + schema.selectOneTypes)
+          println("valueData: " + valueData.debugString)
+          error("No " + fieldName + " found: " + id)
+        }
+      }
     }
     
     class RichRefData(refData: RefData) {
+
       def asRefType: RefType = {
         val name = refData("Name").asInstanceOf[String]
         val parentName = refData("Parent").asInstanceOf[ResourceRef].id
         def parent: RefType = schema.findRefType(parentName) getOrElse error("No RefType found called \"" + parentName + "\"") 
         val isAbstract = refData("Abstract").asInstanceOf[Boolean]
         val fields: List[Field] = refData("Fields").asInstanceOf[List[ValueData]].map(_.asField)
-        RefType(name, parent, isAbstract, fields: _*)
+        val rt = RefType(name) extend parent definesLazy fields
+        if (isAbstract) rt.abstractly else rt
       }
         
       def asValueType: ValueType = {
@@ -235,7 +248,9 @@ package object meta {
         def parent: ValueType = schema.findValueType(parentName) getOrElse error("No ValueType found called \"" + parentName + "\"")
         val isAbstract = refData("Abstract").asInstanceOf[Boolean]
         val fields: List[Field] = refData("Fields").asInstanceOf[List[ValueData]].map(_.asField)
-        ValueType(name, parent, isAbstract, fields: _*)
+        
+        val vt = ValueType(name) extend parent definesLazy fields
+        if (isAbstract) vt.abstractly else vt
       }
         
       def asSelectOneType: SelectOneType = {

@@ -30,8 +30,8 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
   }
 
   describe("Resources") {
-    val fooType = RefType("foo", idField, 'a -> IntType)
-    val blahType = RefType("blah", idField, 'b -> IntType)
+    val fooType = RefType("foo") defines (idField, 'a -> IntType)
+    val blahType = RefType("blah") defines (idField, 'b -> IntType)
     val fooRes = RefData(fooType, 'id -> "bob", 'a -> 1, 'b -> 2, 'c -> 3)
     val blahRes = RefData(blahType, 'id -> "floop", 'a -> 4, 'b -> 5, 'c -> 6)
     val libWithAddedResource = library addResources fooRes
@@ -48,7 +48,7 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
       }
       
       it("should return all resources of sub-types") {
-        val subFooType = RefType("subFoo", fooType, false)
+        val subFooType = RefType("subFoo") extend fooType
         val subFooRes = RefData(subFooType, 'id -> "fred", 'a -> 8, 'b -> 7, 'c -> 6)
         val lib2 = library.addResources(fooRes, subFooRes, blahRes)
         lib2.allResourcesByType(fooType).toSet should equal (Set(fooRes, subFooRes))
@@ -73,7 +73,7 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
      
     describe("Removing") {
       it ("should silently succeed if the resource could not be found") {
-        val fakeRes = RefData(RefType("boo", idField), 'id -> "blah")
+        val fakeRes = RefData(RefType("boo") defines idField, 'id -> "blah")
         libWithAddedResource removeResource fakeRes.ref 
       }
       it ("should fail if other resources refer to it") {
@@ -131,7 +131,7 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
     }
     
     it ("should not be findable in the library if not there") {
-      val fakeRes = RefData(RefType("boo", idField), 'id -> "blah")
+      val fakeRes = RefData(RefType("boo") defines idField, 'id -> "blah")
       library findResource fakeRes.ref should equal (None)
     }
     
@@ -167,7 +167,9 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
   }
 
   describe("Linked libraries") {
-    lazy val bananaType: RefType = RefType("banana", idField, 'color -> StringType, Field("otherBanana", bananaType))
+    lazy val bananaType: RefType = RefType("banana") definesLazy 
+        Seq(idField, 'color -> StringType, 'otherBanana -> bananaType)
+    
     val otherLibResource = RefData(bananaType, 'id -> "b1", 'color -> "red")
     val otherLib = ResourceLibrary("other", ResourceSchema.Empty) addResources otherLibResource
     val linkedLib = library addLinkedLibraries otherLib
@@ -240,11 +242,13 @@ class ResourceLibrarySpec extends Spec with ShouldMatchers {
   }
   
   describe("Renaming a resource") {
-    lazy val fooType: RefType = RefType("Foo", idField, Field("other", fooType), Field("blah", StringType))
+    lazy val fooType: RefType = RefType("Foo") definesLazy 
+        Seq(idField, 'other -> fooType, 'blah -> StringType)
+    
     val mapKeyType = SelectOneType("enum", StringType, "a", "b", "c")
-    val fooListType = RefType("FooList", idField, 'foos -> ListType(fooType))
-    val fooValueType = ValueType("FooValue", idField, 'foo -> fooType)
-    val fooValueDataType = RefType("FooValueData", idField, 'foo -> fooValueType)
+    val fooListType = RefType("FooList") defines (idField, 'foos -> ListType(fooType))
+    val fooValueType = ValueType("FooValue") defines (idField, 'foo -> fooType)
+    val fooValueDataType = RefType("FooValueData") defines (idField, 'foo -> fooValueType)
     
     val a = RefData(fooType, 'id -> "a", "blah" -> "umblob")
     val b = RefData(fooType, 'id -> "b", 'other -> a.ref)

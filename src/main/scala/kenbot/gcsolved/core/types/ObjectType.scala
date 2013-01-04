@@ -13,6 +13,8 @@ abstract class ObjectType private[core] (name: String,
     override val isAbstract: Boolean,
     objectFields: => Seq[Field]) extends ResourceType(name, parentType) with UserType {
   
+  protected type MyType <: ObjectType
+  
   lazy val localFields: Map[Field.Name, Field] = {
     ListMap(initFields(objectFields).map(f => (f.name,f)): _*)
   }
@@ -21,7 +23,13 @@ abstract class ObjectType private[core] (name: String,
   
   def fields: Map[Field.Name, Field] = if (parent eq this) localFields 
                                        else ListMap() ++ parent.fields ++ localFields
-                                       
+                      
+  def abstractly: MyType
+  def extend(parent: => MyType): MyType
+  def defines(fields: Field*): MyType
+  def definesLazy(fields: => Seq[Field]): MyType        
+  
+  
   lazy val categories: Seq[Field.Name] = fields.values.map(_.category).filter(_.nonEmpty).toSeq
   
   override lazy val parent: ObjectType = parentType

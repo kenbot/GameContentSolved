@@ -30,7 +30,9 @@ import kenbot.gcsolved.core.ResourceRef
 import kenbot.gcsolved.core.ResourceSchema
 import kenbot.gcsolved.core.ValueData
 
-object DefaultResourceIO extends ResourceIO with ReadText with WriteText {
+
+
+object DefaultResourceIO extends ResourceIO with DefaultResourceReader with DefaultResourceWriter {
   private[core] object Flags {
     val StartLibrary = "[start-library]"
     val EndLibrary = "[end-library]"
@@ -38,36 +40,30 @@ object DefaultResourceIO extends ResourceIO with ReadText with WriteText {
     val EndList = "[end-list]"
     val StartObject = "[start-object]"
     val EndObject = "[end-object]"
-    val StartMap = "[start-map]"
-    val EndMap = "[end-map]"
   }
   
   val fileExtension = "library"
 }
 
-trait WriteText {
+
+trait DefaultResourceWriter extends ResourceWriterBase {
   
-  def writeLibrary(lib: ResourceLibrary, out: DataOutput) {
+  def writeLibraryHeader(lib: ResourceLibrary, out: DataOutput) {
     writeLine(out, StartLibrary)
     writeLine(out, lib.id)
     writeLine(out, lib.name)
-    lib.allResources foreach (writeObjectData(_, out))
-    writeLine(out, EndLibrary)
-  }
-
-  def write[A](resourceType: ResourceType, value: A, out: DataOutput) {
-    resourceType match {    
-      case IntType | DoubleType | BoolType | StringType => writeLine(out, value)
-      case FileType(category, extensions) => writeLine(out, value.asInstanceOf[File].getName)
-      case ListType(elementType, _) => writeList(elementType, value.asInstanceOf[List[Any]], out)
-      case vt: ValueType => writeObjectData(value.asInstanceOf[ValueData], out)
-      case rt: RefType => writeResourceRef(value.asInstanceOf[ResourceRef], out)
-      case s1t: SelectOneType => writeLine(out, value)
-      case AnyType => writeAnyData(value.asInstanceOf[AnyData], out)
-      case x => error("Unknown type: " + x) 
-    }
   }
   
+  def writeLibraryFooter(lib: ResourceLibrary, out: DataOutput) {
+    writeLine(out, EndLibrary)
+  }
+  
+  def writeInt(value: Int, out: DataOutput): Unit = writeLine(out, value)
+  def writeBool(value: Boolean, out: DataOutput): Unit = writeLine(out, value)
+  def writeString(value: String, out: DataOutput): Unit = writeLine(out, value)
+  def writeDouble(value: Double, out: DataOutput): Unit = writeLine(out, value)
+  def writeFile(file: File, out: DataOutput): Unit = writeLine(out, file.getName)
+
   def writeResourceRef(ref: ResourceRef, out: DataOutput) {
     writeLine(out, ref.refType.name)
     writeLine(out, ref.id)
@@ -78,15 +74,10 @@ trait WriteText {
     write(MetaValueType, anyData.resourceType.typeDescriptor, out)
     write(anyData.resourceType, anyData.value, out)
   }
-
-  def writeLine(out: DataOutput, str: Any = "") {
-    out writeBytes str.toString
-    out writeBytes "\n"
-  }
   
-  def writeList(elementType: ResourceType, list: List[Any], out: DataOutput) {
+  def writeList(listType: ListType, list: List[Any], out: DataOutput) {
     writeLine(out, StartList)
-    list.foreach(write(elementType, _, out))
+    list.foreach(write(listType.elementType, _, out))
     writeLine(out, EndList)
   }
 
@@ -107,7 +98,8 @@ trait WriteText {
 
 }
 
-trait ReadText {
+
+trait DefaultResourceReader {
 
   private var lineNumber = 0
   
@@ -137,6 +129,7 @@ trait ReadText {
     
     val id = readLineOrFail(in, "Couldn't read library id")
     val name = readLineOrFail(in, "Couldn't read library name")
+    println("library id: " + id)
     readResourceLoop(ResourceLibrary(id, name, schema))
   }
 

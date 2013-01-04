@@ -13,26 +13,26 @@ import kenbot.gcsolved.core.types.{AnyRefType, AnyType, AnyValueType, BoolType, 
 
 abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with ShouldMatchers {
   
-  val refType = RefType("Reffy", 
+  val refType = RefType("Reffy") defines (
       'id -> StringType ^ (isId = true),
       'aaa -> StringType, 
       'bbb -> IntType)
       
-  val valueType = ValueType("Vally", 
+  val valueType = ValueType("Vally") defines (
       'aaa -> StringType, 
       'bbb -> IntType)
       
-  val nestedValueType = ValueType("Nesty",  
+  val nestedValueType = ValueType("Nesty") defines (
       'ccc -> StringType, 
       'fumble -> valueType)
       
   val mapKeyType = SelectOneType("enum", StringType, "a", "b", "c")
       
-  val complicatedRefType: RefType = RefType.recursive("Complicaty", Seq(
+  val complicatedRefType: RefType = RefType("Complicaty") definesLazy Seq(
       'id -> StringType ^ (isId = true),
       'xxx -> StringType, 
       'yyy -> ListType(nestedValueType), 
-      'self -> complicatedRefType))
+      'self -> complicatedRefType)
       
   complicatedRefType.fields("self").fieldType.toString
       
@@ -198,7 +198,7 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
     }
   }
   
-  
+
   private def withDataStream(thunk: (DataInput, DataOutput) => Unit) {
     val file = new File(outputFile)
     file.createNewFile

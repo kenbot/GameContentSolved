@@ -11,7 +11,7 @@ import kenbot.gcsolved.core.types.{AnyRefType, IntType, RefType, StringType}
 @RunWith(classOf[JUnitRunner])
 class RefDataSpec extends Spec with ShouldMatchers {
   
-  val rabbit = RefType("Rabbit", 
+  val rabbit = RefType("Rabbit") defines ( 
       'name -> StringType ^ (isId = true), 
       'age -> IntType ^ (default = Some(4)))
   
@@ -34,7 +34,7 @@ class RefDataSpec extends Spec with ShouldMatchers {
       data("colour") should equal ("white")
     }
     it("should throw an exception if the resource type is abstract") {
-     val abstractType = RefType("AbstractType", AnyRefType, true)
+     val abstractType = RefType("AbstractType").abstractly
      evaluating { RefData(abstractType) } should produce [IllegalArgumentException]
     }
     it("should have all of the default fields defined in the RefType") {

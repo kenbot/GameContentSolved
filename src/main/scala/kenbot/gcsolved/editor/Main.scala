@@ -6,7 +6,6 @@ import scala.swing.Dimension
 import scala.swing.Frame
 import scala.swing.MainFrame
 import scala.swing.SimpleSwingApplication
-import herezod.types.ActorType
 import herezod.types.HerezodSchema
 import kenbot.gcsolved.editor.gui.{WidgetEditScreen}
 import kenbot.gcsolved.editor.screens.EditScreen
@@ -38,14 +37,14 @@ object Main extends SimpleSwingApplication {
     val resourceDir = "examples"
     
   
-    lazy val otherLibrary = ResourceLibrary("blah", HerezodSchema).
-        addResource( RefData(ActorType, 'Name -> "Gremlin") )
+    //lazy val otherLibrary = ResourceLibrary("blah", HerezodSchema).
+    //    addResource( RefData(ActorType, 'Name -> "Gremlin") )
     
-    lazy val initialLibrary = ResourceLibrary("new", HerezodSchema).
+    lazy val initialLibrary = ResourceLibrary("new", HerezodSchema)/*.
         addLinkedLibraries(otherLibrary).
         addResource( RefData(ActorType, 'Name -> "Orc") ).
         addResource( RefData(ActorType, 'Name -> "Human") ).
-        addResource( RefData(ActorType, 'Name -> "Gnome") )
+        addResource( RefData(ActorType, 'Name -> "Gnome") )*/
         
     lazy val environment = ResourceEnvironment(new File(resourceDir))
     

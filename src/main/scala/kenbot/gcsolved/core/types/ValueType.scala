@@ -20,15 +20,10 @@ object ValueType {
 
   def of(fieldNames: SelectOneType, fieldType: ResourceType): ValueType = {
     val fields = fieldNames.values.map(n => Field[fieldType.Value](n.toString, fieldType))
-    apply("", fields: _*)
+    apply("") defines (fields: _*)
   }
   
-  def apply(name: String, fields: Field*): ValueType = apply(name, AnyValueType, false, fields: _*)
-  def apply(name: String, parent: => ValueType, fields: Field*): ValueType = 
-      new ValueType(name, parent, false, fields)
-  def apply(name: String, parent: => ValueType, isAbstract: Boolean, fields: Field*): ValueType = 
-      new ValueType(name, parent, isAbstract, fields)
-      
+  def apply(name: String) = new ValueType(name, AnyValueType, false)
   def unapply(vt: ValueType): Option[(String, Map[Field.Name,Field])] = Some((vt.name, vt.fields))
 }
 
@@ -42,6 +37,8 @@ sealed class ValueType(
   type Value = ValueData
 
   def metaType: MetaAnyType = MetaValueType
+  
+  protected override type MyType = ValueType
   
   override lazy val parent: ValueType = parentType
   
@@ -60,6 +57,11 @@ sealed class ValueType(
       
     case _ => throw new IllegalArgumentException("Expecting a ValueData object: " + a)
   }
+  
+  def abstractly = new ValueType(name, parent, true, fieldSet)
+  def extend(parent: => ValueType) = new ValueType(name, parent, isAbstract, fieldSet)
+  def defines(fields: Field*) = new ValueType(name, parentType, isAbstract, fieldSet ++ fields)
+  def definesLazy(fields: => Seq[Field]) = defines(fields: _*)
   
   override def getFailures(value: Any): List[String] = {
     

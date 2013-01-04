@@ -12,11 +12,12 @@ import kenbot.gcsolved.core.types.IntType
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.StringType
 import org.scalatest.junit.JUnitRunner
+import kenbot.gcsolved.editor.Main
 
 @RunWith(classOf[JUnitRunner])
 class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
   
-  val refType = RefType("Rabbit", 
+  val refType = RefType("Rabbit") defines ( 
       'numEars -> IntType, 
       'fluffiness -> IntType, 
       'name -> StringType ^ (isId = true))
@@ -137,6 +138,18 @@ class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
     }
     
   }
+      /*
+  describe("a HerezodSchema library") {
+    it("should save and load correctly") {
+      givenAnEnvironment { env => 
+        val saved = Main.Settings.initialLibrary
+        env saveLibrary saved
+        val loaded = env loadLibrary saved.ref
+        loaded should equal (saved)
+      }
+
+    }
+  }*/
   
   private def givenPackageFiles(env: ResourceEnvironment, fileNames: String*)(thunk: => Unit) {
     fileNames foreach { f =>
@@ -176,7 +189,7 @@ class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
     
     try {
       val env = ResourceEnvironment(homeDirectory, io, packager)
-      thunk(env)
+      thunk(ResourceEnvironment(homeDirectory, io, packager))
     }
     finally deltree(homeDirectory)
   }
