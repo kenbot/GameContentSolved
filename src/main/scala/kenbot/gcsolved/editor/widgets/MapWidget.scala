@@ -62,7 +62,6 @@ class MapWidget(theField: Field,
   
   def rawFieldValue: Option[Any] = {
     val mapValue = editor.values 
-    println("mapEditor.values: " + mapValue)
     if (mapValue.nonEmpty) Some(mapValue) else None
   }
   

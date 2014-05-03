@@ -13,7 +13,7 @@ trait ResourceIO {
   def readLibrary(schema: ResourceSchema, in: DataInput): ResourceLibrary
 
   def write[A](resourceType: ResourceType, value: A, out: DataOutput): Unit
-  def read(resourceType: ResourceType, lib: ResourceLibrary, in: DataInput): Any
+  def read(resourceType: ResourceType, lib: ResourceLibrary, in: DataInput): resourceType.Value 
 }
 
 

@@ -13,6 +13,7 @@ import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.StringType
 import org.scalatest.junit.JUnitRunner
 import kenbot.gcsolved.editor.Main
+import herezod.HerezodSchema
 
 @RunWith(classOf[JUnitRunner])
 class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
@@ -27,7 +28,7 @@ class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
   val schema = ResourceSchema().addRefTypes(refType)
   def packageExt = packager.packageExtension
   def ioExt = io.fileExtension
-
+/*
   describe("Libraries in the environment") {
     it("should include all files with the right package extension") {
       givenAnEnvironment { env => 
@@ -95,6 +96,8 @@ class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
     }
   }
   
+  */
+  
   describe("Saving") {
     
     def createLib(): ResourceLibrary = ResourceLibrary("mtl", "My test library", schema).addResources(
@@ -102,7 +105,7 @@ class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
             RefData(refType, 'numEars -> 4, 'fluffiness -> 77, 'name -> "Jane"),
             RefData(refType, 'numEars -> 7, 'fluffiness -> 9, 'name -> "Carol"))
     
-    
+    /*
     it("should create a save file") {
       givenAnEnvironment { env => 
         val lib = createLib()
@@ -135,21 +138,20 @@ class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
         val schemaFile = new File(dir.getPath + "/schema." + ioExt)
         schemaFile should be ('exists)
       }
-    }
+    }*/
     
   }
-      /*
+      
   describe("a HerezodSchema library") {
     it("should save and load correctly") {
       givenAnEnvironment { env => 
-        val saved = Main.Settings.initialLibrary
+        val saved = ResourceLibrary("new", HerezodSchema.Schema)
         env saveLibrary saved
         val loaded = env loadLibrary saved.ref
         loaded should equal (saved)
       }
-
     }
-  }*/
+  }
   
   private def givenPackageFiles(env: ResourceEnvironment, fileNames: String*)(thunk: => Unit) {
     fileNames foreach { f =>
@@ -184,13 +186,11 @@ class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
     
     def deltree(f: File) { 
       if (f.isDirectory) f.listFiles foreach deltree
-      require(f.delete, "Couldn't delete " + f.getPath + " in home directory cleanup") 
+      val deleted = f.delete
+      require(deleted, "Couldn't delete " + f.getPath + " in home directory cleanup") 
     }
     
-    try {
-      val env = ResourceEnvironment(homeDirectory, io, packager)
-      thunk(ResourceEnvironment(homeDirectory, io, packager))
-    }
+    try thunk(ResourceEnvironment(homeDirectory, io, packager))
     finally deltree(homeDirectory)
   }
   

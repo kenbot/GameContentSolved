@@ -1,0 +1,29 @@
+ValueData(
+  MetaField, 
+  Map(
+    Name -> PROBLEMFIELD, 
+    Default -> AnyData(
+      ValueData(
+        Vally, 
+        Map(
+          aaa -> THISISTHEPROBLEM, 
+          bbb -> 6666
+        )
+      ),
+      Vally
+    ), 
+    FieldType -> ValueData(
+      MetaValueType, 
+      Map(
+        ValueType -> ResourceRef(Vally,ValueTypeDefinition)
+      )
+    ), 
+    Required -> false, 
+    IsId -> false
+  )
+)
+ValueData(MetaField, Map(Name -> PROBLEMFIELD, Default -> AnyData(ValueData(Vally, Map(aaa -> THISISTHEPROBLEM, bbb -> 6666)),Vally), FieldType -> ValueData(MetaValueType, Map(ValueType -> ResourceRef(Vally,ValueTypeDefinition))), Required -> false, IsId -> false))
+ValueData(MetaField, Map(Name -> PROBLEMFIELD, Default -> AnyData(ValueData(Vally, Map(aaa -> THISISTHEPROBLEM, bbb -> 6666)),Vally), FieldType -> ValueData(MetaValueType, Map(ValueType -> ResourceRef(Vally,ValueTypeDefinition))), Required -> false, IsId -> false))
+ > ValueData(MetaValueType, Map(ValueType -> ResourceRef(Vally,ValueTypeDefinition)))
+ > ValueData(Vally, Map(aaa -> THISISTHEPROBLEM, bbb -> 6666))
+ > ValueData(MetaValueType, Map(ValueType -> ResourceRef(Vally,ValueTypeDefinition)))

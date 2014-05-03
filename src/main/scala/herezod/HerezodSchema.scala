@@ -1,8 +1,6 @@
 package herezod
 
 import kenbot.gcsolved.core.Field.symbolAndType2Field
-import kenbot.gcsolved.core.types.AnyRefType
-import kenbot.gcsolved.core.types.AnyValueType
 import kenbot.gcsolved.core.types.BoolType
 import kenbot.gcsolved.core.types.FileType
 import kenbot.gcsolved.core.types.IntType
@@ -12,9 +10,11 @@ import kenbot.gcsolved.core.types.SelectOneType
 import kenbot.gcsolved.core.types.StringType
 import kenbot.gcsolved.core.types.ValueType
 import kenbot.gcsolved.core.types.DoubleType
-import java.io.File
+import kenbot.gcsolved.core.Field.symbolAndValue2namePair
+import kenbot.gcsolved.core.ResourceSchema
+import kenbot.gcsolved.core.ValueData
 
-package object types {
+object HerezodSchema {
   import kenbot.gcsolved.core._
 
   val RectType = ValueType("Rect") defines (
@@ -47,11 +47,11 @@ package object types {
   
   val ImageType = ValueType("Image").abstractly
 
-  val StillImageType = ValueType("StillImage") defines (
+  val StillImageType = ValueType("StillImage") /*defines (
     'Filename -> FileType("image", "png") ^ (required=true, description="File containing the image"),
-    'Bounds -> RectType ^ (description="Bounds of the image within the file"))
+    'Bounds -> RectType ^ (description="Bounds of the image within the file")) */
 
-  val AnimImageType = ValueType("Animation")   defines 'Frames -> ListType(StillImageType)
+  val AnimImageType = ValueType("Animation") extend ImageType defines 'Frames -> ListType(StillImageType)
 
   val SideEffect = RefType("SideEffect").abstractly defines 'Name -> StringType ^ (isId=true)
     
@@ -145,19 +145,27 @@ package object types {
     'ImageFile -> FileType("images", "png", "jpg") ^ (description="The image file to use"),
     'Race -> Race ^ (description="Don't be a racist!  They're all equal."),
     'Health -> RangeType ^ (description="The health points available"),
-    'HealthRegen -> RangeType ^ (default=Some(ValueData(PointType, 'Min -> 10, 'Max -> 10))),
-    'Magic -> RangeType,
-    'MagicRegen -> RangeType,
-    'CanBeMale -> BoolType,
-    'CanBeFemale -> BoolType ^ (default=Some(true)),
-    'BloodColor -> ColorType
-    //'Images ->  ValueType.of(ActorState, ValueType.of(Direction, ListType(ImageType))),
+    'HealthRegen -> RangeType ^ (default=Some(RangeType('Min -> 10, 'Max -> 10)))
+    //'Magic -> RangeType,
+    //'MagicRegen -> RangeType,
+    //'CanBeMale -> BoolType,
+    //'CanBeFemale -> BoolType ^ (default=Some(true)),
+    //'BloodColor -> ColorType
+    //'Images ->  ValueType.of(ActorState, ValueType.of(Direction, ListType(ImageType)))
     //'CorpseImages -> ListType(StillImageType) ^ (default=Some(List(someImage)), description="This is what it looks like dead")
     )
-
   
-  val HerezodSchema = ResourceSchema().
-      addValueTypes(/*RectType,*/ RangeType, PointType, ColorType, /*ImageType, StillImageType */ AnimImageType).
-      addSelectOneTypes()
-      
+  val Foo1 = RefType("Foo1") defines ('Id -> StringType ^ (isId = true), 'TNC -> ActorState)
+  lazy val Foo2: RefType = RefType("Foo2") extend Foo1 definesLazy Seq('TNC2 -> ActorState, 'Recursive -> Foo2)
+  
+  import meta._
+  
+    
+  val Schema = ResourceSchema().
+    //addRefTypes(Foo1, Foo2).addSelectOneTypes(ActorState)
+    addRefTypes(ActorType).
+    addValueTypes(RangeType)
+   // addSelectOneTypes(ActorState, Race, Direction, OrthogonalDirection, TerrainLayer, TerrainNeighbourCombo)
+
+  val SchemaAsLibrary = Schema.asLibrary
 }

@@ -27,18 +27,7 @@ object AnyRefType extends RefType("AnyRef", isAbstract=true) {
 object RefType {
   
   def apply(name: String): RefType = new RefType(name)
-/*
-  def recursive(name: String, fields: => Seq[Field]): RefType = recursive(name, AnyRefType, false, fields)
-  def recursive(name: String, parent: => RefType, isAbstract: Boolean, fields: => Seq[Field]): RefType = {
-    new RefType(name, parent, isAbstract, fields)
-  }
-    
-  def apply(name: String, fields: Field*): RefType = apply(name, AnyRefType, false, fields: _*)
-  def apply(name: String, parent: => RefType, fields: Field*): RefType = new RefType(name, parent, false, fields)
-  def apply(name: String, parent: => RefType, isAbstract: Boolean, fields: Field*): RefType = {
-    new RefType(name, parent, isAbstract, fields)
-  }*/
-  
+
   def unapply(resourceType: ResourceType): Option[String] = resourceType match {
     case rt: RefType => Some(rt.name)
     case _ => None
@@ -48,16 +37,16 @@ object RefType {
 class RefType(
     name: String, 
     parentType: => RefType = AnyRefType, 
-    override val isAbstract: Boolean = false,
+    isAbstract: Boolean = false,
     theFields: => Seq[Field] = Seq()) 
     
-  extends ObjectType(name, parentType, true, false, theFields) {
-	  
+  extends ObjectType(name, parentType, true, isAbstract, theFields) {
   
   
   def metaType: MetaAnyType = MetaRefType
   type Value = ResourceRef
   protected type MyType = RefType
+  type MyData = RefData
   
   def idField: Field.Name = fields.values.find(_.isId) match {
     case Some(field) => field.name
@@ -83,6 +72,8 @@ class RefType(
   override lazy val parent: RefType = parentType
   
   override def emptyData = RefData(this)
+  
+  override def apply(fields: (Field.Name, Any)*): RefData = RefData(this, fields: _*)
   
   lazy val defaultValueMap: Map[Field.Name, Any] = (for {
     field <- fields.values

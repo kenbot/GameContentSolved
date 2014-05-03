@@ -47,7 +47,8 @@ class MainPanel(settings: Settings) extends NestedBorderPanel with Publisher {
   listenTo(sideBar.libraryPage, sideBar.schemaPage)
   
   reactions += {
-    case SelectionEvent(src: LibraryPage, refType: RefType) => editDialog(refType)
+    case SelectionEvent(src: LibraryPage, Seq(refType: RefType)) => editDialog(refType)
+    case SelectionEvent(a,b) => println(s"FooSelectionEvent ${a.getClass.getName} $b")
   }
   
   def editDialog(refType: RefType) {

@@ -29,7 +29,7 @@ object JsonResourceIO extends ResourceIO {//}with JsonResourceWriter {
   def writeLibrary(lib: ResourceLibrary, out: DataOutput) {}
   def write[A](resourceType: ResourceType, value: A, out: DataOutput) {}
   def readLibrary(schema: ResourceSchema, in: DataInput): ResourceLibrary = ResourceLibrary("foo", schema)
-  def read(resourceType: ResourceType, lib: ResourceLibrary, in: DataInput): Any = ()
+  def read(resourceType: ResourceType, lib: ResourceLibrary, in: DataInput): resourceType.Value = ???
 }
 
 trait JsonResourceWriter extends ResourceWriterBase {

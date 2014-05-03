@@ -21,8 +21,6 @@ object SearchBar {
     }
   }
 }
-
-
 class SearchBar extends BorderPanel with Publisher {
   val searchButton = new Button("Go")
   val searchField = new TextField with BlankText {

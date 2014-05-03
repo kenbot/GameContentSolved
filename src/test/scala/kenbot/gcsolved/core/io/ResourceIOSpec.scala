@@ -31,7 +31,11 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
   val complicatedRefType: RefType = RefType("Complicaty") definesLazy Seq(
       'id -> StringType ^ (isId = true),
       'xxx -> StringType, 
-      'yyy -> ListType(nestedValueType), 
+      'yyy -> ListType(nestedValueType) ^ (default = Some(List(nestedValueType(
+                                                          'ccc -> "hello", 
+                                                          'fumble -> valueType(
+                                                              'aaa -> "foo", 
+                                                              'bbb -> 555))))), 
       'self -> complicatedRefType)
       
   complicatedRefType.fields("self").fieldType.toString
@@ -43,6 +47,8 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
 
   
   describe("ResourceIO") {
+    
+    /*
     it("should be able to write and read back an integer") {
       withDataStream { (in, out) =>
         resourceIO.write(IntType, 5677, out)
@@ -162,31 +168,52 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
         resourceIO.write(nestedValueType, valueData, out)
         resourceIO.read(nestedValueType, lib, in) should equal (valueData)
       }
+    }*/
+    
+    it("should be able to write and read back a field") {
+      import kenbot.gcsolved.core.meta._
+      import kenbot.gcsolved.core.Field
+      val schemaContext = new SchemaContext(lib.schema)
+      import schemaContext._
+        
+      val field: Field = 'PROBLEMFIELD -> valueType ^ (default = 
+        Some(valueType(
+            'aaa -> "THISISTHEPROBLEM", 
+            'bbb -> 6666)))
+      
+      val fieldData = field.asData
+      
+      withDataStream { (in, out) =>
+        resourceIO.write(MetaFieldType, field.asData, out)
+        val valueData = resourceIO.read(MetaFieldType, lib.schema.asLibrary, in).asInstanceOf[ValueData]
+        valueData.asField should equal (field)
+      }
     }
     
     it("should be able to write and read back a complicated library") {
-
-      val valueData1 = ValueData(nestedValueType, 
+      pending
+      val valueData1 = nestedValueType( 
           'ccc -> "booboo", 
-          'fumble -> ValueData(valueType, 
+          'fumble -> valueType( 
               'aaa -> "blahblah", 
               'bbb -> 66))
               
-      val valueData2 = ValueData(nestedValueType, 
+      val valueData2 = nestedValueType( 
           'ccc -> "dodo", 
-          'fumble -> ValueData(valueType, 
+          'fumble -> valueType(
               'aaa -> "happy", 
               'bbb -> 2))
               
-      val complicatedResource1 = RefData(complicatedRefType, 
+      val complicatedResource1 = complicatedRefType(
           'id -> "compy1",
-          'xxx -> "super")
+          'xxx -> "super",                
+          'self -> ResourceRef("compy2", complicatedRefType))
               
-      val complicatedResource2 = RefData(complicatedRefType, 
+      val complicatedResource2 = complicatedRefType(
           'id -> "compy2",
           'xxx -> "Foo",
           'yyy -> List(valueData1, valueData2),
-          'self -> complicatedResource1.ref)
+          'self -> ResourceRef("compy1", complicatedRefType))
 
       val beforeLib = lib.addResources(complicatedResource1, complicatedResource2)
       
@@ -202,8 +229,8 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
   private def withDataStream(thunk: (DataInput, DataOutput) => Unit) {
     val file = new File(outputFile)
     file.createNewFile
-    def in = new DataInputStream(new FileInputStream(file))
-    def out = new DataOutputStream(new FileOutputStream(file, false))
+    lazy val in = new DataInputStream(new FileInputStream(file))
+    lazy val out = new DataOutputStream(new FileOutputStream(file, false))
     try {
       thunk(in, out) 
     }

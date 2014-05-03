@@ -45,7 +45,8 @@ class LibraryPage(val refTypes: Seq[RefType], val library: ResourceLibrary) exte
       
     case DoubleClick(pt) => 
       val refType = treeView.getClosestPathForLocation(pt.x, pt.y).last
-      publish(SelectionEvent(this, refType))
+      println("publishing double click")
+      LibraryPage.this.publish(SelectionEvent(this, refType))
   }
   
   def filterBy(searchString: String) {

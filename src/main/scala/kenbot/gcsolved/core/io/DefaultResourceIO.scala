@@ -34,12 +34,12 @@ import kenbot.gcsolved.core.ValueData
 
 object DefaultResourceIO extends ResourceIO with DefaultResourceReader with DefaultResourceWriter {
   private[core] object Flags {
-    val StartLibrary = "[start-library]"
-    val EndLibrary = "[end-library]"
-    val StartList = "[start-list]"
-    val EndList = "[end-list]"
-    val StartObject = "[start-object]"
-    val EndObject = "[end-object]"
+    val StartLibrary = "<library>"
+    val EndLibrary = "</library>"
+    val StartList = "<list>"
+    val EndList = "</list>"
+    val StartObject = "<object>"
+    val EndObject = "</object>"
   }
   
   val fileExtension = "library"
@@ -77,7 +77,9 @@ trait DefaultResourceWriter extends ResourceWriterBase {
   
   def writeList(listType: ListType, list: List[Any], out: DataOutput) {
     writeLine(out, StartList)
-    list.foreach(write(listType.elementType, _, out))
+    indent(list.toString) {
+      list.foreach(write(listType.elementType, _, out))
+    }
     writeLine(out, EndList)
   }
 
@@ -85,21 +87,22 @@ trait DefaultResourceWriter extends ResourceWriterBase {
     val objectType = objectData.resourceType
     
     writeLine(out, StartObject)
-    writeLine(out, objectType.name)
-    
-    objectData.fields foreach { 
-      case (fieldName, v) => 
-        writeLine(out, fieldName)
-        val field = objectType.fields(fieldName)
-        write(field.fieldType, v, out)
+    indent(objectData.debugString) {
+      writeLine(out, objectType.name)
+      
+      objectData.fields foreach { 
+        case (fieldName, v) => 
+          writeLine(out, fieldName)
+          val field = objectType.fields(fieldName)
+          write(field.fieldType, v, out)
+      }
     }
     writeLine(out, EndObject)
   }
-
 }
 
 
-trait DefaultResourceReader {
+trait DefaultResourceReader extends Indentable {
 
   private var lineNumber = 0
   
@@ -110,7 +113,9 @@ trait DefaultResourceReader {
   
   def readLine(in: DataInput): Option[String] = {
     lineNumber += 1
-    Option(in.readLine).map(_.trim).filterNot(_ startsWith "[end")
+    val line = Option(in.readLine)
+    val three = 2+1;
+    line.map(_.trim).filterNot(_ startsWith "</")
   }
   
   def readLineOrFail(in: DataInput, errorMsg: => String): String = readLine(in) getOrElse error(errorMsg)
@@ -129,16 +134,23 @@ trait DefaultResourceReader {
     
     val id = readLineOrFail(in, "Couldn't read library id")
     val name = readLineOrFail(in, "Couldn't read library name")
-    println("library id: " + id)
-    readResourceLoop(ResourceLibrary(id, name, schema))
+    indent("Library " + id + "/" + name) {
+      readResourceLoop(ResourceLibrary(id, name, schema))
+    }
   }
 
   def read(resourceType: ResourceType, lib: ResourceLibrary, in: DataInput): resourceType.Value = {
-    readOpt(resourceType, lib, in) getOrElse error("Expecting " + resourceType.name + "; nothing found")
+    readOpt(resourceType, lib, in) getOrElse error("Expecting " + resourceType.name + "; nothing found. Stack: " + indentStack.stack)
   }
   
   def readOpt(resourceType: ResourceType, lib: ResourceLibrary, in: DataInput): Option[resourceType.Value] = {
-    def forLine[A](f: String => A) = readLine(in).map(str => resourceType asValue f(str))
+    def forLine[A](f: String => A) = {
+      val line = readLine(in)
+      line.map { str => 
+        val transformed = f(str)
+        resourceType asValue transformed
+      }
+    }    
     resourceType match {
       case IntType(_,_) => forLine(_.toInt)
       case DoubleType => forLine(_.toDouble)
@@ -152,7 +164,7 @@ trait DefaultResourceReader {
         for (v <- readOpt(s1t.valueType, lib, in) if s1t.values contains v) 
         yield resourceType asValue v
       case AnyType => readAnyData(in, lib).map(resourceType asValue _)
-      case x => sys.error("Unknown type: " + x) 
+      case x => error("Unknown type: " + x) 
     }
   }
   
@@ -165,17 +177,19 @@ trait DefaultResourceReader {
     yield ResourceRef(id, refType)
   }
   
+  
   def readAnyData(in: DataInput, lib: ResourceLibrary): Option[AnyData] = {
     import meta._
-    val context = new SchemaContext(lib.schema)
+    val context = new SchemaContext(lib.asSchema)
     import context._
-    
-    for {
-      resourceTypeData: ValueData <- readOpt(MetaAnyType, lib.schema.asLibrary, in)
-      resourceType = resourceTypeData.asResourceType
-      value <- readOpt(resourceType, lib, in)
-    } 
-    yield AnyData(value, resourceType)
+    indent("AnyData") {
+      for {
+        resourceTypeData: ValueData <- readOpt(MetaAnyType, lib.schema.asLibrary, in)
+        resourceType = resourceTypeData.asResourceType
+        value <- readOpt(resourceType, lib, in)
+      } 
+      yield AnyData(value, resourceType)
+    }
   }
   
   def readObjectData(objectType: ObjectType, lib: ResourceLibrary, in: DataInput): Option[ObjectData] = {
@@ -195,12 +209,13 @@ trait DefaultResourceReader {
     }
     
     if (readLine(in) != Some(StartObject)) return None
-    
-    for {
-      actualTypeName <- readLine(in)
-      actualType <- lib.schema.findObjectType(actualTypeName)
-    } 
-    yield readFieldLoop(actualType.emptyData)
+    indent("object") {
+      for {
+        actualTypeName <- readLine(in)
+        actualType <- lib.schema.findObjectType(actualTypeName)
+      } 
+      yield readFieldLoop(actualType.emptyData)
+    }
   }
 
   def readList(elementType: ResourceType, lib: ResourceLibrary, in: DataInput): Option[List[elementType.Value]] = {
@@ -214,6 +229,8 @@ trait DefaultResourceReader {
         case None => list
       }
     }
-    Some(readNextItem(Nil).reverse)
+    indent("list") {
+      Some(readNextItem(Nil).reverse)
+    }
   }
 }

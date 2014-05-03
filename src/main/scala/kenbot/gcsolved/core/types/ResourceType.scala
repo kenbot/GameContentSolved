@@ -32,6 +32,7 @@ abstract class ResourceType protected[core] (val name: String, parentType: => Re
    */
   def asValue(a: Any): Value
   
+  
   /**
    * Return a list of validation failures incurred by the given value.
    */

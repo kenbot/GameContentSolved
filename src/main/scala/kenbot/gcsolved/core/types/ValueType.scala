@@ -23,26 +23,29 @@ object ValueType {
     apply("") defines (fields: _*)
   }
   
-  def apply(name: String) = new ValueType(name, AnyValueType, false)
+  def apply(name: String) = new ValueType(name)
   def unapply(vt: ValueType): Option[(String, Map[Field.Name,Field])] = Some((vt.name, vt.fields))
 }
 
 sealed class ValueType(
     name: String, 
     parentType: => ValueType = AnyValueType, 
-    override val isAbstract: Boolean,
+    isAbstract: Boolean = false,
     fieldSet: Seq[Field] = Seq()) // Call-by-value, since recursive field types are forbidden for value types.
-  extends ObjectType(name, parentType, false, false, fieldSet) {
+  extends ObjectType(name, parentType, false, isAbstract, fieldSet) {
   
-  type Value = ValueData
+  override type Value = ValueData
+  override type MyData = ValueData
+  protected override type MyType = ValueType
 
   def metaType: MetaAnyType = MetaValueType
   
-  protected override type MyType = ValueType
   
   override lazy val parent: ValueType = parentType
   
   override def emptyData = ValueData(this)
+  
+  override def apply(fields: (Field.Name, Any)*): ValueData = ValueData(this, fields: _*)
   
   override def asValue(a: Any): Value = a match {
     case data: ValueData => 

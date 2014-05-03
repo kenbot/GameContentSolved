@@ -10,7 +10,6 @@ import kenbot.gcsolved.core.types.AnyType
 import kenbot.gcsolved.core.types.UserType
 
 
-
 object ResourceSchema {
   def apply() = new ResourceSchema(Seq(), Seq(), Seq(), Seq())
   def apply( 
@@ -29,6 +28,8 @@ class ResourceSchema private (
     theValueTypes: => Seq[ValueType],
     theSelectOneTypes: => Seq[SelectOneType],
     val linkedSchemas: Seq[ResourceSchema]) {
+  
+  top => 
   
   def refTypes: Seq[RefType] = AnyRefType :: userRefTypes
   def valueTypes: Seq[ValueType] = AnyValueType :: userValueTypes

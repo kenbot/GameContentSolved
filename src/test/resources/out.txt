@@ -1,0 +1,30 @@
+<object>
+  MetaField
+  Name
+  PROBLEMFIELD
+  Default
+  <object>
+    MetaValueType
+    ValueType
+    ValueTypeDefinition
+    Vally
+  </object>
+  <object>
+    Vally
+    aaa
+    THISISTHEPROBLEM
+    bbb
+    6666
+  </object>
+  FieldType
+  <object>
+    MetaValueType
+    ValueType
+    ValueTypeDefinition
+    Vally
+  </object>
+  Required
+  false
+  IsId
+  false
+</object>

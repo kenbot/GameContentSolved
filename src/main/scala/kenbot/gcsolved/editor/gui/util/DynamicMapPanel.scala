@@ -118,7 +118,6 @@ class DynamicMapPanel[K, V]
   def values: Map[K, V] = {
     val optionalValues = pairPanels.map(p => getKey(p.keyPanel) -> getValue(p.valuePanel))
     val definedValuesOnly = optionalValues.collect { case (Some(k), Some(v)) => k -> v }
-    println(definedValuesOnly.toMap)
     definedValuesOnly.toMap
   }
   

@@ -58,11 +58,14 @@ object ResourceEnvironment {
       packedFileName dropRight extLength
     }
     
-    private def getPackedFileName(libraryRef: ResourceLibraryRef) = libraryRef + "." + packager.packageExtension
+    private def getPackedFileName(libraryRef: ResourceLibraryRef) = 
+      libraryRef + "." + packager.packageExtension
     
-    def isLibraryFile(f: File): Boolean = f.isFile && f.getName.endsWith("." + packager.packageExtension)
+    def isLibraryFile(f: File): Boolean = 
+      f.isFile && f.getName.endsWith("." + packager.packageExtension)
     
-    private def getUnpackedLibraryPath(libraryRef: ResourceLibraryRef) = unpackedArea.getAbsolutePath + "/" + libraryRef
+    private def getUnpackedLibraryPath(libraryRef: ResourceLibraryRef) = 
+      unpackedArea.getAbsolutePath + "/" + libraryRef
     
     def unpackedArea: File = new File(homeDirectory.getPath + "/" + expandedDirName)
     
@@ -90,9 +93,12 @@ object ResourceEnvironment {
     }
     
     def clearUnpackedArea() = {
-      def deltree(f: File) { 
-        if (f.isDirectory) f.listFiles foreach deltree
-        require(f.delete, "Couldn't delete file: " + f.getPath) 
+      def deltree(f: File): Unit = { 
+        if (f.isDirectory) {
+          f.listFiles foreach deltree
+        }
+        val deleteSuccess = f.delete()
+        require(deleteSuccess, "Couldn't delete file: " + f.getPath) 
       }
       unpackedArea.listFiles foreach deltree
     }
@@ -110,10 +116,12 @@ object ResourceEnvironment {
       
       // TODO Capture files
       
+      println("WRITE SCHEMA")
       val schemaOut = new DataOutputStream(new FileOutputStream(schemaFilename, false))
       try io.writeLibrary(lib.schema.asLibrary, schemaOut) 
       finally schemaOut.close
       
+      println("WRITE LIB")
       val resOut = new DataOutputStream(new FileOutputStream(resourcesFilename, false))
       try io.writeLibrary(lib, resOut) 
       finally resOut.close
@@ -123,17 +131,19 @@ object ResourceEnvironment {
     
     def loadLibrary(libraryRef: ResourceLibraryRef): ResourceLibrary = {
       val unpackedDir = unpackLibrary(libraryRef)
-      
       val schemaFile = getUnpackedLibraryPath(libraryRef) + "/" + schemaFileName
+      
       val resourcesFile = getUnpackedLibraryPath(libraryRef) + "/" + resourcesFileName
       
       import meta._
       
+      println("READ SCHEMA")
       val schemaIn = new DataInputStream(new FileInputStream(schemaFile))
       val schema = try io.readLibrary(MetaSchema, schemaIn).asSchema 
                    finally schemaIn.close
                
       val resIn = new DataInputStream(new FileInputStream(resourcesFile))
+      println("READ LIB")
       try io.readLibrary(schema, resIn)
       finally resIn.close() 
     }

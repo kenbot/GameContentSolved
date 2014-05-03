@@ -6,7 +6,7 @@ import scala.swing.Dimension
 import scala.swing.Frame
 import scala.swing.MainFrame
 import scala.swing.SimpleSwingApplication
-import herezod.types.HerezodSchema
+import herezod.HerezodSchema
 import kenbot.gcsolved.editor.gui.{WidgetEditScreen}
 import kenbot.gcsolved.editor.screens.EditScreen
 import kenbot.gcsolved.editor.widgets.DefaultMakeWidget
@@ -19,6 +19,7 @@ import kenbot.gcsolved.core.ResourceEnvironment
 import kenbot.gcsolved.core.ResourceLibrary
 import kenbot.gcsolved.core.ResourceSchema
 import javax.swing.UIManager
+import herezod.HerezodSchema
 
 
 
@@ -32,19 +33,20 @@ object Main extends SimpleSwingApplication {
       
     val iconDir = "/icons"
     val iconFileExt = "png"
-    val imageFileExt = "png"     
+    val imageFileExt = "png"
     val frameTitle = "GameContentSolved"
     val resourceDir = "examples"
     
+    import HerezodSchema._
   
-    //lazy val otherLibrary = ResourceLibrary("blah", HerezodSchema).
-    //    addResource( RefData(ActorType, 'Name -> "Gremlin") )
+    lazy val otherLibrary = ResourceLibrary("blah", HerezodSchema.Schema).
+        addResource( ActorType('Name -> "Gremlin") )
     
-    lazy val initialLibrary = ResourceLibrary("new", HerezodSchema)/*.
+    lazy val initialLibrary = ResourceLibrary("new", HerezodSchema.Schema).
         addLinkedLibraries(otherLibrary).
-        addResource( RefData(ActorType, 'Name -> "Orc") ).
-        addResource( RefData(ActorType, 'Name -> "Human") ).
-        addResource( RefData(ActorType, 'Name -> "Gnome") )*/
+        addResource( ActorType('Name -> "Orc") ).
+        addResource( ActorType('Name -> "Human") ).
+        addResource( ActorType('Name -> "Gnome") )
         
     lazy val environment = ResourceEnvironment(new File(resourceDir))
     

@@ -6,9 +6,29 @@ import scala.sys.error
 
 import kenbot.gcsolved.core.{AnyData, ObjectData, ResourceLibrary, ResourceRef, ValueData}
 import kenbot.gcsolved.core.types.{AnyType, BoolType, DoubleType, FileType, IntType, ListType, RefType, ResourceType, SelectOneType, StringType, ValueType}
+import scala.util.DynamicVariable
 
+class IndentStack  {
+  private val stackVar = new DynamicVariable(List[String]())
+  def indent[A](stackLevel: String)(thunk: => A): A = {
+    stackVar.withValue(stackLevel :: stackVar.value) { 
+      println((" > " * (stackSize-1)) + stackVar.value.head)
+      thunk 
+    }
+  }
+  def stack = stackVar.value.reverse
+  def stackString = stackVar.value mkString "\n   in "
+  def stackSize = stackVar.value.size
+  def indentSpaces(size: Int = 2) = " " * (size * stackSize)
+}
 
-trait ResourceWriterBase {
+trait Indentable {
+  protected val indentStack = new IndentStack
+  protected def indent[A](stackLevel: String)(thunk: => A): A = indentStack.indent(stackLevel)(thunk)
+}
+
+trait ResourceWriterBase extends Indentable {
+  
   def writeLibrary(lib: ResourceLibrary, out: DataOutput) {
     writeLibraryHeader(lib, out)
     lib.allResources foreach (writeObjectData(_, out))
@@ -30,6 +50,7 @@ trait ResourceWriterBase {
   }
   
   def writeLine(out: DataOutput, str: Any = "") {
+    out writeBytes indentStack.indentSpaces(2)
     out writeBytes str.toString
     out writeBytes "\n"
   }

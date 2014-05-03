@@ -70,17 +70,8 @@ package object meta {
       'IsId -> BoolType ^ (description="Whether or not this field is the ID. Only one field can be the ID, and it will always be required."),
       'Default -> AnyType ^ (description="Optionally, some default value for the field"))
                     
-                    
-  implicit def enrichLibrary(lib: ResourceLibrary) = new RichResourceLibrary(lib)    
-  implicit def enrichSchema(s: ResourceSchema) = new RichResourceSchema(s)    
-  implicit def enrichField(f: Field) = new RichField(f)
-  implicit def enrichResourceType(rt: ResourceType) = new RichResourceType(rt)
-  implicit def enrichSelectOneType(s1t: SelectOneType) = new RichSelectOneType(s1t)
-  implicit def enrichRefType(rt: RefType) = new RichRefType(rt)
-  implicit def enrichValueType(vt: ValueType) = new RichValueType(vt)
-
   
-  class RichResourceSchema(schema: ResourceSchema) {
+  implicit class RichResourceSchema(schema: ResourceSchema) {
     def asLibrary: ResourceLibrary = ResourceLibrary("Schema", MetaSchema).
       addResources(AnyRefType.asData +: schema.userRefTypes.map(_.asData): _*).
       addResources(AnyValueType.asData +: schema.userValueTypes.map(_.asData): _*).
@@ -89,7 +80,7 @@ package object meta {
   }
   
   
-  class RichResourceLibrary(library: ResourceLibrary) {
+  implicit class RichResourceLibrary(library: ResourceLibrary) {
     def asSchema: ResourceSchema = {
       require(library.schema == MetaSchema, "This library cannot be converted into a schema.")
       
@@ -106,7 +97,7 @@ package object meta {
     }
   }
   
-  class RichValueType(valueType: ValueType) {
+  implicit class RichValueType(valueType: ValueType) {
     def metaRef: ResourceRef = ResourceRef(valueType.name, ValueTypeDefinition)
     
     def asData: RefData = RefData(ValueTypeDefinition, 
@@ -116,7 +107,7 @@ package object meta {
       'Fields -> valueType.localFields.values.toList.map(_.asData))
   }
   
-  class RichRefType(refType: RefType) {
+  implicit class RichRefType(refType: RefType) {
     def metaRef: ResourceRef = ResourceRef(refType.name, RefTypeDefinition)
     
     def asData: RefData = RefData(RefTypeDefinition, 
@@ -126,7 +117,7 @@ package object meta {
       'Fields -> refType.localFields.values.toList.map(_.asData))
   }
 
-  class RichSelectOneType(selectOneType: SelectOneType) {
+  implicit class RichSelectOneType(selectOneType: SelectOneType) {
     def metaRef: ResourceRef = ResourceRef(selectOneType.name, SelectOneTypeDefinition)
     
     def asData: RefData = RefData(SelectOneTypeDefinition, 
@@ -135,7 +126,7 @@ package object meta {
       'Values -> selectOneType.values.map(selectOneType.valueType.asAny))
   } 
   
-  class RichField(field: Field) {
+  implicit class RichField(field: Field) {
     def asData: ValueData = {
       
       val baseFields = Map(
@@ -155,7 +146,7 @@ package object meta {
     }
   } 
 
-  class RichResourceType(resourceType: ResourceType) {
+  implicit class RichResourceType(resourceType: ResourceType) {
     def typeDescriptor: ValueData = resourceType match {    
       case AnyType | AnyValueType | AnyRefType | DoubleType | BoolType | StringType => ValueData(resourceType.metaType)
       
@@ -184,13 +175,10 @@ package object meta {
   class SchemaContext(currentSchema: => ResourceSchema) {
     
     lazy val schema = currentSchema
-    
-    implicit def enrichRefData(rd: RefData): RichRefData = new RichRefData(rd)
-    implicit def enrichValueData(vd: ValueData) = new RichValueData(vd)
-    
-    class RichValueData(valueData: ValueData) {
 
-      def asResourceType: ResourceType = valueData.resourceType match {    
+    implicit class RichValueData(valueData: ValueData) {
+
+      def asResourceType: ResourceType =  valueData.resourceType match {    
         case MetaAnyType => AnyType
         case MetaAnyRefType => AnyRefType
         case MetaAnyValueType => AnyValueType
@@ -209,7 +197,7 @@ package object meta {
       
       def asField: Field = {
         val name = valueData("Name").asInstanceOf[String]
-        val fieldType = valueData("FieldType").asInstanceOf[ValueData].asResourceType
+        lazy val fieldType = valueData("FieldType").asInstanceOf[ValueData].asResourceType // new SchemaContext(lib.asSchema).enrichValueData(valueData).asResourceType
         val category = valueData.getOrElse("Category", "")
         val description = valueData.getOrElse("Description", "")
         val required = valueData("Required").asInstanceOf[Boolean]
@@ -223,14 +211,12 @@ package object meta {
       private def getUserType[A <: UserType](fieldName: String, findOptType: (ResourceSchema, String) => Option[A]) = {
         val id = valueData(fieldName).asInstanceOf[ResourceRef].id
         findOptType(schema, id) getOrElse {
-          println("s1ts: " + schema.selectOneTypes)
-          println("valueData: " + valueData.debugString)
           error("No " + fieldName + " found: " + id)
         }
       }
     }
     
-    class RichRefData(refData: RefData) {
+    implicit class RichRefData(refData: RefData) {
 
       def asRefType: RefType = {
         val name = refData("Name").asInstanceOf[String]

@@ -43,6 +43,6 @@ class ValueData private (
     case _ => false
   }
   
-  override def toString(): String = fields.map(kv => kv._1.toString + ": " + kv._2.toString).mkString("{", ", ", "}")
+  override def toString(): String = debugString //fields.map(kv => kv._1.toString + ": " + kv._2.toString).mkString("{", ", ", "}")
   def debugString: String = "ValueData(%s, %s)".format(resourceType, fields)
 }

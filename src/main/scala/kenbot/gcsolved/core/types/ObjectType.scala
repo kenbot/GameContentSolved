@@ -13,7 +13,9 @@ abstract class ObjectType private[core] (name: String,
     override val isAbstract: Boolean,
     objectFields: => Seq[Field]) extends ResourceType(name, parentType) with UserType {
   
-  protected type MyType <: ObjectType
+  
+  protected type MyType <: ObjectType 
+  type MyData <: ObjectData
   
   lazy val localFields: Map[Field.Name, Field] = {
     ListMap(initFields(objectFields).map(f => (f.name,f)): _*)
@@ -39,7 +41,8 @@ abstract class ObjectType private[core] (name: String,
     fields(fieldName).fieldType
   }
   
-  def emptyData: ObjectData
+  def emptyData: MyData
+  def apply(fields: (Field.Name, Any)*): MyData
   
   private def equality = (name, parent.name, isReferenceType, isAbstract, localFields)
   override def hashCode() = equality.hashCode

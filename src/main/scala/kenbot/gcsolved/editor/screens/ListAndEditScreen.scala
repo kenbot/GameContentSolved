@@ -22,7 +22,7 @@ class ListAndEditScreen(val refType: RefType,
   def updatedLibrary = editSession.library
 
   def selectedResources = editSession.currentEdits 
-  def allResources: Seq[RefData] = updatedLibrary.allResourcesByType(refType).toIndexedSeq ++ selectedResources.filter(!_.hasId)
+  def allResources: Seq[RefData] = updatedLibrary.allResourcesByType(refType).toIndexedSeq ++ selectedResources.filterNot(_.hasId)
 
   def addNew() {
     editSession = editSession selectItems Seq(refType.emptyData) 

@@ -105,7 +105,12 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
     }
     
     describe("typed as \"Any\"") {
-      val anyField = 'Whatevs -> AnyType ^ (category="stuff", required=true, default=Some(StringType asAny "something"), description="nees hows")
+      val anyField = 'Whatevs -> AnyType ^ (
+          category="stuff", 
+          required=true, 
+          default=Some(StringType asAny "something"), 
+          description="nees hows")
+          
       val data = anyField.asData
       
       checkSameFields(data, anyField)
@@ -287,14 +292,17 @@ class MetaSchemaTest extends Spec with ShouldMatchers {
   describe("ResourceSchema") {
     val fruitCompanyType = SelectOneType("FruitCompany", StringType, "Bob's Fruit Co", "BananaCorp", "Grocerinos")
     val seedType = ValueType("Seed") defines ('Color -> StringType, 'Size -> IntType)
+    val nestedValueType = ValueType("NestedValueType") defines ('InnerValue -> seedType)
     val fruitType = RefType("Fruit").abstractly defines (idField, 'Color -> StringType, 'Company -> fruitCompanyType)
     val bananaType = RefType("Banana") extend fruitType defines 'Slipperiness -> IntType
     val appleType = RefType("Apple") extend fruitType defines 'Seeds -> ListType(seedType)
+    val subRefType = RefType("SubRefType") extend appleType
+    lazy val nestedRefType: RefType = RefType("NestedRefType") definesLazy Seq('NestedRefTypeField -> nestedRefType ^ (isId = true))
     
     
     val schema = ResourceSchema().
-        addRefTypes(fruitType, bananaType, appleType).
-        addValueTypes(seedType).
+        addRefTypes(fruitType, bananaType, appleType, subRefType, nestedRefType).
+        addValueTypes(seedType, nestedValueType).
         addSelectOneTypes(fruitCompanyType)
         
     val context = new SchemaContext(schema)

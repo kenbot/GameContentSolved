@@ -63,7 +63,7 @@ abstract class ResourcePackagerSpec(val packager: ResourcePackager) extends Spec
       require(f.delete) 
     }
     
-    try thunk 
+    try thunk
     finally deltree(someDirectory)
   }
   

@@ -3,7 +3,9 @@
 .project
 .scala_dependencies
 .metadata/
+.history
 lib_managed/
+examples/
 project/
 target/
 bin/
