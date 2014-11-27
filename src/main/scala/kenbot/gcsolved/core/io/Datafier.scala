@@ -4,7 +4,6 @@ package io
 import java.io.File
 import scala.collection.JavaConverters._
 import java.util.{Map => JMap}
-import javax.xml.validation.Schema
 
 
 object Datafier {
@@ -19,7 +18,7 @@ object Datafier {
     def fromData(d: Data): A
   }
   
-  class TranslationContext(schema: Schema) {
+  class TranslationContext(schema: ResourceSchema) {
     implicit object FieldTranslation extends DataTranslation[Field] {
       type Data = DataMap
       
@@ -35,12 +34,13 @@ object Datafier {
         
       def fromData(data: Data): Field = {
         val name = data("name")
-        val fieldType = schema findObject anyFromData(data("fieldType"))
+        val fieldType = ??? //schema findObjectType anyFromData(data("fieldType"))
         val category = data("category").asInstanceOf[String]
         val required = data("required").asInstanceOf[Boolean]
         val isId = data("isId").asInstanceOf[Boolean]
         val default = data("default")
         val description = data("description").asInstanceOf[Boolean]
+        ???
       }
     }
   }

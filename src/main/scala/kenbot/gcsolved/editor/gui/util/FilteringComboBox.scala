@@ -53,7 +53,7 @@ class FilteringComboBox[A](originalItems: Seq[A], useBlankItem: Boolean = true)(
     }
   }
   
-  private implicit def modelToSeq(model: ComboBoxModel): Seq[String] = {
+  private implicit def modelToSeq(model: ComboBoxModel[String]): Seq[String] = {
     val list = new ListBuffer[String]
     for (i <- 0 until model.getSize) {
       val a = model.getElementAt(i).asInstanceOf[String]
