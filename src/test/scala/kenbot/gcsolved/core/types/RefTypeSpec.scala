@@ -10,7 +10,7 @@ import kenbot.gcsolved.core.RefData
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class RefTypeSpec extends Spec with ShouldMatchers {
+class RefTypeSpec extends FunSpec with ShouldMatchers {
 
   def idField: Field = 'id -> StringType ^ (isId = true)
   

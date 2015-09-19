@@ -1,12 +1,12 @@
 package kenbot.gcsolved.core.types
 
 import org.junit.runner.RunWith
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class IntTypeSpec extends Spec with ShouldMatchers {
+class IntTypeSpec extends FunSpec with ShouldMatchers {
   
   describe("Accepting values") {
     it("should accept integers") {

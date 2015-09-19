@@ -8,7 +8,7 @@ import kenbot.gcsolved.core.types.BoolType
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])  
-class FieldSpec extends Spec with ShouldMatchers {
+class FieldSpec extends FunSpec with ShouldMatchers {
   val field = Field("foo", IntType, "category", false, false, Some(5), "a cool field")
   val requiredField = Field("fooReq", IntType, required=true)
   val wordyField = Field("maryHadALittleLamb", IntType)

@@ -6,7 +6,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class SelectOneTypeSpec extends Spec with ShouldMatchers {
+class SelectOneTypeSpec extends FunSpec with ShouldMatchers {
   val selectOne = SelectOneType("FruitType", StringType, "Banana", "Apple", "Pear")
   
   describe("Value types") {

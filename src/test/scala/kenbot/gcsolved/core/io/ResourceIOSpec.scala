@@ -2,7 +2,7 @@ package kenbot.gcsolved.core.io
 
 import java.io.{DataInput, DataInputStream, DataOutput, DataOutputStream, File, FileInputStream, FileOutputStream}
 
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import org.scalatest.matchers.ShouldMatchers
 
 import kenbot.gcsolved.core.{RefData, ResourceLibrary, ResourceRef, ResourceSchema, ValueData}
@@ -11,7 +11,7 @@ import kenbot.gcsolved.core.Field.{symbolAndType2Field, symbolAndValue2namePair}
 import kenbot.gcsolved.core.types.{AnyRefType, AnyType, AnyValueType, BoolType, DoubleType, FileType, IntType, ListType, RefType, SelectOneType, StringType, ValueType}
 
 
-abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with ShouldMatchers {
+abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends FunSpec with ShouldMatchers {
   
   val refType = RefType("Reffy") defines (
       'id -> StringType ^ (isId = true),
@@ -168,7 +168,7 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
         resourceIO.write(nestedValueType, valueData, out)
         resourceIO.read(nestedValueType, lib, in) should equal (valueData)
       }
-    }*/
+    }
     
     it("should be able to write and read back a field") {
       import kenbot.gcsolved.core.meta._
@@ -189,6 +189,7 @@ abstract class ResourceIOSpec(val resourceIO: ResourceIO) extends Spec with Shou
         valueData.asField should equal (field)
       }
     }
+    */
     
     it("should be able to write and read back a complicated library") {
       pending

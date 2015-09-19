@@ -2,7 +2,7 @@ package kenbot.gcsolved.editor.widgets
 
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import kenbot.gcsolved.core.Field.symbolAndType2Field
 import kenbot.gcsolved.core.types.IntType
 import kenbot.gcsolved.core.types.StringType
@@ -12,7 +12,7 @@ import kenbot.gcsolved.core.types.DoubleType
 import kenbot.gcsolved.core.Field
 
 @RunWith(classOf[JUnitRunner])
-class TextWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {
+class TextWidgetSpec extends FunSpec with ShouldMatchers with WidgetSpecMethods {
   
   def createTextFieldWidget(f: Field) = new TextFieldWidget(f) 
   

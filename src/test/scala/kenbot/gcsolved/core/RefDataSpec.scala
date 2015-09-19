@@ -1,7 +1,7 @@
 package kenbot.gcsolved.core
 
 import org.junit.runner.RunWith
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
@@ -9,7 +9,7 @@ import kenbot.gcsolved.core.Field.{symbolAndType2Field, symbolAndValue2namePair}
 import kenbot.gcsolved.core.types.{AnyRefType, IntType, RefType, StringType}
 
 @RunWith(classOf[JUnitRunner])
-class RefDataSpec extends Spec with ShouldMatchers {
+class RefDataSpec extends FunSpec with ShouldMatchers {
   
   val rabbit = RefType("Rabbit") defines ( 
       'name -> StringType ^ (isId = true), 

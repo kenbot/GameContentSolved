@@ -12,7 +12,7 @@ import kenbot.gcsolved.core.types.SelectOneType
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class ResourceLibrarySpec extends Spec with ShouldMatchers {
+class ResourceLibrarySpec extends FunSpec with ShouldMatchers {
   val library = ResourceLibrary("gumby", ResourceSchema())
 
   def idField = 'id -> StringType ^ (isId = true)

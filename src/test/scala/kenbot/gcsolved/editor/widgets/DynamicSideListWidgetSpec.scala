@@ -2,7 +2,7 @@ package kenbot.gcsolved.editor.widgets
 
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import kenbot.gcsolved.core.Field.symbolAndType2Field
 import kenbot.gcsolved.core.Field.symbolAndValue2namePair
 import kenbot.gcsolved.core.types.IntType
@@ -17,7 +17,7 @@ import kenbot.gcsolved.core.types.ListType
 import kenbot.gcsolved.editor.gui.TestSettings
 
 @RunWith(classOf[JUnitRunner])
-class DynamicSideListWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {
+class DynamicSideListWidgetSpec extends FunSpec with ShouldMatchers with WidgetSpecMethods {
   
   def makeWidget(f: Field): FieldWidget = new TextFieldWidget(f)
   val listType = ListType(IntType)

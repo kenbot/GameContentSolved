@@ -3,7 +3,7 @@ package kenbot.gcsolved.editor.widgets
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import kenbot.gcsolved.core.Field.symbolAndType2Field
 import kenbot.gcsolved.core.Field.symbolAndValue2namePair
 import kenbot.gcsolved.core.types.IntType
@@ -14,7 +14,7 @@ import kenbot.gcsolved.core.types.ResourceType
 import kenbot.gcsolved.editor.gui.TestSettings
 
 @RunWith(classOf[JUnitRunner])
-class EditScreenWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {
+class EditScreenWidgetSpec extends FunSpec with ShouldMatchers with WidgetSpecMethods {
   
   val EditScreenType = ValueType("EditScreenType") defines ('a -> IntType, 'b -> IntType)
   val NestedType = ValueType("Nested") defines 'nested -> EditScreenType

@@ -2,7 +2,7 @@ package kenbot.gcsolved.core.meta
 
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import kenbot.gcsolved.core.Field._
 import kenbot.gcsolved.core.types.AnyRefType
 import kenbot.gcsolved.core.types.AnyValueType
@@ -26,7 +26,7 @@ import kenbot.gcsolved.core.AnyData
 
 
 @RunWith(classOf[JUnitRunner]) 
-class MetaSchemaTest extends Spec with ShouldMatchers {
+class MetaSchemaTest extends FunSpec with ShouldMatchers {
   
   def idField: Field = 'id -> StringType ^ (isId = true)
   

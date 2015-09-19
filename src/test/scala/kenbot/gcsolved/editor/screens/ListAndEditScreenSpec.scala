@@ -3,7 +3,7 @@ import scala.sys.error
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import kenbot.gcsolved.core.types.IntType
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.StringType
@@ -19,7 +19,7 @@ import org.scalatest.junit.JUnitRunner
 import kenbot.gcsolved.core.Field
 
 @RunWith(classOf[JUnitRunner])  
-class ListAndEditScreenSpec extends Spec with ShouldMatchers with Publisher {
+class ListAndEditScreenSpec extends FunSpec with ShouldMatchers with Publisher {
 
   import Field._
   

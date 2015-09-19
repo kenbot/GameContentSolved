@@ -7,7 +7,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class DoubleTypeSpec extends Spec with ShouldMatchers {
+class DoubleTypeSpec extends FunSpec with ShouldMatchers {
   
   describe("Double") {
     it("should accept doubles") {

@@ -8,7 +8,7 @@ import Field._
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class LibraryEditSessionSpec extends Spec with ShouldMatchers {
+class LibraryEditSessionSpec extends FunSpec with ShouldMatchers {
   val gumbyType = RefType("Gumby") defines ('foo -> StringType ^ (isId = true), 'bar -> IntType)
   val schema = ResourceSchema() addRefTypes gumbyType
   val gumby = RefData(gumbyType, 'foo -> "zzz", 'bar -> 44) 

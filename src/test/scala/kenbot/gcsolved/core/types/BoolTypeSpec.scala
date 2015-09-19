@@ -7,7 +7,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class BoolTypeSpec extends Spec with ShouldMatchers {
+class BoolTypeSpec extends FunSpec with ShouldMatchers {
   
   describe("Boolean") {
     it("should accept true/false") {

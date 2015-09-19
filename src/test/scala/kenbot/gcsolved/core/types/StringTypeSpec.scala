@@ -7,7 +7,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class StringTypeSpec extends Spec with ShouldMatchers {
+class StringTypeSpec extends FunSpec with ShouldMatchers {
   
   describe("Accepting values") {
     it("should accept strings") {

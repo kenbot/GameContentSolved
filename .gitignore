@@ -4,6 +4,10 @@
 .scala_dependencies
 .metadata/
 .history
+.lib
+.idea/
+*.swp
+tags
 lib_managed/
 examples/
 project/

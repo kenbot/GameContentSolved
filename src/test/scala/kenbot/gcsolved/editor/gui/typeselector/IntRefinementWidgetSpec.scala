@@ -3,11 +3,11 @@ package kenbot.gcsolved.editor.gui.typeselector
 import scala.swing.Component
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class IntRefinementWidgetSpec extends Spec with ShouldMatchers {
+class IntRefinementWidgetSpec extends FunSpec with ShouldMatchers {
   
 
   describe("Initial state") {

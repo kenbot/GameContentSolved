@@ -5,7 +5,7 @@ import kenbot.gcsolved.core.pack.DefaultResourcePackager
 import java.io.File
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import kenbot.gcsolved.core.Field.symbolAndType2Field
 import kenbot.gcsolved.core.Field.symbolAndValue2namePair
 import kenbot.gcsolved.core.types.IntType
@@ -16,7 +16,7 @@ import kenbot.gcsolved.editor.Main
 import herezod.HerezodSchema
 
 @RunWith(classOf[JUnitRunner])
-class ResourceEnvironmentSpec extends Spec with ShouldMatchers {
+class ResourceEnvironmentSpec extends FunSpec with ShouldMatchers {
   
   val refType = RefType("Rabbit") defines ( 
       'numEars -> IntType, 

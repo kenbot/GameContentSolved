@@ -3,7 +3,7 @@ package kenbot.gcsolved.editor.widgets
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 
 import kenbot.gcsolved.core.Field.symbolAndType2Field
 import kenbot.gcsolved.core.Field.symbolAndValue2namePair
@@ -14,7 +14,7 @@ import kenbot.gcsolved.core.Field
 import kenbot.gcsolved.core.RefData
 
 @RunWith(classOf[JUnitRunner])  
-class ComboBoxWidgetSpec extends Spec with ShouldMatchers with WidgetSpecMethods {
+class ComboBoxWidgetSpec extends FunSpec with ShouldMatchers with WidgetSpecMethods {
   
   val PotatoType = RefType("Potato") defines ('Name -> StringType ^ (isId = true))
   val colorList = List("red", "green", "blue", "purple")

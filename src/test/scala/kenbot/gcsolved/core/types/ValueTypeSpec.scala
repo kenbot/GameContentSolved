@@ -1,7 +1,7 @@
 package kenbot.gcsolved.core.types
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import kenbot.gcsolved.core.Field.symbolAndType2Field
 import kenbot.gcsolved.core.Field.symbolAndValue2namePair
 import org.scalatest.junit.JUnitRunner
@@ -10,7 +10,7 @@ import kenbot.gcsolved.core.ValueData
 import kenbot.gcsolved.core.Field
 
 @RunWith(classOf[JUnitRunner])
-class ValueTypeSpec extends Spec with ShouldMatchers {
+class ValueTypeSpec extends FunSpec with ShouldMatchers {
 
   describe("Value types") {
     val fruit = ValueType("fruit") defines 'healthy -> BoolType

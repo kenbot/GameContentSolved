@@ -4,10 +4,7 @@ import java.awt.Color
 import javax.swing.BorderFactory
 import scala.swing.FlowPanel
 import scala.swing.Label
-import scala.annotation.target.field
 import scala.swing.Alignment
-import scala.annotation.target.field
-import scala.annotation.target.field
 import scala.swing.event.MousePressed
 
 

@@ -1,11 +1,11 @@
 package kenbot.gcsolved.core.types
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ListTypeSpec extends Spec with ShouldMatchers {
+class ListTypeSpec extends FunSpec with ShouldMatchers {
   
   describe("Accepting values") {
     val intList = ListType(IntType)

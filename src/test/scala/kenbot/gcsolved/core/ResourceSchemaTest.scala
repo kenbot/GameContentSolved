@@ -14,7 +14,7 @@ import kenbot.gcsolved.core.types.ValueType
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class ResourceSchemaSpec extends Spec with ShouldMatchers {
+class ResourceSchemaSpec extends FunSpec with ShouldMatchers {
   
   describe("Empty ResourceSchema") {
     it("should contain AnyRefType as the only RefType") {

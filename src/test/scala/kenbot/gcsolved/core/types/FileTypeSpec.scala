@@ -7,7 +7,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class FileTypeSpec extends Spec with ShouldMatchers {
+class FileTypeSpec extends FunSpec with ShouldMatchers {
   
   describe("Accepting values") {
     val textFiles = FileType("text", "txt", "foo", "bar")

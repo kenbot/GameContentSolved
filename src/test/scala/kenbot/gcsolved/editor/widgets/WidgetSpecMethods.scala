@@ -2,14 +2,14 @@ package kenbot.gcsolved.editor.widgets
 import scala.swing.Frame
 import scala.swing.MainFrame
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest._
 import kenbot.gcsolved.core.types.ResourceType
 import kenbot.gcsolved.core.Field
 import scala.swing.Swing
 import kenbot.gcsolved.core.types.StringType
 
 trait WidgetSpecMethods {
-  this: Spec with ShouldMatchers =>
+  this: FunSpec with ShouldMatchers =>
  
     
   def describe(fieldType: ResourceType)(thunk: => Unit) {

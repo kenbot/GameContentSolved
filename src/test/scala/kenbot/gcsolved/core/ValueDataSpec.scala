@@ -9,7 +9,7 @@ import kenbot.gcsolved.core.types.StringType
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class ValueDataSpec extends Spec with ShouldMatchers {
+class ValueDataSpec extends FunSpec with ShouldMatchers {
   val rabbit = ValueType("Rabbit")
   val ghost = RefType("Ghost") defines ('id -> StringType ^ (isId = true))
   def makeData = ValueData(rabbit, 

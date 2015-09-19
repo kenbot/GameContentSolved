@@ -2,7 +2,7 @@ package kenbot.gcsolved.editor.screens
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import kenbot.gcsolved.core.types.RefType
 import kenbot.gcsolved.core.types.StringType
 import kenbot.gcsolved.core.Field._
@@ -12,7 +12,7 @@ import org.scalatest.junit.JUnitRunner
 import kenbot.gcsolved.editor.widgets.TextFieldWidget
 
 @RunWith(classOf[JUnitRunner])  
-class WidgetEditScreenSpec extends Spec with ShouldMatchers {
+class WidgetEditScreenSpec extends FunSpec with ShouldMatchers {
   
   lazy val bananaType = RefType("Banana") defines ('name -> StringType ^ (isId = true))
   

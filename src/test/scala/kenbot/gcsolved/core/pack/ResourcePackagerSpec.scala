@@ -1,10 +1,10 @@
 package kenbot.gcsolved.core.pack
 
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.Spec
+import org.scalatest.FunSpec
 import java.io.File
 
-abstract class ResourcePackagerSpec(val packager: ResourcePackager) extends Spec with ShouldMatchers {
+abstract class ResourcePackagerSpec(val packager: ResourcePackager) extends FunSpec with ShouldMatchers {
    
   val baseDir = new File("test-pack-env")
 
